@@ -76,5 +76,29 @@ router
       .use(middleware.auth())
       .use(middleware.account())
       .use(middleware.admin())
+      
+    router
+      .group(() => {
+        router.get('/', [controllers.Categorias, 'index'])
+        router.post('/', [controllers.Categorias, 'store'])
+        router.get(':id', [controllers.Categorias, 'show'])
+        router.patch(':id', [controllers.Categorias, 'update'])
+      })
+      .prefix('categorias')
+      .as('categorias')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.Subcategorias, 'index'])
+        router.post('/', [controllers.Subcategorias, 'store'])
+        router.get(':id', [controllers.Subcategorias, 'show'])
+        router.patch(':id', [controllers.Subcategorias, 'update'])
+      })
+      .prefix('subcategorias')
+      .as('subcategorias')
+      .use(middleware.auth())
+      .use(middleware.account())
   })
   .prefix('/api/v1')
