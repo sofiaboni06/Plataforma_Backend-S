@@ -46,4 +46,28 @@ export interface ApiDefinition {
       update: typeof routes['users.users.update']
     }
   }
+  categorias: {
+    categorias: {
+      index: typeof routes['categorias.categorias.index']
+      store: typeof routes['categorias.categorias.store']
+      show: typeof routes['categorias.categorias.show']
+      update: typeof routes['categorias.categorias.update']
+    }
+  }
+  subcategorias: {
+    subcategorias: {
+      index: typeof routes['subcategorias.subcategorias.index']
+      store: typeof routes['subcategorias.subcategorias.store']
+      show: typeof routes['subcategorias.subcategorias.show']
+      update: typeof routes['subcategorias.subcategorias.update']
+    }
+  }
+  elementos: {
+    elementos: {
+      index: typeof routes['elementos.elementos.index']
+      store: typeof routes['elementos.elementos.store']
+      show: typeof routes['elementos.elementos.show']
+      update: typeof routes['elementos.elementos.update']
+    }
+  }
 }

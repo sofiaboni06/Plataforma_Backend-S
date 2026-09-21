@@ -247,4 +247,148 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'categorias.categorias.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/categorias'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['index']>>>
+    }
+  }
+  'categorias.categorias.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/categorias'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/categoria').createCategoriaValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/categoria').createCategoriaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'categorias.categorias.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/categorias/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['show']>>>
+    }
+  }
+  'categorias.categorias.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/categorias/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/categoria').updateCategoriaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/categoria').updateCategoriaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'subcategorias.subcategorias.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/subcategorias'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['index']>>>
+    }
+  }
+  'subcategorias.subcategorias.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/subcategorias'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/subcategoria').createSubcategoriaValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/subcategoria').createSubcategoriaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'subcategorias.subcategorias.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/subcategorias/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['show']>>>
+    }
+  }
+  'subcategorias.subcategorias.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/subcategorias/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/subcategoria').updateSubcategoriaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/subcategoria').updateSubcategoriaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'elementos.elementos.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/elementos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'elementos.elementos.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/inventario/elementos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'elementos.elementos.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/elementos/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'elementos.elementos.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/inventario/elementos/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
 }
