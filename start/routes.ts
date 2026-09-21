@@ -1,12 +1,3 @@
-/*
-|--------------------------------------------------------------------------
-| Routes file
-|--------------------------------------------------------------------------
-|
-| The routes file is used for defining the HTTP routes.
-|
-*/
-
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
@@ -100,5 +91,21 @@ router
       .as('subcategorias')
       .use(middleware.auth())
       .use(middleware.account())
+
+  
+    router
+  .group(() => {
+    router.get('/:id_bodega/stands', [controllers.Stand, 'index'])
+    router.post('/:id_bodega/stands', [controllers.Stand, 'store'])
+
+    router.get('/stands/:id', [controllers.Stand, 'show'])
+    router.patch('/stands/:id', [controllers.Stand, 'update'])
+    router.delete('/stands/:id', [controllers.Stand, 'destroy'])
   })
+  .prefix('bodegas')
+  .as('bodegas')
+  .use(middleware.auth())
+  .use(middleware.account())
+})
+     
   .prefix('/api/v1')
