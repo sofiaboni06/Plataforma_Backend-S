@@ -417,11 +417,11 @@ export interface Registry {
   }
   'bodegas.stand.index': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/bodegas/:id_bodega/stands'
+    pattern: '/api/v1/bodegas/:id/stands'
     types: {
       body: {}
       paramsTuple: [ParamValue]
-      params: { id_bodega: ParamValue }
+      params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['index']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['index']>>>
@@ -429,11 +429,11 @@ export interface Registry {
   }
   'bodegas.stand.store': {
     methods: ["POST"]
-    pattern: '/api/v1/bodegas/:id_bodega/stands'
+    pattern: '/api/v1/bodegas/:id/stands'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/stand').createStandValidator)>>
       paramsTuple: [ParamValue]
-      params: { id_bodega: ParamValue }
+      params: { id: ParamValue }
       query: ExtractQuery<InferInput<(typeof import('#validators/stand').createStandValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }

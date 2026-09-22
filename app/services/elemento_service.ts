@@ -3,16 +3,16 @@ import type User from '#models/usuario'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type ElementoPayload = {
-  id_subcategoria: number
-  id_stand: number
+  idSubcategoria: number
+  idStand: number
   nombre: string
   cantidad: number
   estado: boolean
-  id_unidad_medida: number
+  idUnidadMedida: number
   codigo: string
   descripcion?: string | null
   marca?: string | null
-  url_fotografia?: string | null
+  urlFotografia?: string | null
 }
 
 type UpdateElementoPayload = Partial<ElementoPayload>
@@ -25,16 +25,16 @@ export default class ElementoService {
   async create(_user: User, payload: ElementoPayload) {
     try {
       const elemento = await Elemento.create({
-        idSubcategoria: payload.id_subcategoria,
-        idStand: payload.id_stand,
+        idSubcategoria: payload.idSubcategoria,
+        idStand: payload.idStand,
         nombre: payload.nombre,
         cantidad: payload.cantidad,
         estado: payload.estado,
-        idUnidadMedida: payload.id_unidad_medida,
+        idUnidadMedida: payload.idUnidadMedida,
         codigo: payload.codigo,
         descripcionTecnica: payload.descripcion ?? null,
         marca: payload.marca ?? null,
-        urlFotografia: payload.url_fotografia ?? null,
+        urlFotografia: payload.urlFotografia ?? null,
       })
 
       return this.findById(_user, elemento.id)
@@ -51,16 +51,16 @@ export default class ElementoService {
     const elemento = await Elemento.findOrFail(id)
 
     elemento.merge({
-      ...(payload.id_subcategoria !== undefined && { idSubcategoria: payload.id_subcategoria }),
-      ...(payload.id_stand !== undefined && { idStand: payload.id_stand }),
+      ...(payload.idSubcategoria !== undefined && { idSubcategoria: payload.idSubcategoria }),
+      ...(payload.idStand !== undefined && { idStand: payload.idStand }),
       ...(payload.nombre !== undefined && { nombre: payload.nombre }),
       ...(payload.cantidad !== undefined && { cantidad: payload.cantidad }),
       ...(payload.estado !== undefined && { estado: payload.estado }),
-      ...(payload.id_unidad_medida !== undefined && { idUnidadMedida: payload.id_unidad_medida }),
+      ...(payload.idUnidadMedida !== undefined && { idUnidadMedida: payload.idUnidadMedida }),
       ...(payload.codigo !== undefined && { codigo: payload.codigo }),
       ...(payload.descripcion !== undefined && { descripcionTecnica: payload.descripcion }),
       ...(payload.marca !== undefined && { marca: payload.marca }),
-      ...(payload.url_fotografia !== undefined && { urlFotografia: payload.url_fotografia }),
+      ...(payload.urlFotografia !== undefined && { urlFotografia: payload.urlFotografia }),
     })
 
     try {

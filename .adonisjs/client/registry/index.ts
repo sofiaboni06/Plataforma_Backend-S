@@ -212,14 +212,14 @@ const routes = {
   },
   'bodegas.stand.index': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/bodegas/:id_bodega/stands',
-    tokens: [{"old":"/api/v1/bodegas/:id_bodega/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id_bodega/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id_bodega/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id_bodega/stands","type":1,"val":"id_bodega","end":""},{"old":"/api/v1/bodegas/:id_bodega/stands","type":0,"val":"stands","end":""}],
+    pattern: '/api/v1/bodegas/:id/stands',
+    tokens: [{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id/stands","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"stands","end":""}],
     types: placeholder as Registry['bodegas.stand.index']['types'],
   },
   'bodegas.stand.store': {
     methods: ["POST"],
-    pattern: '/api/v1/bodegas/:id_bodega/stands',
-    tokens: [{"old":"/api/v1/bodegas/:id_bodega/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id_bodega/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id_bodega/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id_bodega/stands","type":1,"val":"id_bodega","end":""},{"old":"/api/v1/bodegas/:id_bodega/stands","type":0,"val":"stands","end":""}],
+    pattern: '/api/v1/bodegas/:id/stands',
+    tokens: [{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id/stands","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"stands","end":""}],
     types: placeholder as Registry['bodegas.stand.store']['types'],
   },
   'bodegas.stand.show': {

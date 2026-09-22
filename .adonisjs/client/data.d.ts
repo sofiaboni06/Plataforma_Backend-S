@@ -13,6 +13,8 @@ import type RoleTransformer from '#transformers/role_transformer'
 import type SubcategoriaTransformer from '#transformers/subcategoria_transformer'
 import type UserTransformer from '#transformers/user_transformer'
 import type UnidadMedidaTransformer from '#transformers/unidad_medida_transformer'
+import type StandTransformer from '#transformers/stand_transformer'
+import type BodegaTransformer from '#transformers/bodega_transformer'
 
 export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
@@ -46,5 +48,13 @@ export namespace Data {
   export type UnidadMedida = InferData<UnidadMedidaTransformer>
   export namespace UnidadMedida {
     export type Variants = InferVariants<UnidadMedidaTransformer>
+  }
+  export type Stand = InferData<StandTransformer>
+  export namespace Stand {
+    export type Variants = InferVariants<StandTransformer>
+  }
+  export type Bodega = InferData<BodegaTransformer>
+  export namespace Bodega {
+    export type Variants = InferVariants<BodegaTransformer>
   }
 }

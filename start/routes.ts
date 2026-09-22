@@ -108,8 +108,8 @@ router
       .group(() => {
         router.get('/', [controllers.Bodega, 'index'])
         router.post('/', [controllers.Bodega, 'store'])
-        router.get(':id_bodega/stands', [controllers.Stand, 'index'])
-        router.post(':id_bodega/stands', [controllers.Stand, 'store'])
+        router.get(':id/stands', [controllers.Stand, 'index'])
+        router.post(':id/stands', [controllers.Stand, 'store'])
         router.get('stands/:id', [controllers.Stand, 'show'])
         router.patch('stands/:id', [controllers.Stand, 'update'])
         router.delete('stands/:id', [controllers.Stand, 'destroy'])

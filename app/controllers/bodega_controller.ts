@@ -1,19 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http'
-
 import BodegaService from '#services/bodega_service'
-import Bodega from '#models/bodega'
-
-import {
-  createBodegaValidator,
-  updateBodegaValidator,
-} from '#validators/bodega'
+import BodegaTransformer from '#transformers/bodega_transformer'
+import { createBodegaValidator, updateBodegaValidator } from '#validators/bodega'
 
 function parsePositiveInt(value: unknown, fallback: number) {
   const parsed = Number(value)
-
-  return Number.isInteger(parsed) && parsed > 0
-    ? parsed
-    : fallback
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback
 }
 
 function parseOptionalBoolean(value: unknown) {
@@ -21,21 +13,11 @@ function parseOptionalBoolean(value: unknown) {
     return undefined
   }
 
-  if (
-    value === true ||
-    value === 'true' ||
-    value === 1 ||
-    value === '1'
-  ) {
+  if (value === true || value === 'true' || value === 1 || value === '1') {
     return true
   }
 
-  if (
-    value === false ||
-    value === 'false' ||
-    value === 0 ||
-    value === '0'
-  ) {
+  if (value === false || value === 'false' || value === 0 || value === '0') {
     return false
   }
 
@@ -45,33 +27,14 @@ function parseOptionalBoolean(value: unknown) {
 export default class BodegasController {
   private service = new BodegaService()
 
-  async index({ request }: HttpContext) {
-    const page = parsePositiveInt(
-      request.input('page'),
-      1
-    )
-
-    const perPage = Math.min(
-      parsePositiveInt(
-        request.input('perPage'),
-        10
-      ),
-      100
-    )
-
-    const search =
-      String(request.input('search', '')).trim() || undefined
-
+  async index({ request, serialize }: HttpContext) {
+    const page = parsePositiveInt(request.input('page'), 1)
+    const perPage = Math.min(parsePositiveInt(request.input('perPage'), 10), 100)
+    const search = String(request.input('search', '')).trim() || undefined
     const idCformacion = request.input('idCformacion')
-      ? parsePositiveInt(
-          request.input('idCformacion'),
-          0
-        )
+      ? parsePositiveInt(request.input('idCformacion'), 0)
       : undefined
-
-    const estado = parseOptionalBoolean(
-      request.input('estado')
-    )
+    const estado = parseOptionalBoolean(request.input('estado'))
 
     const result = await this.service.list({
       page,
@@ -81,99 +44,37 @@ export default class BodegasController {
       estado,
     })
 
-    return {
-      data: result
-        .all()
-        .map((bodega) => this.serializeBodega(bodega)),
-
-      meta: result.getMeta(),
-    }
+    return serialize(BodegaTransformer.paginate(result.all(), result.getMeta()))
   }
 
-  async show({ params }: HttpContext) {
-    const bodega = await this.service.show(
-      Number(params.id)
-    )
+  async show({ params, serialize }: HttpContext) {
+    const bodega = await this.service.show(Number(params.id))
 
-    return {
-      data: this.serializeBodega(bodega),
-    }
+    return serialize(BodegaTransformer.transform(bodega))
   }
 
-  async store({ auth, request }: HttpContext) {
-    const payload = await request.validateUsing(
-      createBodegaValidator
-    )
-
+  async store({ auth, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(createBodegaValidator)
     const user = auth.getUserOrFail()
-
     const bodega = await this.service.create({
       nombre: payload.nombre,
       idCformacion: payload.idCformacion ?? user.idCformacion,
       estado: payload.estado,
     })
 
-    return {
-      data: this.serializeBodega(bodega),
-      message: 'Bodega creada correctamente',
-    }
+    return serialize(BodegaTransformer.transform(bodega))
   }
 
-  async update({ params, request }: HttpContext) {
-    const payload = await request.validateUsing(
-      updateBodegaValidator
-    )
+  async update({ params, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(updateBodegaValidator)
+    const bodega = await this.service.update(Number(params.id), payload)
 
-    const bodega = await this.service.update(
-      Number(params.id),
-      payload
-    )
-
-    return {
-      data: this.serializeBodega(bodega),
-      message: 'Bodega actualizada correctamente',
-    }
+    return serialize(BodegaTransformer.transform(bodega))
   }
 
-  async destroy({ params, response }: HttpContext) {
-    const result = await this.service.remove(
-      Number(params.id)
-    )
+  async destroy({ params, serialize }: HttpContext) {
+    const result = await this.service.remove(Number(params.id))
 
-    return response.status(200).send(result)
-  }
-
-  private serializeBodega(bodega: Bodega) {
-    return {
-      id: bodega.id,
-
-      id_bodega: bodega.id,
-
-      id_cformacion: bodega.idCformacion,
-
-      nombre: bodega.nombre,
-
-      estado: bodega.estado,
-
-      ubicacion:
-        bodega.trainingCenter?.nombre ?? null,
-
-      centroFormacion: bodega.trainingCenter
-        ? {
-            id: bodega.trainingCenter.id,
-            nombre: bodega.trainingCenter.nombre,
-          }
-        : null,
-
-      stands: (bodega.stands ?? []).map((stand) => ({
-        id: stand.id,
-        idStand: stand.id,
-        nombre: stand.nombre,
-        estado: stand.estado,
-      })),
-
-      totalStands:
-        bodega.stands?.length ?? 0,
-    }
+    return serialize(result)
   }
 }
