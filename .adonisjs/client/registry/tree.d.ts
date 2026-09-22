@@ -63,6 +63,13 @@ export interface ApiDefinition {
     }
   }
   bodegas: {
+    bodega: {
+      index: typeof routes['bodegas.bodega.index']
+      store: typeof routes['bodegas.bodega.store']
+      show: typeof routes['bodegas.bodega.show']
+      update: typeof routes['bodegas.bodega.update']
+      destroy: typeof routes['bodegas.bodega.destroy']
+    }
     stand: {
       index: typeof routes['bodegas.stand.index']
       store: typeof routes['bodegas.stand.store']

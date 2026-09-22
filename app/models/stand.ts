@@ -17,6 +17,6 @@ export default class Stand extends BaseModel {
   @column()
   declare estado: boolean
 
-  @belongsTo(() => Bodega, { foreignKey: 'id_bodega"' })
+  @belongsTo(() => Bodega, { foreignKey: 'id_bodega' })
   declare bodega: BelongsTo<typeof Bodega>
 }

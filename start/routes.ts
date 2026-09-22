@@ -94,18 +94,24 @@ router
 
   
     router
-  .group(() => {
-    router.get('/:id_bodega/stands', [controllers.Stand, 'index'])
-    router.post('/:id_bodega/stands', [controllers.Stand, 'store'])
+      .group(() => {
+        router.get('/', [controllers.Bodega, 'index'])
+        router.post('/', [controllers.Bodega, 'store'])
+        router.get('/:id', [controllers.Bodega, 'show'])
+        router.patch('/:id', [controllers.Bodega, 'update'])
+        router.delete('/:id', [controllers.Bodega, 'destroy'])
 
-    router.get('/stands/:id', [controllers.Stand, 'show'])
-    router.patch('/stands/:id', [controllers.Stand, 'update'])
-    router.delete('/stands/:id', [controllers.Stand, 'destroy'])
-  })
-  .prefix('bodegas')
-  .as('bodegas')
-  .use(middleware.auth())
-  .use(middleware.account())
+        router.get('/:id_bodega/stands', [controllers.Stand, 'index'])
+        router.post('/:id_bodega/stands', [controllers.Stand, 'store'])
+
+        router.get('/stands/:id', [controllers.Stand, 'show'])
+        router.patch('/stands/:id', [controllers.Stand, 'update'])
+        router.delete('/stands/:id', [controllers.Stand, 'destroy'])
+      })
+      .prefix('bodegas')
+      .as('bodegas')
+      .use(middleware.auth())
+      .use(middleware.account())
 })
      
   .prefix('/api/v1')

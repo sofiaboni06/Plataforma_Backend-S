@@ -174,6 +174,36 @@ const routes = {
     tokens: [{"old":"/api/v1/subcategorias/:id","type":0,"val":"api","end":""},{"old":"/api/v1/subcategorias/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/subcategorias/:id","type":0,"val":"subcategorias","end":""},{"old":"/api/v1/subcategorias/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['subcategorias.subcategorias.update']['types'],
   },
+  'bodegas.bodega.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/bodegas',
+    tokens: [{"old":"/api/v1/bodegas","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas","type":0,"val":"bodegas","end":""}],
+    types: placeholder as Registry['bodegas.bodega.index']['types'],
+  },
+  'bodegas.bodega.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/bodegas',
+    tokens: [{"old":"/api/v1/bodegas","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas","type":0,"val":"bodegas","end":""}],
+    types: placeholder as Registry['bodegas.bodega.store']['types'],
+  },
+  'bodegas.bodega.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/bodegas/:id',
+    tokens: [{"old":"/api/v1/bodegas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bodegas.bodega.show']['types'],
+  },
+  'bodegas.bodega.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/bodegas/:id',
+    tokens: [{"old":"/api/v1/bodegas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bodegas.bodega.update']['types'],
+  },
+  'bodegas.bodega.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/bodegas/:id',
+    tokens: [{"old":"/api/v1/bodegas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bodegas.bodega.destroy']['types'],
+  },
   'bodegas.stand.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/bodegas/:id_bodega/stands',
