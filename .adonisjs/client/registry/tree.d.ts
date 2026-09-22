@@ -62,7 +62,20 @@ export interface ApiDefinition {
       update: typeof routes['subcategorias.subcategorias.update']
     }
   }
+  elementos: {
+    elementos: {
+      index: typeof routes['elementos.elementos.index']
+      store: typeof routes['elementos.elementos.store']
+      show: typeof routes['elementos.elementos.show']
+      update: typeof routes['elementos.elementos.update']
   bodegas: {
+    bodega: {
+      index: typeof routes['bodegas.bodega.index']
+      store: typeof routes['bodegas.bodega.store']
+      show: typeof routes['bodegas.bodega.show']
+      update: typeof routes['bodegas.bodega.update']
+      destroy: typeof routes['bodegas.bodega.destroy']
+    }
     stand: {
       index: typeof routes['bodegas.stand.index']
       store: typeof routes['bodegas.stand.store']

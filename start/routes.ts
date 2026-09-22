@@ -1,6 +1,7 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import ElementosController from '#controllers/elementos_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -67,7 +68,7 @@ router
       .use(middleware.auth())
       .use(middleware.account())
       .use(middleware.admin())
-      
+
     router
       .group(() => {
         router.get('/', [controllers.Categorias, 'index'])
@@ -92,20 +93,38 @@ router
       .use(middleware.auth())
       .use(middleware.account())
 
-  
-    router
+  router
   .group(() => {
-    router.get('/:id_bodega/stands', [controllers.Stand, 'index'])
-    router.post('/:id_bodega/stands', [controllers.Stand, 'store'])
-
-    router.get('/stands/:id', [controllers.Stand, 'show'])
-    router.patch('/stands/:id', [controllers.Stand, 'update'])
-    router.delete('/stands/:id', [controllers.Stand, 'destroy'])
+    router.get('inventario/elementos', [ElementosController, 'index'])
+    router.post('inventario/elementos', [ElementosController, 'store'])
+    router.get('inventario/elementos/:id', [ElementosController, 'show'])
+    router.patch('inventario/elementos/:id', [ElementosController, 'update'])
   })
-  .prefix('bodegas')
-  .as('bodegas')
+  .as('elementos')
   .use(middleware.auth())
   .use(middleware.account())
+  })
+  .prefix('/api/v1')
+  
+    router
+      .group(() => {
+        router.get('/', [controllers.Bodega, 'index'])
+        router.post('/', [controllers.Bodega, 'store'])
+        router.get('/:id', [controllers.Bodega, 'show'])
+        router.patch('/:id', [controllers.Bodega, 'update'])
+        router.delete('/:id', [controllers.Bodega, 'destroy'])
+
+        router.get('/:id_bodega/stands', [controllers.Stand, 'index'])
+        router.post('/:id_bodega/stands', [controllers.Stand, 'store'])
+
+        router.get('/stands/:id', [controllers.Stand, 'show'])
+        router.patch('/stands/:id', [controllers.Stand, 'update'])
+        router.delete('/stands/:id', [controllers.Stand, 'destroy'])
+      })
+      .prefix('bodegas')
+      .as('bodegas')
+      .use(middleware.auth())
+      .use(middleware.account())
 })
      
   .prefix('/api/v1')
