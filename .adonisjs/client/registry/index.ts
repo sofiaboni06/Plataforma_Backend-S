@@ -174,6 +174,29 @@ const routes = {
     tokens: [{"old":"/api/v1/subcategorias/:id","type":0,"val":"api","end":""},{"old":"/api/v1/subcategorias/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/subcategorias/:id","type":0,"val":"subcategorias","end":""},{"old":"/api/v1/subcategorias/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['subcategorias.subcategorias.update']['types'],
   },
+  'elementos.elementos.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/inventario/elementos',
+    tokens: [{"old":"/api/v1/inventario/elementos","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos","type":0,"val":"elementos","end":""}],
+    types: placeholder as Registry['elementos.elementos.index']['types'],
+  },
+  'elementos.elementos.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/inventario/elementos',
+    tokens: [{"old":"/api/v1/inventario/elementos","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos","type":0,"val":"elementos","end":""}],
+    types: placeholder as Registry['elementos.elementos.store']['types'],
+  },
+  'elementos.elementos.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/inventario/elementos/:id',
+    tokens: [{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"elementos","end":""},{"old":"/api/v1/inventario/elementos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['elementos.elementos.show']['types'],
+  },
+  'elementos.elementos.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/inventario/elementos/:id',
+    tokens: [{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"elementos","end":""},{"old":"/api/v1/inventario/elementos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['elementos.elementos.update']['types'],
   'bodegas.bodega.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/bodegas',

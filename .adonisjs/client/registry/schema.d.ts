@@ -343,6 +343,9 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/subcategorias_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'elementos.elementos.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/elementos'
   'bodegas.bodega.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/bodegas'
@@ -351,6 +354,25 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'elementos.elementos.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/inventario/elementos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'elementos.elementos.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/elementos/:id'
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['index']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['index']>>>
     }
@@ -435,6 +457,13 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'elementos.elementos.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/inventario/elementos/:id'
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['show']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['show']>>>
     }
@@ -459,6 +488,8 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
+      response: unknown
+      errorResponse: unknown
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['destroy']>>>
     }

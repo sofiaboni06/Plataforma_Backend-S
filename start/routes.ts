@@ -1,6 +1,7 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import ElementosController from '#controllers/elementos_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -67,7 +68,7 @@ router
       .use(middleware.auth())
       .use(middleware.account())
       .use(middleware.admin())
-      
+
     router
       .group(() => {
         router.get('/', [controllers.Categorias, 'index'])
@@ -92,6 +93,18 @@ router
       .use(middleware.auth())
       .use(middleware.account())
 
+  router
+  .group(() => {
+    router.get('inventario/elementos', [ElementosController, 'index'])
+    router.post('inventario/elementos', [ElementosController, 'store'])
+    router.get('inventario/elementos/:id', [ElementosController, 'show'])
+    router.patch('inventario/elementos/:id', [ElementosController, 'update'])
+  })
+  .as('elementos')
+  .use(middleware.auth())
+  .use(middleware.account())
+  })
+  .prefix('/api/v1')
   
     router
       .group(() => {
