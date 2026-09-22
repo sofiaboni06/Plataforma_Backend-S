@@ -34,11 +34,11 @@ Ahí va el orden modelo → validador → servicio → transformer → controlad
 | `GET/PATCH` | `/categorias/:id` | |
 | `GET/POST` | `/subcategorias` | |
 | `GET/PATCH` | `/subcategorias/:id` | |
-| `GET/POST` | `/inventario/elementos` | el JSON de entrada sigue en snake_case (`id_subcategoria`, `id_stand`, `id_unidad_medida`, `url_fotografia`). `descripcion` se guarda en `descripcion_tecnica` |
+| `GET/POST` | `/inventario/elementos` | camelCase. `descripcion` se guarda en `descripcion_tecnica`. La respuesta incluye `unidadMedida`, `subcategoria` y `stand` |
 | `GET/PATCH` | `/inventario/elementos/:id` | |
-| `GET/POST` | `/bodegas` | respuesta `{ data }`. Borrar una bodega con stands responde 409 |
+| `GET/POST` | `/bodegas` | listado paginado: `{ data, metadata }`. Borrar una bodega con stands responde 409 |
 | `GET/PATCH/DELETE` | `/bodegas/:id` | |
-| `GET/POST` | `/bodegas/:id_bodega/stands` | |
+| `GET/POST` | `/bodegas/:id/stands` | |
 | `GET/PATCH/DELETE` | `/bodegas/stands/:id` | borrar un stand con elementos responde 409 |
 | `GET` | `/unidades-medida` | catálogo de `unidad_medida` |
 | `GET` | `/unidades-medida/:id` | |
