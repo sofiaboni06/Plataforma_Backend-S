@@ -3,10 +3,6 @@ import vine from '@vinejs/vine'
 const email = () => vine.string().email().maxLength(150)
 const password = () => vine.string().minLength(8).maxLength(32)
 
-export const createProductoValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(100),
-})
-
 export const signupValidator = vine.create({
   nombres: vine.string().trim().minLength(1).maxLength(100),
   apellidos: vine.string().trim().minLength(1).maxLength(100),

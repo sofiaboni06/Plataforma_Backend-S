@@ -1,12 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
-import BodegaService from '#services/bodega_service'
+import StandService from '#services/stand_service'
 import Stand from '#models/stand'
 
-import {
-  createStandValidator,
-  updateStandValidator,
-} from '#validators/bodega'
+import { createStandValidator, updateStandValidator } from '#validators/stand'
 
 function parsePositiveInt(value: unknown, fallback: number) {
   const parsed = Number(value)
@@ -28,7 +25,7 @@ function parseOptionalBoolean(value: unknown) {
 }
 
 export default class StandsController {
-  private service = new BodegaService()
+  private service = new StandService()
 
   async index({ params, request }: HttpContext) {
     const page = parsePositiveInt(request.input('page'), 1)
@@ -43,8 +40,8 @@ export default class StandsController {
 
     const estado = parseOptionalBoolean(request.input('estado'))
 
-    const result = await this.service.listStands({
-      id_bodega: Number(params.id_bodega),
+    const result = await this.service.list({
+      idBodega: Number(params.id_bodega),
       page,
       perPage,
       search,
@@ -60,10 +57,7 @@ export default class StandsController {
   async store({ params, request }: HttpContext) {
     const payload = await request.validateUsing(createStandValidator)
 
-    const stand = await this.service.createStand(
-      Number(params.id_bodega),
-      payload
-    )
+    const stand = await this.service.create(Number(params.id_bodega), payload)
 
     return {
       data: this.serializeStand(stand),
@@ -71,18 +65,15 @@ export default class StandsController {
     }
   }
   async show({ params }: HttpContext) {
-    const stand = await this.service.showStand(Number(params.id))
+    const stand = await this.service.show(Number(params.id))
 
-    return this.serializeStand(stand)
+    return { data: this.serializeStand(stand) }
   }
 
   async update({ params, request }: HttpContext) {
     const payload = await request.validateUsing(updateStandValidator)
 
-    const stand = await this.service.updateStand(
-      Number(params.id),
-      payload
-    )
+    const stand = await this.service.update(Number(params.id), payload)
 
     return {
       data: this.serializeStand(stand),
@@ -91,7 +82,7 @@ export default class StandsController {
   }
 
   async destroy({ params, response }: HttpContext) {
-    const result = await this.service.removeStand(Number(params.id))
+    const result = await this.service.remove(Number(params.id))
 
     return response.status(200).send(result)
   }
@@ -100,7 +91,7 @@ export default class StandsController {
     return {
       id: stand.id,
       idStand: stand.id,
-      idBodega: stand.id_bodega,
+      idBodega: stand.idBodega,
       nombre: stand.nombre,
       estado: stand.estado,
 

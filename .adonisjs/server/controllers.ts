@@ -5,10 +5,9 @@
 
 export const controllers = {
   AccessTokens: () => import('#controllers/access_tokens_controller'),
-  Categorias: () => import('#controllers/categorias_controller'),
-  Elementos: () => import('#controllers/elementos_controller'),
   Bodega: () => import('#controllers/bodega_controller'),
   Categorias: () => import('#controllers/categorias_controller'),
+  Elementos: () => import('#controllers/elementos_controller'),
   Modules: () => import('#controllers/modules_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Profile: () => import('#controllers/profile_controller'),
@@ -16,4 +15,5 @@ export const controllers = {
   Stand: () => import('#controllers/stand_controller'),
   Subcategorias: () => import('#controllers/subcategorias_controller'),
   Users: () => import('#controllers/users_controller'),
+  UnidadesMedida: () => import('#controllers/unidades_medida_controller'),
 }

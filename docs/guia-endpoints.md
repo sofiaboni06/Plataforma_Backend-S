@@ -30,5 +30,19 @@ Ahí va el orden modelo → validador → servicio → transformer → controlad
 | `GET` | `/users/options` | perfiles activos y centros, solo admin |
 | `GET/POST` | `/users` | listar / crear usuario con `idPerfil`, solo admin |
 | `GET/PATCH` | `/users/:id` | ficha y cambio de perfil/datos, solo admin |
+| `GET/POST` | `/categorias` | categorías del centro |
+| `GET/PATCH` | `/categorias/:id` | |
+| `GET/POST` | `/subcategorias` | |
+| `GET/PATCH` | `/subcategorias/:id` | |
+| `GET/POST` | `/inventario/elementos` | el JSON de entrada sigue en snake_case (`id_subcategoria`, `id_stand`, `id_unidad_medida`, `url_fotografia`). `descripcion` se guarda en `descripcion_tecnica` |
+| `GET/PATCH` | `/inventario/elementos/:id` | |
+| `GET/POST` | `/bodegas` | respuesta `{ data }`. Borrar una bodega con stands responde 409 |
+| `GET/PATCH/DELETE` | `/bodegas/:id` | |
+| `GET/POST` | `/bodegas/:id_bodega/stands` | |
+| `GET/PATCH/DELETE` | `/bodegas/stands/:id` | borrar un stand con elementos responde 409 |
+| `GET` | `/unidades-medida` | catálogo de `unidad_medida` |
+| `GET` | `/unidades-medida/:id` | |
 
 Cuentas dump, password `123456`: Carlos Administrador, Juan Almacenista, María Funcionario.
+
+Tablas del backup que todavía no tienen CRUD: `item` (seriales). El modelo ya existe para no inventar columnas. Recuperar contraseña (`/auth/recover`) sigue siendo la tarea aparte; los tests están en skip.

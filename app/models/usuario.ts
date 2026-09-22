@@ -26,10 +26,10 @@ export default class User extends AuthFinder(BaseModel) {
   @column({ isPrimary: true, columnName: 'id_usuario' })
   declare id: number
 
-  @column()
+  @column({ columnName: 'id_cformacion' })
   declare idCformacion: number
 
-  @column()
+  @column({ columnName: 'id_perfil' })
   declare idPerfil: number
 
   @column()
@@ -38,10 +38,10 @@ export default class User extends AuthFinder(BaseModel) {
   @column()
   declare apellidos: string
 
-  @column()
+  @column({ columnName: 'tipo_documento' })
   declare tipoDocumento: string
 
-  @column()
+  @column({ columnName: 'numero_documento' })
   declare numeroDocumento: string
 
   @column({ columnName: 'correo' })

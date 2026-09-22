@@ -21,6 +21,6 @@ export default class Bodega extends BaseModel {
   @belongsTo(() => TrainingCenter, { foreignKey: 'idCformacion' })
   declare trainingCenter: BelongsTo<typeof TrainingCenter>
 
-  @hasMany(() => Stand, { foreignKey: 'id_bodega' })
+  @hasMany(() => Stand, { foreignKey: 'idBodega' })
   declare stands: HasMany<typeof Stand>
 }

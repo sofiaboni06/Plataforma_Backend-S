@@ -1,4 +1,5 @@
 import Subcategoria from '#models/subcategoria'
+import { rethrowDatabaseError } from '#services/database_error'
 
 export default class SubcategoriaService {
   async index() {
@@ -14,11 +15,15 @@ export default class SubcategoriaService {
     nombre: string
     estado?: boolean
   }) {
-    return Subcategoria.create({
-      idCategoria: payload.idCategoria,
-      nombre: payload.nombre,
-      estado: payload.estado ?? true,
-    })
+    try {
+      return await Subcategoria.create({
+        idCategoria: payload.idCategoria,
+        nombre: payload.nombre,
+        estado: payload.estado ?? true,
+      })
+    } catch (error) {
+      rethrowDatabaseError(error, 'No se pudo crear la subcategoría')
+    }
   }
 
   async update(
@@ -37,7 +42,11 @@ export default class SubcategoriaService {
       estado: payload.estado,
     })
 
-    await subcategoria.save()
+    try {
+      await subcategoria.save()
+    } catch (error) {
+      rethrowDatabaseError(error, 'No se pudo actualizar la subcategoría')
+    }
 
     return subcategoria
   }
