@@ -68,6 +68,8 @@ export interface ApiDefinition {
       store: typeof routes['elementos.elementos.store']
       show: typeof routes['elementos.elementos.show']
       update: typeof routes['elementos.elementos.update']
+    }
+  }
   bodegas: {
     bodega: {
       index: typeof routes['bodegas.bodega.index']
@@ -82,6 +84,12 @@ export interface ApiDefinition {
       show: typeof routes['bodegas.stand.show']
       update: typeof routes['bodegas.stand.update']
       destroy: typeof routes['bodegas.stand.destroy']
+    }
+  }
+  unidadesMedida: {
+    unidadesMedida: {
+      index: typeof routes['unidadesMedida.unidades_medida.index']
+      show: typeof routes['unidadesMedida.unidades_medida.show']
     }
   }
 }

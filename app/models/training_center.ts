@@ -8,7 +8,7 @@ export default class TrainingCenter extends BaseModel {
   @column({ isPrimary: true, columnName: 'id_cformacion' })
   declare id: number
 
-  @column()
+  @column({ columnName: 'id_regional' })
   declare idRegional: number
 
   @column()

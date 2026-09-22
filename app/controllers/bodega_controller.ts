@@ -95,7 +95,9 @@ export default class BodegasController {
       Number(params.id)
     )
 
-    return this.serializeBodega(bodega)
+    return {
+      data: this.serializeBodega(bodega),
+    }
   }
 
   async store({ auth, request }: HttpContext) {

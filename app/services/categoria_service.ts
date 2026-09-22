@@ -1,4 +1,5 @@
 import Categoria from '#models/categoria'
+import { rethrowDatabaseError } from '#services/database_error'
 
 export default class CategoriaService {
   async index() {
@@ -14,11 +15,15 @@ export default class CategoriaService {
     nombre: string
     estado?: boolean
   }) {
-    return Categoria.create({
-      idCformacion: payload.idCformacion,
-      nombre: payload.nombre,
-      estado: payload.estado ?? true,
-    })
+    try {
+      return await Categoria.create({
+        idCformacion: payload.idCformacion,
+        nombre: payload.nombre,
+        estado: payload.estado ?? true,
+      })
+    } catch (error) {
+      rethrowDatabaseError(error, 'No se pudo crear la categoría')
+    }
   }
 
   async update(
@@ -37,7 +42,11 @@ export default class CategoriaService {
       estado: payload.estado,
     })
 
-    await categoria.save()
+    try {
+      await categoria.save()
+    } catch (error) {
+      rethrowDatabaseError(error, 'No se pudo actualizar la categoría')
+    }
 
     return categoria
   }

@@ -346,6 +346,51 @@ export interface Registry {
   'elementos.elementos.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/inventario/elementos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['index']>>>
+    }
+  }
+  'elementos.elementos.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/inventario/elementos'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/elemento').createElementoValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/elemento').createElementoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'elementos.elementos.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/elementos/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['show']>>>
+    }
+  }
+  'elementos.elementos.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/inventario/elementos/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/elemento').updateElementoValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/elemento').updateElementoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'bodegas.bodega.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/bodegas'
@@ -354,25 +399,6 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'elementos.elementos.store': {
-    methods: ["POST"]
-    pattern: '/api/v1/inventario/elementos'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'elementos.elementos.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/inventario/elementos/:id'
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['index']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['index']>>>
     }
@@ -387,6 +413,66 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/bodega').createBodegaValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'bodegas.stand.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/bodegas/:id_bodega/stands'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id_bodega: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['index']>>>
+    }
+  }
+  'bodegas.stand.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/bodegas/:id_bodega/stands'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/stand').createStandValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id_bodega: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/stand').createStandValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'bodegas.stand.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/bodegas/stands/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['show']>>>
+    }
+  }
+  'bodegas.stand.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/bodegas/stands/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/stand').updateStandValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/stand').updateStandValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'bodegas.stand.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/bodegas/stands/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['destroy']>>>
     }
   }
   'bodegas.bodega.show': {
@@ -425,73 +511,28 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['destroy']>>>
     }
   }
-  'bodegas.stand.index': {
+  'unidadesMedida.unidades_medida.index': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/bodegas/:id_bodega/stands'
+    pattern: '/api/v1/unidades-medida'
     types: {
       body: {}
-      paramsTuple: [ParamValue]
-      params: { id_bodega: ParamValue }
+      paramsTuple: []
+      params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['index']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['index']>>>
     }
   }
-  'bodegas.stand.store': {
-    methods: ["POST"]
-    pattern: '/api/v1/bodegas/:id_bodega/stands'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/bodega').createStandValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id_bodega: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/bodega').createStandValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'bodegas.stand.show': {
+  'unidadesMedida.unidades_medida.show': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/bodegas/stands/:id'
+    pattern: '/api/v1/unidades-medida/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'elementos.elementos.update': {
-    methods: ["PATCH"]
-    pattern: '/api/v1/inventario/elementos/:id'
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['show']>>>
-    }
-  }
-  'bodegas.stand.update': {
-    methods: ["PATCH"]
-    pattern: '/api/v1/bodegas/stands/:id'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/bodega').updateStandValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/bodega').updateStandValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['update']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'bodegas.stand.destroy': {
-    methods: ["DELETE"]
-    pattern: '/api/v1/bodegas/stands/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: unknown
-      errorResponse: unknown
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['destroy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['destroy']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['show']>>>
     }
   }
 }

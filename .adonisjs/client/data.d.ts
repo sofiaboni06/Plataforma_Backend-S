@@ -12,6 +12,7 @@ import type ModuleTransformer from '#transformers/module_transformer'
 import type RoleTransformer from '#transformers/role_transformer'
 import type SubcategoriaTransformer from '#transformers/subcategoria_transformer'
 import type UserTransformer from '#transformers/user_transformer'
+import type UnidadMedidaTransformer from '#transformers/unidad_medida_transformer'
 
 export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
@@ -41,5 +42,9 @@ export namespace Data {
   export type User = InferData<UserTransformer>
   export namespace User {
     export type Variants = InferVariants<UserTransformer>
+  }
+  export type UnidadMedida = InferData<UnidadMedidaTransformer>
+  export namespace UnidadMedida {
+    export type Variants = InferVariants<UnidadMedidaTransformer>
   }
 }
