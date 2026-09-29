@@ -21,4 +21,5 @@ export const controllers = {
   Subcategorias: () => import('#controllers/subcategorias_controller'),
   UnidadesMedida: () => import('#controllers/unidades_medida_controller'),
   Users: () => import('#controllers/users_controller'),
+  UsosPresupuestales: () => import('#controllers/usos_presupuestales_controller'),
 }

@@ -109,12 +109,16 @@ test.group('Items y elementos', () => {
       idItem: number
       idClasificacion: number | null
       clasificacion: { id: number; nombre: string } | null
+      cantidadMinima: number
+      idUsoPresupuestal: number | null
       valorUnitarioPromedio: number | null
       porcentajeAumento: number | null
       valorConAumento: number | null
       item: { nombre: string }
     }
     assert.equal(elemento.cantidad, 10)
+    assert.equal(elemento.cantidadMinima, 10)
+    assert.isNull(elemento.idUsoPresupuestal)
     assert.equal(elemento.gramaje, 1.5)
     assert.equal(elemento.idItem, item.id)
     assert.equal(elemento.nombre, item.nombre)
@@ -124,9 +128,9 @@ test.group('Items y elementos', () => {
 
     const clasificaciones = await client.get('/api/v1/clasificaciones-elemento').bearerToken(token)
     clasificaciones.assertStatus(200)
-    const consumo = (
-      clasificaciones.body().data as { id: number; nombre: string }[]
-    ).find((itemClasificacion) => itemClasificacion.nombre === 'CONSUMO')
+    const consumo = (clasificaciones.body().data as { id: number; nombre: string }[]).find(
+      (itemClasificacion) => itemClasificacion.nombre === 'CONSUMO'
+    )
     assert.exists(consumo)
 
     const ficha = await client
@@ -176,5 +180,21 @@ test.group('Items y elementos', () => {
     assert.equal(conCodigo.body().data.idCodigoEstandar, resina!.id)
     assert.equal(conCodigo.body().data.codigoEstandar.codigo, '13111305')
     assert.equal(conCodigo.body().data.codigoEstandar.nombre, 'RESINA O ESPUMA')
+
+    const usos = await client.get('/api/v1/usos-presupuestales').bearerToken(token)
+    usos.assertStatus(200)
+    const minerales = (usos.body().data as { id: number; nombre: string }[]).find(
+      (uso) => uso.nombre === 'MINERALES; ELECTRICIDAD, GAS Y AGUA'
+    )
+    assert.exists(minerales)
+
+    const conUso = await client
+      .patch(`/api/v1/inventario/elementos/${elemento.id}`)
+      .bearerToken(token)
+      .json({ idUsoPresupuestal: minerales!.id, cantidadMinima: 15 })
+    conUso.assertStatus(200)
+    assert.equal(conUso.body().data.idUsoPresupuestal, minerales!.id)
+    assert.equal(conUso.body().data.usoPresupuestal.nombre, 'MINERALES; ELECTRICIDAD, GAS Y AGUA')
+    assert.equal(conUso.body().data.cantidadMinima, 15)
   })
 })

@@ -15,6 +15,9 @@ Cuentas del dump, contraseña `123456`:
 | `carlos@correo.com` | Administrador |
 | `juan@correo.com` | Almacenista |
 | `maria@correo.com` | Funcionario |
+| `adminbodega@correo.com` | Admin bodega (la crea `db:seed`) |
+
+El perfil se llama como el Administrador quiera. En Perfiles marca el módulo Inventario y, debajo, las funciones: solo elementos, solo stands, o **Agregar como admin bodega**. Esa opción deja ver y manejar el inventario de la bodega asignada, sin `bodega.crear` ni `bodega.eliminar`. En Usuarios se elige ese perfil, el centro, y se marca la bodega.
 
 ## Devuelvan subcategorías y quiten sub-bodegas
 
@@ -67,6 +70,7 @@ Códigos que usa esta API:
 | `item` | `ver` `crear` `editar` `eliminar` |
 | `elemento` | `ver` `crear` `editar` |
 | `clasificacion_elemento` | `ver` `crear` `editar` `eliminar` |
+| `uso_presupuestal` | `ver` `crear` `editar` `eliminar` |
 | `unidad_medida` | `ver` |
 
 `GET /permissions` (solo admin) devuelve el árbol para los checkboxes: `data.modules[]` → `resources[]` → `permissions[]` con `code`, `action`, `actionLabel`, `name`.
@@ -222,19 +226,22 @@ El stock de un item. `GET/POST /inventario/elementos`, `GET/PATCH /inventario/el
   "idClasificacion": 2,
   "valorUnitarioPromedio": 1000,
   "porcentajeAumento": 15,
-  "idCodigoEstandar": 8
+  "idCodigoEstandar": 8,
+  "idUsoPresupuestal": 1,
+  "cantidadMinima": 10
 }
 ```
 
 Reglas:
 
-- `cantidad` mínima 10. Menos de eso es 422.
+- `cantidad` mínima 10. Menos de eso es 422. Es la existencia, lo que hay en el stand.
+- `cantidadMinima` es el umbral de la alerta. Si no se manda, queda en 10. Puede ser 0. No es lo mismo que `cantidad`.
 - `idItem` es obligatorio al crear. Nombre y subcategoría se copian del item; no se mandan aparte.
 - `codigo` es el código propio del elemento y no se repite.
-- `idClasificacion`, valores y `idCodigoEstandar` pueden ir en el alta o en un PATCH posterior.
+- `idClasificacion`, `idUsoPresupuestal`, valores y `idCodigoEstandar` pueden ir en el alta o en un PATCH posterior. Uso presupuestal es la partida de la plata, no el código UNSPSC.
 - `valorConAumento` no se envía. Lo calcula el backend: cantidad × valor unitario × (1 + porcentaje / 100). Sale `null` hasta que existan valor y porcentaje. Ejemplo: cantidad 10, valor 1000, porcentaje 15 → `11500`.
 
-La respuesta incluye `item`, `subcategoria`, `stand` (con su `subBodega`), `unidadMedida`, `clasificacion` y `codigoEstandar`.
+La respuesta incluye `item`, `subcategoria`, `stand` (con su `subBodega`), `unidadMedida`, `clasificacion`, `codigoEstandar`, `usoPresupuestal` y `cantidadMinima`.
 
 ### Bodega → stand
 
@@ -280,6 +287,16 @@ Clasificación de la ficha (ACCESORIO, EPP, CONSUMO, ELEMENTO DE ASEO, …):
 
 `DELETE` deshabilita. Objeto: `{ id, nombre, estado }`.
 
+Uso presupuestal, la partida de la ficha (MINERALES; ELECTRICIDAD, GAS Y AGUA, …). No es el código UNSPSC:
+
+`GET/POST /usos-presupuestales`, `GET/PATCH/DELETE /usos-presupuestales/:id`.
+
+```json
+{ "nombre": "Herramientas y Maquinaria General" }
+```
+
+`DELETE` deshabilita. Objeto: `{ id, nombre, estado }`.
+
 Códigos UNSPSC, solo lectura, permiso `elemento.ver`:
 
 `GET /codigos-estandar`, `GET /codigos-estandar/:id`.
@@ -299,7 +316,7 @@ Unidades de medida, solo lectura, permiso `unidad_medida.ver`:
 ## Orden de una pantalla de alta
 
 1. Login y guardar `token`, `permissions`, `isAdmin`, `bodegas`.
-2. Selects: unidades de medida, clasificaciones, códigos estándar, bodegas del usuario.
+2. Selects: unidades de medida, clasificaciones, usos presupuestales, códigos estándar, bodegas del usuario.
 3. Subcategoría con `GET /subcategorias`, o una que ya exista.
 4. Bodega, una `subBodegas` que ya venga en la bodega, y el stand sobre ese id.
 5. Item con `idSubcategoria`. Mostrar `subcategoria.nombre` y `subcategoria.categoria.nombre` que devuelve la API.

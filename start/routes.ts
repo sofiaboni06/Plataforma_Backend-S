@@ -239,6 +239,29 @@ router
     router
       .group(() => {
         router
+          .get('/', [controllers.UsosPresupuestales, 'index'])
+          .use(middleware.permission('uso_presupuestal.ver'))
+        router
+          .post('/', [controllers.UsosPresupuestales, 'store'])
+          .use(middleware.permission('uso_presupuestal.crear'))
+        router
+          .get(':id', [controllers.UsosPresupuestales, 'show'])
+          .use(middleware.permission('uso_presupuestal.ver'))
+        router
+          .patch(':id', [controllers.UsosPresupuestales, 'update'])
+          .use(middleware.permission('uso_presupuestal.editar'))
+        router
+          .delete(':id', [controllers.UsosPresupuestales, 'destroy'])
+          .use(middleware.permission('uso_presupuestal.eliminar'))
+      })
+      .prefix('usos-presupuestales')
+      .as('usosPresupuestales')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
           .get('/', [controllers.CodigosEstandar, 'index'])
           .use(middleware.permission('elemento.ver'))
         router

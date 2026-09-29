@@ -19,6 +19,7 @@ import type SubBodegaTransformer from '#transformers/sub_bodega_transformer'
 import type SubcategoriaTransformer from '#transformers/subcategoria_transformer'
 import type UnidadMedidaTransformer from '#transformers/unidad_medida_transformer'
 import type UserTransformer from '#transformers/user_transformer'
+import type UsoPresupuestalTransformer from '#transformers/uso_presupuestal_transformer'
 
 export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
@@ -76,5 +77,9 @@ export namespace Data {
   export type User = InferData<UserTransformer>
   export namespace User {
     export type Variants = InferVariants<UserTransformer>
+  }
+  export type UsoPresupuestal = InferData<UsoPresupuestalTransformer>
+  export namespace UsoPresupuestal {
+    export type Variants = InferVariants<UsoPresupuestalTransformer>
   }
 }

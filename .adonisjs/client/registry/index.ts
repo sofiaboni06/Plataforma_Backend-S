@@ -390,6 +390,36 @@ const routes = {
     tokens: [{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"api","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"clasificaciones-elemento","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['clasificacionesElemento.clasificaciones_elemento.destroy']['types'],
   },
+  'usosPresupuestales.usos_presupuestales.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/usos-presupuestales',
+    tokens: [{"old":"/api/v1/usos-presupuestales","type":0,"val":"api","end":""},{"old":"/api/v1/usos-presupuestales","type":0,"val":"v1","end":""},{"old":"/api/v1/usos-presupuestales","type":0,"val":"usos-presupuestales","end":""}],
+    types: placeholder as Registry['usosPresupuestales.usos_presupuestales.index']['types'],
+  },
+  'usosPresupuestales.usos_presupuestales.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/usos-presupuestales',
+    tokens: [{"old":"/api/v1/usos-presupuestales","type":0,"val":"api","end":""},{"old":"/api/v1/usos-presupuestales","type":0,"val":"v1","end":""},{"old":"/api/v1/usos-presupuestales","type":0,"val":"usos-presupuestales","end":""}],
+    types: placeholder as Registry['usosPresupuestales.usos_presupuestales.store']['types'],
+  },
+  'usosPresupuestales.usos_presupuestales.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/usos-presupuestales/:id',
+    tokens: [{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"api","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"usos-presupuestales","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['usosPresupuestales.usos_presupuestales.show']['types'],
+  },
+  'usosPresupuestales.usos_presupuestales.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/usos-presupuestales/:id',
+    tokens: [{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"api","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"usos-presupuestales","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['usosPresupuestales.usos_presupuestales.update']['types'],
+  },
+  'usosPresupuestales.usos_presupuestales.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/usos-presupuestales/:id',
+    tokens: [{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"api","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":0,"val":"usos-presupuestales","end":""},{"old":"/api/v1/usos-presupuestales/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['usosPresupuestales.usos_presupuestales.destroy']['types'],
+  },
   'codigosEstandar.codigos_estandar.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/codigos-estandar',

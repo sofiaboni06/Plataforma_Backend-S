@@ -122,6 +122,15 @@ export interface ApiDefinition {
       destroy: typeof routes['clasificacionesElemento.clasificaciones_elemento.destroy']
     }
   }
+  usosPresupuestales: {
+    usosPresupuestales: {
+      index: typeof routes['usosPresupuestales.usos_presupuestales.index']
+      store: typeof routes['usosPresupuestales.usos_presupuestales.store']
+      show: typeof routes['usosPresupuestales.usos_presupuestales.show']
+      update: typeof routes['usosPresupuestales.usos_presupuestales.update']
+      destroy: typeof routes['usosPresupuestales.usos_presupuestales.destroy']
+    }
+  }
   codigosEstandar: {
     codigosEstandar: {
       index: typeof routes['codigosEstandar.codigos_estandar.index']
