@@ -153,19 +153,6 @@ router
 
     router
       .group(() => {
-        router.get('/', [controllers.Bodega, 'index'])
-        router.post('/', [controllers.Bodega, 'store'])
-
-        router.get(':id/sub-bodegas', [controllers.SubBodegas, 'index'])
-        router.post(':id/sub-bodegas', [controllers.SubBodegas, 'store'])
-
-        router.get('sub-bodegas/:id', [controllers.SubBodegas, 'show'])
-        router.patch('sub-bodegas/:id', [controllers.SubBodegas, 'update'])
-        router.delete('sub-bodegas/:id', [controllers.SubBodegas, 'destroy'])
-
-        router.get(':id', [controllers.Bodega, 'show'])
-        router.patch(':id', [controllers.Bodega, 'update'])
-        router.delete(':id', [controllers.Bodega, 'destroy'])
         router.get('/', [controllers.Items, 'index']).use(middleware.permission('item.ver'))
         router.post('/', [controllers.Items, 'store']).use(middleware.permission('item.crear'))
         router.get(':id', [controllers.Items, 'show']).use(middleware.permission('item.ver'))
@@ -190,6 +177,15 @@ router
           .post('sub-bodegas/:id/stands', [controllers.Stand, 'store'])
           .use(middleware.permission('stand.crear'))
         router
+          .get('sub-bodegas/:id', [controllers.SubBodegas, 'show'])
+          .use(middleware.permission('bodega.ver'))
+        router
+          .patch('sub-bodegas/:id', [controllers.SubBodegas, 'update'])
+          .use(middleware.permission('bodega.editar'))
+        router
+          .delete('sub-bodegas/:id', [controllers.SubBodegas, 'destroy'])
+          .use(middleware.permission('bodega.eliminar'))
+        router
           .get('stands/:id', [controllers.Stand, 'show'])
           .use(middleware.permission('stand.ver'))
         router
@@ -198,6 +194,12 @@ router
         router
           .delete('stands/:id', [controllers.Stand, 'destroy'])
           .use(middleware.permission('stand.eliminar'))
+        router
+          .get(':id/sub-bodegas', [controllers.SubBodegas, 'index'])
+          .use(middleware.permission('bodega.ver'))
+        router
+          .post(':id/sub-bodegas', [controllers.SubBodegas, 'store'])
+          .use(middleware.permission('bodega.crear'))
         router.get(':id', [controllers.Bodega, 'show']).use(middleware.permission('bodega.ver'))
         router
           .patch(':id', [controllers.Bodega, 'update'])
@@ -213,15 +215,6 @@ router
 
     router
       .group(() => {
-        router.get(':id/stands', [controllers.Stand, 'index'])
-        router.post(':id/stands', [controllers.Stand, 'store'])
-
-        router.get('stands/:id', [controllers.Stand, 'show'])
-        router.patch('stands/:id', [controllers.Stand, 'update'])
-        router.delete('stands/:id', [controllers.Stand, 'destroy'])
-      })
-      .prefix('sub-bodegas')
-      .as('subBodegasStands')
         router
           .get('/', [controllers.ClasificacionesElemento, 'index'])
           .use(middleware.permission('clasificacion_elemento.ver'))
@@ -259,8 +252,6 @@ router
 
     router
       .group(() => {
-        router.get('/', [controllers.UnidadesMedida, 'index'])
-        router.get(':id', [controllers.UnidadesMedida, 'show'])
         router
           .get('/', [controllers.UnidadesMedida, 'index'])
           .use(middleware.permission('unidad_medida.ver'))

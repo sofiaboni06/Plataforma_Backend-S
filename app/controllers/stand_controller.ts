@@ -35,7 +35,6 @@ export default class StandsController {
     const estado = parseOptionalBoolean(request.input('estado'))
     const scope = await resolveScope(auth.getUserOrFail())
 
-    const result = await this.service.list({
     const result = await this.service.list(scope, {
       idSubBodega: Number(params.id),
       page,
@@ -49,11 +48,6 @@ export default class StandsController {
 
   async store({ auth, params, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(createStandValidator)
-
-    const stand = await this.service.create(
-      Number(params.id),
-      payload
-    )
     const scope = await resolveScope(auth.getUserOrFail())
     const stand = await this.service.create(scope, Number(params.id), payload)
 
@@ -69,11 +63,6 @@ export default class StandsController {
 
   async update({ auth, params, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(updateStandValidator)
-
-    const stand = await this.service.update(
-      Number(params.id),
-      payload
-    )
     const scope = await resolveScope(auth.getUserOrFail())
     const stand = await this.service.update(scope, Number(params.id), payload)
 

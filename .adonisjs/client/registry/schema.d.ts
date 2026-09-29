@@ -583,6 +583,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'bodegas.sub_bodegas.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/bodegas/sub-bodegas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['show']>>>
+    }
+  }
+  'bodegas.sub_bodegas.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/bodegas/sub-bodegas/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/sub_bodega').updateSubBodegaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/sub_bodega').updateSubBodegaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'bodegas.sub_bodegas.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/bodegas/sub-bodegas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['destroy']>>>
+    }
+  }
   'bodegas.stand.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/bodegas/stands/:id'
@@ -617,6 +653,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/stand_controller').default['destroy']>>>
+    }
+  }
+  'bodegas.sub_bodegas.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/bodegas/:id/sub-bodegas'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['index']>>>
+    }
+  }
+  'bodegas.sub_bodegas.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/bodegas/:id/sub-bodegas'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/sub_bodega').createSubBodegaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/sub_bodega').createSubBodegaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/sub_bodegas_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'bodegas.bodega.show': {

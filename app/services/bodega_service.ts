@@ -23,9 +23,6 @@ export default class BodegaService {
   ) {
     const query = Bodega.query()
       .preload('trainingCenter')
-      .preload('subBodegas', (subBodegasQuery) =>
-        subBodegasQuery.orderBy('id_sub_bodega', 'asc')
-      )
       .preload('subBodegas', (subBodegasQuery) => {
         subBodegasQuery
           .orderBy('id_sub_bodega', 'asc')
@@ -38,7 +35,6 @@ export default class BodegaService {
         query.where('id_cformacion', options.idCformacion)
       }
     } else {
-      // Each center only sees its own bodega, and only if it was assigned.
       query.where('id_cformacion', scope.idCformacion).whereIn('id_bodega', scope.bodegaIds)
     }
 
@@ -59,9 +55,6 @@ export default class BodegaService {
     return Bodega.query()
       .where('id_bodega', id)
       .preload('trainingCenter')
-      .preload('subBodegas', (subBodegasQuery) =>
-        subBodegasQuery.orderBy('id_sub_bodega', 'asc')
-      )
       .preload('subBodegas', (subBodegasQuery) => {
         subBodegasQuery
           .orderBy('id_sub_bodega', 'asc')
@@ -71,8 +64,6 @@ export default class BodegaService {
   }
 
   async create(
-    payload: Required<Pick<BodegaPayload, 'nombre' | 'idCformacion'>> &
-      Pick<BodegaPayload, 'estado'>
     scope: AccessScope,
     payload: Pick<BodegaPayload, 'estado'> & { nombre: string; idCformacion?: number }
   ) {
@@ -89,10 +80,7 @@ export default class BodegaService {
 
       return this.show(scope, bodega.id)
     } catch (error) {
-      rethrowDatabaseError(
-        error,
-        'No se pudo crear la bodega'
-      )
+      rethrowDatabaseError(error, 'No se pudo crear la bodega')
     }
   }
 
@@ -100,11 +88,9 @@ export default class BodegaService {
     await assertBodegaInScope(scope, id)
 
     const bodega = await Bodega.findOrFail(id)
-
     bodega.merge({
       ...(payload.nombre !== undefined ? { nombre: payload.nombre } : {}),
       ...(payload.estado !== undefined ? { estado: payload.estado } : {}),
-      // Moving a bodega between training centers is an admin-only operation.
       ...(payload.idCformacion !== undefined && scope.isAdmin
         ? { idCformacion: payload.idCformacion }
         : {}),
@@ -113,10 +99,7 @@ export default class BodegaService {
     try {
       await bodega.save()
     } catch (error) {
-      rethrowDatabaseError(
-        error,
-        'No se pudo actualizar la bodega'
-      )
+      rethrowDatabaseError(error, 'No se pudo actualizar la bodega')
     }
 
     return this.show(scope, id)
@@ -126,22 +109,6 @@ export default class BodegaService {
     await assertBodegaInScope(scope, id)
 
     const bodega = await Bodega.findOrFail(id)
-
-    const subBodegaCount = await SubBodega
-      .query()
-      .where('id_bodega', id)
-      .count('* as total')
-
-    const total = Number(subBodegaCount[0].$extras.total)
-
-    if (total > 0) {
-      throw new Exception(
-        'No se puede eliminar la bodega porque tiene sub-bodegas asociadas',
-        {
-          status: 409,
-          code: 'E_BODEGA_HAS_SUB_BODEGAS',
-        }
-      )
     const subBodegaCount = await SubBodega.query().where('id_bodega', id).count('* as total')
     const total = Number(subBodegaCount[0].$extras.total)
 
@@ -155,14 +122,9 @@ export default class BodegaService {
     try {
       await bodega.delete()
     } catch (error) {
-      rethrowDatabaseError(
-        error,
-        'No se pudo eliminar la bodega'
-      )
+      rethrowDatabaseError(error, 'No se pudo eliminar la bodega')
     }
 
-    return {
-      message: 'Bodega eliminada correctamente',
-    }
+    return { message: 'Bodega eliminada correctamente' }
   }
 }
