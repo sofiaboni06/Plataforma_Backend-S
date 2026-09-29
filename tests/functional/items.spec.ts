@@ -1,7 +1,5 @@
 import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
-import SubBodega from '#models/sub_bodega'
-import Subcategoria from '#models/subcategoria'
 
 async function login(client: ApiClient, email = 'carlos@correo.com') {
   const response = await client.post('/api/v1/auth/login').json({ email, password: '123456' })
@@ -17,10 +15,24 @@ test.group('Items y elementos', () => {
     const token = await login(client)
     const suffix = Date.now()
 
-    const subcategoria = await Subcategoria.query()
-      .where('estado', true)
-      .orderBy('id_subcategoria', 'asc')
-      .firstOrFail()
+    const categoriaRes = await client
+      .post('/api/v1/categorias')
+      .bearerToken(token)
+      .json({ nombre: `Pinturas ${suffix}`, estado: true })
+    categoriaRes.assertStatus(200)
+    const categoria = categoriaRes.body().data as { id: number; nombre: string }
+
+    const subcategoriaRes = await client
+      .post('/api/v1/subcategorias')
+      .bearerToken(token)
+      .json({ idCategoria: categoria.id, nombre: `Vinilos ${suffix}`, estado: true })
+    subcategoriaRes.assertStatus(200)
+    const subcategoria = subcategoriaRes.body().data as {
+      id: number
+      idCategoria: number
+      nombre: string
+    }
+    assert.equal(subcategoria.idCategoria, categoria.id)
 
     const creado = await client
       .post('/api/v1/inventario/items')
@@ -43,7 +55,8 @@ test.group('Items y elementos', () => {
     assert.equal(item.descripcion, 'Vinilo para techo, acabado mate')
     assert.equal(item.idSubcategoria, subcategoria.id)
     assert.equal(item.subcategoria.id, subcategoria.id)
-    assert.exists(item.subcategoria.categoria)
+    assert.equal(item.subcategoria.categoria?.id, categoria.id)
+    assert.equal(item.subcategoria.categoria?.nombre, categoria.nombre)
 
     const bodegas = await client.get('/api/v1/bodegas').bearerToken(token)
     bodegas.assertStatus(200)
@@ -51,20 +64,33 @@ test.group('Items y elementos', () => {
     assert.exists(bodega)
     assert.exists(bodega.idCformacion)
 
-    const subBodega = await SubBodega.create({
-      idBodega: bodega.id,
-      nombre: `Madera ${suffix}`,
-      estado: true,
-    })
+    const subRes = await client
+      .post(`/api/v1/bodegas/${bodega.id}/sub-bodegas`)
+      .bearerToken(token)
+      .json({ nombre: `Madera ${suffix}` })
+    subRes.assertStatus(200)
+    const subBodega = subRes.body().data as {
+      id: number
+      idBodega: number
+      bodega: { id: number }
+    }
     assert.equal(subBodega.idBodega, bodega.id)
+    assert.equal(subBodega.bodega.id, bodega.id)
 
     const standRes = await client
       .post(`/api/v1/bodegas/sub-bodegas/${subBodega.id}/stands`)
       .bearerToken(token)
       .json({ nombre: `Estante 1 ${suffix}` })
     standRes.assertStatus(200)
-    const stand = standRes.body().data as { id: number; idSubBodega: number }
+    const stand = standRes.body().data as {
+      id: number
+      idSubBodega: number
+      subBodega: { id: number; idBodega: number }
+      bodega: { id: number }
+    }
     assert.equal(stand.idSubBodega, subBodega.id)
+    assert.equal(stand.subBodega.idBodega, bodega.id)
+    assert.equal(stand.bodega.id, bodega.id)
 
     const unidades = await client.get('/api/v1/unidades-medida').bearerToken(token)
     unidades.assertStatus(200)
@@ -114,7 +140,16 @@ test.group('Items y elementos', () => {
       valorUnitarioPromedio: number | null
       porcentajeAumento: number | null
       valorConAumento: number | null
-      item: { nombre: string }
+      item: {
+        nombre: string
+        subcategoria: { id: number; categoria: { id: number; nombre: string } }
+      }
+      idSubcategoria: number
+      subcategoria: { id: number; nombre: string; categoria: { id: number; nombre: string } }
+      stand: {
+        id: number
+        subBodega: { id: number; idBodega: number; bodega: { id: number } }
+      }
     }
     assert.equal(elemento.cantidad, 10)
     assert.equal(elemento.cantidadMinima, 10)
@@ -123,6 +158,16 @@ test.group('Items y elementos', () => {
     assert.equal(elemento.idItem, item.id)
     assert.equal(elemento.nombre, item.nombre)
     assert.equal(elemento.item.nombre, item.nombre)
+    assert.equal(elemento.idSubcategoria, subcategoria.id)
+    assert.equal(elemento.subcategoria.id, subcategoria.id)
+    assert.equal(elemento.subcategoria.categoria.id, categoria.id)
+    assert.equal(elemento.subcategoria.categoria.nombre, categoria.nombre)
+    assert.equal(elemento.item.subcategoria.id, subcategoria.id)
+    assert.equal(elemento.item.subcategoria.categoria.nombre, categoria.nombre)
+    assert.equal(elemento.stand.id, stand.id)
+    assert.equal(elemento.stand.subBodega.id, subBodega.id)
+    assert.equal(elemento.stand.subBodega.idBodega, bodega.id)
+    assert.equal(elemento.stand.subBodega.bodega.id, bodega.id)
     assert.isNull(elemento.valorConAumento)
     assert.isNull(elemento.idClasificacion)
 

@@ -426,11 +426,29 @@ const routes = {
     tokens: [{"old":"/api/v1/codigos-estandar","type":0,"val":"api","end":""},{"old":"/api/v1/codigos-estandar","type":0,"val":"v1","end":""},{"old":"/api/v1/codigos-estandar","type":0,"val":"codigos-estandar","end":""}],
     types: placeholder as Registry['codigosEstandar.codigos_estandar.index']['types'],
   },
+  'codigosEstandar.codigos_estandar.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/codigos-estandar',
+    tokens: [{"old":"/api/v1/codigos-estandar","type":0,"val":"api","end":""},{"old":"/api/v1/codigos-estandar","type":0,"val":"v1","end":""},{"old":"/api/v1/codigos-estandar","type":0,"val":"codigos-estandar","end":""}],
+    types: placeholder as Registry['codigosEstandar.codigos_estandar.store']['types'],
+  },
   'codigosEstandar.codigos_estandar.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/codigos-estandar/:id',
     tokens: [{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"api","end":""},{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"codigos-estandar","end":""},{"old":"/api/v1/codigos-estandar/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['codigosEstandar.codigos_estandar.show']['types'],
+  },
+  'codigosEstandar.codigos_estandar.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/codigos-estandar/:id',
+    tokens: [{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"api","end":""},{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"codigos-estandar","end":""},{"old":"/api/v1/codigos-estandar/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['codigosEstandar.codigos_estandar.update']['types'],
+  },
+  'codigosEstandar.codigos_estandar.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/codigos-estandar/:id',
+    tokens: [{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"api","end":""},{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"codigos-estandar","end":""},{"old":"/api/v1/codigos-estandar/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['codigosEstandar.codigos_estandar.destroy']['types'],
   },
   'unidadesMedida.unidades_medida.index': {
     methods: ["GET","HEAD"],
@@ -438,11 +456,29 @@ const routes = {
     tokens: [{"old":"/api/v1/unidades-medida","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida","type":0,"val":"unidades-medida","end":""}],
     types: placeholder as Registry['unidadesMedida.unidades_medida.index']['types'],
   },
+  'unidadesMedida.unidades_medida.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/unidades-medida',
+    tokens: [{"old":"/api/v1/unidades-medida","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida","type":0,"val":"unidades-medida","end":""}],
+    types: placeholder as Registry['unidadesMedida.unidades_medida.store']['types'],
+  },
   'unidadesMedida.unidades_medida.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/unidades-medida/:id',
     tokens: [{"old":"/api/v1/unidades-medida/:id","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"unidades-medida","end":""},{"old":"/api/v1/unidades-medida/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['unidadesMedida.unidades_medida.show']['types'],
+  },
+  'unidadesMedida.unidades_medida.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/unidades-medida/:id',
+    tokens: [{"old":"/api/v1/unidades-medida/:id","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"unidades-medida","end":""},{"old":"/api/v1/unidades-medida/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['unidadesMedida.unidades_medida.update']['types'],
+  },
+  'unidadesMedida.unidades_medida.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/unidades-medida/:id',
+    tokens: [{"old":"/api/v1/unidades-medida/:id","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"unidades-medida","end":""},{"old":"/api/v1/unidades-medida/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['unidadesMedida.unidades_medida.destroy']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

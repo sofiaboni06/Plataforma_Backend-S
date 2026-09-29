@@ -8,6 +8,9 @@ export default class CodigoEstandar extends BaseModel {
   @column({ isPrimary: true, columnName: 'id_codigo_estandar' })
   declare id: number
 
+  @column({ columnName: 'id_cformacion' })
+  declare idCformacion: number
+
   @column()
   declare codigo: string
 

@@ -134,13 +134,19 @@ export interface ApiDefinition {
   codigosEstandar: {
     codigosEstandar: {
       index: typeof routes['codigosEstandar.codigos_estandar.index']
+      store: typeof routes['codigosEstandar.codigos_estandar.store']
       show: typeof routes['codigosEstandar.codigos_estandar.show']
+      update: typeof routes['codigosEstandar.codigos_estandar.update']
+      destroy: typeof routes['codigosEstandar.codigos_estandar.destroy']
     }
   }
   unidadesMedida: {
     unidadesMedida: {
       index: typeof routes['unidadesMedida.unidades_medida.index']
+      store: typeof routes['unidadesMedida.unidades_medida.store']
       show: typeof routes['unidadesMedida.unidades_medida.show']
+      update: typeof routes['unidadesMedida.unidades_medida.update']
+      destroy: typeof routes['unidadesMedida.unidades_medida.destroy']
     }
   }
 }

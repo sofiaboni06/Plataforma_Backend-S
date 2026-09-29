@@ -8,6 +8,7 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
     const unidadMedida = this.resource.unidadMedida
 
     const item = this.resource.item
+    const itemSubcategoria = item?.subcategoria
     const codigoEstandar = this.resource.codigoEstandar
     const clasificacion = this.resource.clasificacion
     const usoPresupuestal = this.resource.usoPresupuestal
@@ -51,9 +52,31 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
             nombre: item.nombre,
             descripcion: item.descripcion,
             idSubcategoria: item.idSubcategoria,
+            subcategoria: itemSubcategoria
+              ? {
+                  id: itemSubcategoria.id,
+                  nombre: itemSubcategoria.nombre,
+                  idCategoria: itemSubcategoria.idCategoria,
+                  categoria: itemSubcategoria.categoria
+                    ? {
+                        id: itemSubcategoria.categoria.id,
+                        nombre: itemSubcategoria.categoria.nombre,
+                      }
+                    : null,
+                }
+              : null,
           }
         : null,
-      subcategoria: subcategoria ? { id: subcategoria.id, nombre: subcategoria.nombre } : null,
+      subcategoria: subcategoria
+        ? {
+            id: subcategoria.id,
+            nombre: subcategoria.nombre,
+            idCategoria: subcategoria.idCategoria,
+            categoria: subcategoria.categoria
+              ? { id: subcategoria.categoria.id, nombre: subcategoria.categoria.nombre }
+              : null,
+          }
+        : null,
       stand: stand
         ? {
             id: stand.id,
@@ -64,6 +87,12 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
                   id: stand.subBodega.id,
                   nombre: stand.subBodega.nombre,
                   idBodega: stand.subBodega.idBodega,
+                  bodega: stand.subBodega.bodega
+                    ? {
+                        id: stand.subBodega.bodega.id,
+                        nombre: stand.subBodega.bodega.nombre,
+                      }
+                    : null,
                 }
               : null,
           }

@@ -51,7 +51,12 @@ export const PERMISSION_RESOURCES = {
   unidad_medida: {
     module: 'Inventario',
     label: 'Unidades de medida',
-    actions: ['ver'],
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  codigo_estandar: {
+    module: 'Inventario',
+    label: 'Códigos UNSPSC',
+    actions: ['crear', 'editar', 'eliminar'],
   },
   clasificacion_elemento: {
     module: 'Inventario',

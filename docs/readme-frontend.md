@@ -19,35 +19,33 @@ Cuentas del dump, contraseña `123456`:
 
 El perfil se llama como el Administrador quiera. En Perfiles marca el módulo Inventario y, debajo, las funciones: solo elementos, solo stands, o **Agregar como admin bodega**. Esa opción deja ver y manejar el inventario de la bodega asignada, sin `bodega.crear` ni `bodega.eliminar`. En Usuarios se elige ese perfil, el centro, y se marca la bodega.
 
-## Devuelvan subcategorías y quiten sub-bodegas
+## Dos cadenas distintas
 
-Se quitó la pantalla equivocada. Subcategoría clasifica el producto y cuelga de la categoría. Sub-bodega es el tipo de material dentro de la bodega, y el stand cuelga de ella. No son la misma cosa.
+Subcategoría clasifica el producto y cuelga de la categoría. Sub-bodega es el tipo de material dentro de la bodega, y el stand cuelga de ella. No son la misma cosa.
 
-### Volver a poner (se sacó por error)
+### Producto: categoría → subcategoría → ítem → elemento
 
-Subcategorías otra vez tienen API: `GET/POST /subcategorias` y `GET/PATCH /subcategorias/:id`. Permisos `subcategoria.ver`, `subcategoria.crear`, `subcategoria.editar`.
+`GET/POST /subcategorias` y `GET/PATCH /subcategorias/:id`. Permisos `subcategoria.ver`, `subcategoria.crear`, `subcategoria.editar`.
 
-- Categorías. Crear, editar y ver vuelven a pedir y guardar subcategorías. El alta de la categoría sigue siendo nombre, estado y centro (`POST /categorias`). La subcategoría se guarda aparte, con `idCategoria`, en `POST /subcategorias`.
-- Listado de categorías. Vuelve la columna de subcategorías. Salen de `GET /subcategorias`, no del objeto de la categoría. El botón de inhabilitar se queda: `categoria.eliminar` y `DELETE /categorias/:id`. Si todavía hay subcategorías activas, se muestra el 409.
-- Ítems. Vuelvan a llamar a `GET /subcategorias` para el select. Al crear o editar se envía `idSubcategoria`. La tabla sigue mostrando categoría y subcategoría que devuelve la API.
-- Elementos. El listado y el detalle vuelven a mostrar la subcategoría. La trae el elemento (`subcategoria`) y también el ítem relacionado. No hace falta armarla a mano.
+- Categorías. El alta es nombre, estado y centro (`POST /categorias`). La subcategoría se guarda aparte, con `idCategoria`, en `POST /subcategorias`.
+- Listado de categorías. La columna de subcategorías sale de `GET /subcategorias`, no del objeto de la categoría. El botón de inhabilitar se queda: `categoria.eliminar` y `DELETE /categorias/:id`. Si todavía hay subcategorías activas, se muestra el 409.
+- Ítems. `GET /subcategorias` para el select. Al crear o editar se envía `idSubcategoria`. La tabla muestra categoría y subcategoría que devuelve la API.
+- Elementos. El listado y el detalle traen `subcategoria` (con su `categoria`) y lo mismo dentro de `item.subcategoria`. No hace falta armarlo a mano.
 
 No hay `DELETE /subcategorias`. Para apagar una se manda `PATCH` con `{ "estado": false }`.
 
-### Quitar (esto sí)
+### Ubicación: bodega → sub-bodega → stand → elemento
 
-La pantalla de sub-bodegas: crear, editar y borrar. Estas rutas responden 404:
+No hay permisos `sub_bodega.*`. Crear, ver, editar y borrar sub-bodegas usa los de bodega: `bodega.ver`, `bodega.crear`, `bodega.editar`, `bodega.eliminar`.
 
-- `GET/POST /bodegas/:id/sub-bodegas`
-- `GET/PATCH/DELETE /bodegas/sub-bodegas/:id`
+| Método | Ruta |
+| --- | --- |
+| `GET/POST` | `/bodegas/:id/sub-bodegas` |
+| `GET/PATCH/DELETE` | `/bodegas/sub-bodegas/:id` |
 
-No hay permisos `sub_bodega.*`.
+Crear sub-bodega: `{ "nombre": "Madera" }`. `estado` es opcional y queda en `true`.
 
-Lo que se queda de la bodega:
-
-- La bodega sigue trayendo `subBodegas` para elegir una que ya exista.
-- El stand se crea sobre esa sub-bodega: `POST /bodegas/sub-bodegas/:id/stands` con `{ "nombre" }`.
-- Ítems, elementos, bodega, stand, clasificaciones, unidades y códigos UNSPSC se dejan como están, salvo ese formulario de sub-bodega.
+El stand se crea sobre esa sub-bodega: `POST /bodegas/sub-bodegas/:id/stands` con `{ "nombre" }`. Borrar una sub-bodega que todavía tiene stands responde 409. Borrar una bodega que todavía tiene sub-bodegas responde 409.
 
 ## Cómo ocultar botones
 
@@ -71,7 +69,8 @@ Códigos que usa esta API:
 | `elemento` | `ver` `crear` `editar` |
 | `clasificacion_elemento` | `ver` `crear` `editar` `eliminar` |
 | `uso_presupuestal` | `ver` `crear` `editar` `eliminar` |
-| `unidad_medida` | `ver` |
+| `unidad_medida` | `ver` `crear` `editar` `eliminar` |
+| `codigo_estandar` | `crear` `editar` `eliminar` |
 
 `GET /permissions` (solo admin) devuelve el árbol para los checkboxes: `data.modules[]` → `resources[]` → `permissions[]` con `code`, `action`, `actionLabel`, `name`.
 
@@ -239,22 +238,57 @@ Reglas:
 - `idItem` es obligatorio al crear. Nombre y subcategoría se copian del item; no se mandan aparte.
 - `codigo` es el código propio del elemento y no se repite.
 - `idClasificacion`, `idUsoPresupuestal`, valores y `idCodigoEstandar` pueden ir en el alta o en un PATCH posterior. Uso presupuestal es la partida de la plata, no el código UNSPSC.
+- Esos ids, y también `idUnidadMedida`, tienen que ser del mismo centro que el stand. Si son de otro centro, la API responde 422.
 - `valorConAumento` no se envía. Lo calcula el backend: cantidad × valor unitario × (1 + porcentaje / 100). Sale `null` hasta que existan valor y porcentaje. Ejemplo: cantidad 10, valor 1000, porcentaje 15 → `11500`.
 
-La respuesta incluye `item`, `subcategoria`, `stand` (con su `subBodega`), `unidadMedida`, `clasificacion`, `codigoEstandar`, `usoPresupuestal` y `cantidadMinima`.
+La respuesta incluye `item` (con `subcategoria` y `categoria`), `subcategoria` (con `categoria`), `stand.subBodega.bodega`, `unidadMedida`, `clasificacion`, `codigoEstandar`, `usoPresupuestal` y `cantidadMinima`.
 
-### Bodega → stand
+```json
+{
+  "idItem": 12,
+  "item": {
+    "id": 12,
+    "nombre": "Pintura para techos vinilo color rojo",
+    "subcategoria": {
+      "id": 4,
+      "nombre": "Vinilos",
+      "categoria": { "id": 2, "nombre": "Pinturas" }
+    }
+  },
+  "subcategoria": {
+    "id": 4,
+    "nombre": "Vinilos",
+    "categoria": { "id": 2, "nombre": "Pinturas" }
+  },
+  "stand": {
+    "id": 3,
+    "nombre": "Estante 1",
+    "subBodega": {
+      "id": 7,
+      "nombre": "Madera",
+      "idBodega": 1,
+      "bodega": { "id": 1, "nombre": "Bodega principal" }
+    }
+  }
+}
+```
 
-La bodega es la del centro. La sub-bodega sigue existiendo como relación (el stand cuelga de ella), pero crear, editar y borrar sub-bodegas no es de esta entrega.
+### Bodega → sub-bodega → stand
+
+La bodega es la del centro. La sub-bodega cuelga de ella y el stand cuelga de la sub-bodega.
 
 | Método | Ruta | Notas |
 | --- | --- | --- |
 | `GET/POST` | `/bodegas` | `page`, `perPage` (default 10), `search`, `estado`, `idCformacion` (admin) |
 | `GET/PATCH/DELETE` | `/bodegas/:id` | borrar con sub-bodegas → 409 |
-| `GET/POST` | `/bodegas/sub-bodegas/:id/stands` | el id es de una sub-bodega que ya exista |
+| `GET/POST` | `/bodegas/:id/sub-bodegas` | permisos de bodega |
+| `GET/PATCH/DELETE` | `/bodegas/sub-bodegas/:id` | borrar con stands → 409 |
+| `GET/POST` | `/bodegas/sub-bodegas/:id/stands` | el id es de la sub-bodega |
 | `GET/PATCH/DELETE` | `/bodegas/stands/:id` | borrar con elementos → 409 |
 
 Crear bodega: `{ "nombre": "Bodega principal", "estado": true }`. El admin puede mandar `idCformacion`.
+
+Crear sub-bodega: `{ "nombre": "Madera" }`.
 
 Crear stand: `{ "nombre": "Estante 1" }`.
 
@@ -273,19 +307,27 @@ Bodega:
 }
 ```
 
-Bodega y stand sí se borran de la tabla, pero solo si están vacíos. La sub-bodega no tiene endpoint para borrarla.
+Bodega, sub-bodega y stand sí se borran de la tabla, pero solo si están vacíos.
 
 ### Catálogos del elemento
+
+Clasificación, uso presupuestal, código UNSPSC y unidad de medida pertenecen al **centro de formación**, no a la bodega y no son globales. Dos bodegas del mismo centro comparten catálogo. Un centro nuevo no trae filas: hay que crearlas ahí.
+
+En el alta del elemento, los selects se piden con el `idCformacion` de la bodega elegida:
+
+`GET /clasificaciones-elemento?idCformacion=2`
+
+Quien no es admin ignora ese query y solo ve su centro. El admin, si no manda `idCformacion`, ve el centro de su propia cuenta.
 
 Clasificación de la ficha (ACCESORIO, EPP, CONSUMO, ELEMENTO DE ASEO, …):
 
 `GET/POST /clasificaciones-elemento`, `GET/PATCH/DELETE /clasificaciones-elemento/:id`.
 
 ```json
-{ "nombre": "HERRAMIENTA" }
+{ "nombre": "HERRAMIENTA", "idCformacion": 2 }
 ```
 
-`DELETE` deshabilita. Objeto: `{ id, nombre, estado }`.
+`idCformacion` en el POST solo lo respeta el admin. `DELETE` deshabilita. Objeto: `{ id, idCformacion, nombre, estado }`.
 
 Uso presupuestal, la partida de la ficha (MINERALES; ELECTRICIDAD, GAS Y AGUA, …). No es el código UNSPSC:
 
@@ -295,29 +337,33 @@ Uso presupuestal, la partida de la ficha (MINERALES; ELECTRICIDAD, GAS Y AGUA, �
 { "nombre": "Herramientas y Maquinaria General" }
 ```
 
-`DELETE` deshabilita. Objeto: `{ id, nombre, estado }`.
+`DELETE` deshabilita. Objeto: `{ id, idCformacion, nombre, estado }`.
 
-Códigos UNSPSC, solo lectura, permiso `elemento.ver`:
+Códigos UNSPSC. Ver con `elemento.ver`. Crear, editar y borrar con `codigo_estandar.crear`, `codigo_estandar.editar`, `codigo_estandar.eliminar`:
 
-`GET /codigos-estandar`, `GET /codigos-estandar/:id`.
-
-```json
-{ "id": 8, "codigo": "13111305", "nombre": "RESINA O ESPUMA" }
-```
-
-Unidades de medida, solo lectura, permiso `unidad_medida.ver`:
-
-`GET /unidades-medida`, `GET /unidades-medida/:id`.
+`GET/POST /codigos-estandar`, `GET/PATCH/DELETE /codigos-estandar/:id`.
 
 ```json
-{ "id": 1, "nombre": "Unidad", "abreviatura": "UND", "estado": true }
+{ "codigo": "13111305", "nombre": "RESINA O ESPUMA", "idCformacion": 2 }
 ```
+
+Objeto: `{ id, idCformacion, codigo, nombre }`. Borrar uno que ya usa un elemento responde 409.
+
+Unidades de medida, permiso `unidad_medida.ver` / `crear` / `editar` / `eliminar`:
+
+`GET/POST /unidades-medida`, `GET/PATCH/DELETE /unidades-medida/:id`.
+
+```json
+{ "nombre": "Unidad", "abreviatura": "UND", "estado": true }
+```
+
+`DELETE` deshabilita. Objeto: `{ id, idCformacion, nombre, abreviatura, estado }`.
 
 ## Orden de una pantalla de alta
 
 1. Login y guardar `token`, `permissions`, `isAdmin`, `bodegas`.
-2. Selects: unidades de medida, clasificaciones, usos presupuestales, códigos estándar, bodegas del usuario.
+2. Bodega del usuario. Con su `idCformacion`, pedir unidades, clasificaciones, usos presupuestales y códigos UNSPSC. Si el centro es nuevo, esos selects llegan vacíos.
 3. Subcategoría con `GET /subcategorias`, o una que ya exista.
-4. Bodega, una `subBodegas` que ya venga en la bodega, y el stand sobre ese id.
+4. Bodega, sub-bodega con `POST /bodegas/:id/sub-bodegas`, y el stand sobre ese id.
 5. Item con `idSubcategoria`. Mostrar `subcategoria.nombre` y `subcategoria.categoria.nombre` que devuelve la API.
 6. Elemento con `idItem`, `idStand`, `cantidad` ≥ 10 y el resto de la ficha.

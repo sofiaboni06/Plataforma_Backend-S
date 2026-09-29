@@ -1,27 +1,42 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import UsoPresupuestal from '#models/uso_presupuestal'
-import { assertCan, type AccessScope } from '#services/access_control'
+import {
+  assertCan,
+  assertOwnedByCenter,
+  centerIdFor,
+  type AccessScope,
+} from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type UsoPresupuestalPayload = {
+  idCformacion?: number
   nombre: string
   estado?: boolean
 }
 
 export default class UsoPresupuestalService {
-  async index(options: { estado?: boolean } = {}) {
+  async index(scope: AccessScope, options: { estado?: boolean; idCformacion?: number } = {}) {
     return UsoPresupuestal.query()
+      .where('id_cformacion', centerIdFor(scope, options.idCformacion))
       .where('estado', options.estado ?? true)
       .orderBy('nombre', 'asc')
   }
 
-  async show(id: number) {
-    return UsoPresupuestal.findOrFail(id)
+  async show(scope: AccessScope, id: number) {
+    const uso = await UsoPresupuestal.findOrFail(id)
+    assertOwnedByCenter(
+      scope,
+      uso.idCformacion,
+      'Ese uso presupuestal no pertenece a tu centro de formación'
+    )
+
+    return uso
   }
 
-  async store(payload: UsoPresupuestalPayload) {
+  async store(scope: AccessScope, payload: UsoPresupuestalPayload) {
     try {
       return await UsoPresupuestal.create({
+        idCformacion: centerIdFor(scope, payload.idCformacion),
         nombre: payload.nombre,
         estado: payload.estado ?? true,
       })
@@ -31,7 +46,7 @@ export default class UsoPresupuestalService {
   }
 
   async update(scope: AccessScope, id: number, payload: Partial<UsoPresupuestalPayload>) {
-    const uso = await UsoPresupuestal.findOrFail(id)
+    const uso = await this.show(scope, id)
 
     if (payload.estado !== undefined && payload.estado !== uso.estado) {
       assertCan(scope, 'uso_presupuestal.eliminar')
@@ -55,8 +70,8 @@ export default class UsoPresupuestalService {
    * Soft delete. Elementos keep the foreign key, so the name stays on old
    * stock rows. The select only lists active budget uses.
    */
-  async remove(id: number) {
-    const uso = await UsoPresupuestal.findOrFail(id)
+  async remove(scope: AccessScope, id: number) {
+    const uso = await this.show(scope, id)
 
     if (uso.estado === false) {
       throw new Exception('El uso presupuestal ya está deshabilitado', {

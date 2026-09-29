@@ -193,6 +193,25 @@ export async function assertCategoriaInScope(scope: AccessScope, idCategoria: nu
   }
 }
 
+/**
+ * Catalog rows (clasificación, unidad, UNSPSC, uso presupuestal) belong to one
+ * training center. A non-admin always stays in their own center. An admin may
+ * name another center; otherwise the center of their account is used.
+ */
+export function centerIdFor(scope: AccessScope, requested?: number) {
+  if (!scope.isAdmin) {
+    return scope.idCformacion
+  }
+
+  return requested ?? scope.idCformacion
+}
+
+export function assertOwnedByCenter(scope: AccessScope, idCformacion: number, message: string) {
+  if (!scope.isAdmin && idCformacion !== scope.idCformacion) {
+    throw forbidden(message)
+  }
+}
+
 export async function assertSubcategoriaInScope(scope: AccessScope, idSubcategoria: number) {
   if (scope.isAdmin) {
     return

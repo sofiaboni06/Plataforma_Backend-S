@@ -19,7 +19,7 @@ Después de restaurar el dump, **los dos comandos son obligatorios**:
 
 ```bash
 node ace migration:run   # tablas nuevas (tokens, permiso, perfil_permiso, usuario_bodega, codigo_estandar, uso_presupuestal), ficha de elemento e item
-node ace db:seed         # llena permisos, códigos UNSPSC, clasificaciones, usos presupuestales y el perfil Admin bodega
+node ace db:seed         # llena permisos, y en el primer centro los UNSPSC, clasificaciones y usos. El perfil Admin bodega también. Un centro nuevo no hereda esos catálogos
 ```
 
 Si te saltas `db:seed`, la tabla `permiso` queda vacía y **no hay ningún mensaje de error**: el
@@ -69,20 +69,22 @@ El perfil `Administrador` se salta todas estas validaciones y ve todos los centr
 | `GET/PATCH` | `/subcategorias/:id` | no hay `DELETE`. Apagarla es `estado: false` |
 | `GET/POST` | `/inventario/items` | ficha del producto: `nombre`, `descripcion`, `idSubcategoria`. El nombre es lo específico, por ejemplo "pintura para techos vinilo color rojo". `?idSubcategoria=` / `?search=` / `?estado=` |
 | `GET/PATCH/DELETE` | `/inventario/items/:id` | `DELETE` deshabilita. Falla 409 si tiene elementos activos |
-| `GET/POST` | `/inventario/elementos` | stock de un item. `idItem` obligatorio, `cantidad` mínimo 10, `cantidadMinima` opcional (default 10, umbral de alerta), `gramaje` opcional. Ficha: `idClasificacion`, `idUsoPresupuestal` (partida, no es el UNSPSC), `valorUnitarioPromedio`, `porcentajeAumento` (editable) y `idCodigoEstandar`. `valorConAumento` se calcula: cantidad × valor unitario × (1 + porcentaje / 100). Nombre y subcategoría se copian del item. `codigo` sigue siendo el código propio del elemento |
+| `GET/POST` | `/inventario/elementos` | stock de un item. `idItem` obligatorio, `cantidad` mínimo 10, `cantidadMinima` opcional (default 10, umbral de alerta), `gramaje` opcional. Ficha: `idClasificacion`, `idUsoPresupuestal` (partida, no es el UNSPSC), `valorUnitarioPromedio`, `porcentajeAumento` (editable) y `idCodigoEstandar`. Esos ids tienen que ser del mismo centro que el stand. `valorConAumento` se calcula: cantidad × valor unitario × (1 + porcentaje / 100). Nombre y subcategoría se copian del item. `codigo` sigue siendo el código propio del elemento |
 | `GET/PATCH` | `/inventario/elementos/:id` | |
 | `GET/POST` | `/bodegas` | listado paginado: `{ data, metadata }`. La bodega es la del centro (`idCformacion`): cada centro solo ve la suya. Borrar una bodega con sub-bodegas responde 409 |
 | `GET/PATCH/DELETE` | `/bodegas/:id` | |
-| `GET/POST` | `/bodegas/sub-bodegas/:id/stands` | el stand cuelga de una sub-bodega que ya exista. No hay CRUD de sub-bodegas en esta entrega |
+| `GET/POST` | `/bodegas/:id/sub-bodegas` | la sub-bodega cuelga de la bodega. Permisos de bodega. Borrar una con stands responde 409 |
+| `GET/PATCH/DELETE` | `/bodegas/sub-bodegas/:id` | |
+| `GET/POST` | `/bodegas/sub-bodegas/:id/stands` | el stand cuelga de esa sub-bodega |
 | `GET/PATCH/DELETE` | `/bodegas/stands/:id` | borrar un stand con elementos responde 409 |
-| `GET/POST` | `/clasificaciones-elemento` | catálogo de la ficha (ACCESORIO, EPP, ELEMENTO DE ASEO, …). `POST` crea una nueva. `DELETE` la deshabilita |
+| `GET/POST` | `/clasificaciones-elemento` | catálogo de la ficha del centro (ACCESORIO, EPP, …). `?idCformacion=` (solo admin). Un centro nuevo llega vacío. `POST` crea una en el centro de quien entra; el admin puede mandar `idCformacion`. `DELETE` la deshabilita |
 | `GET/PATCH/DELETE` | `/clasificaciones-elemento/:id` | |
-| `GET/POST` | `/usos-presupuestales` | partida de la ficha (MINERALES; ELECTRICIDAD, GAS Y AGUA, …). No es el código UNSPSC. `POST` crea una nueva. `DELETE` la deshabilita |
+| `GET/POST` | `/usos-presupuestales` | partida del centro (MINERALES; ELECTRICIDAD, GAS Y AGUA, …). No es el código UNSPSC. Mismas reglas de centro que la clasificación |
 | `GET/PATCH/DELETE` | `/usos-presupuestales/:id` | |
-| `GET` | `/codigos-estandar` | catálogo UNSPSC para el select del elemento. Ej. `{ codigo: "13111305", nombre: "RESINA O ESPUMA" }` |
-| `GET` | `/codigos-estandar/:id` | |
-| `GET` | `/unidades-medida` | catálogo de `unidad_medida` |
-| `GET` | `/unidades-medida/:id` | |
+| `GET/POST` | `/codigos-estandar` | UNSPSC del centro. Ej. `{ idCformacion, codigo: "13111305", nombre: "RESINA O ESPUMA" }`. `GET` usa `elemento.ver`. Crear, editar y borrar usan `codigo_estandar.*`. Un centro nuevo llega vacío |
+| `GET/PATCH/DELETE` | `/codigos-estandar/:id` | borrar con elementos que lo usan responde 409 |
+| `GET/POST` | `/unidades-medida` | unidades del centro. `POST`: `nombre`, `abreviatura`. Un centro nuevo llega vacío. `DELETE` deshabilita |
+| `GET/PATCH/DELETE` | `/unidades-medida/:id` | |
 
 El login y `GET /account/profile` devuelven `permissions` (lista de códigos), `isAdmin` y `bodegas`,
 para que el front oculte botones sin adivinar. Al Administrador le llega el catálogo completo.
@@ -90,8 +92,8 @@ para que el front oculte botones sin adivinar. Al Administrador le llega el cat�
 Cuentas dump, password `123456`: Carlos Administrador, Juan Almacenista, María Funcionario.
 `db:seed` agrega `adminbodega@correo.com` (Admin bodega): inventario de la bodega que tiene asignada. No crea ni borra bodegas.
 
-Subcategoría y sub-bodega no se mezclan. La subcategoría clasifica el producto (`categoria` → `subcategoria` → item) y sí tiene CRUD en `/subcategorias`. La sub-bodega es la ubicación (`bodega` → `sub-bodega` → stand): la tabla y la relación se quedan, el stand sigue pidiendo una que ya exista, y la bodega la devuelve en `subBodegas`. Crear, editar y borrar sub-bodegas no es de esta entrega.
+Subcategoría y sub-bodega no se mezclan. La subcategoría clasifica el producto (`categoria` → `subcategoria` → item → elemento) y tiene CRUD en `/subcategorias`. La sub-bodega es la ubicación (`bodega` → `sub-bodega` → stand → elemento) y se crea, edita y borra con los permisos de bodega. El elemento copia nombre y subcategoría del item, y queda en el stand.
 
-Categorías e items **no se borran de la base**: `DELETE` baja `estado`. La subcategoría se apaga con `estado: false`, sin `DELETE`. Bodegas y stands sí se borran de verdad, pero solo si están vacíos (409 si no). La bodega pertenece a un centro de formación. El Administrador la crea y se la asigna al usuario en Usuarios. Quien no es administrador solo ve esas bodegas. Si otro perfil con permiso de crear bodega crea una, queda asignada a él. Admin bodega no trae `bodega.crear` ni `bodega.eliminar`. Elementos todavía no tienen `DELETE`. Un elemento nuevo no puede quedar con cantidad menor a 10. Recuperar contraseña (`/auth/recover`) sigue siendo la tarea aparte; los tests están en skip.
+Categorías e items **no se borran de la base**: `DELETE` baja `estado`. La subcategoría se apaga con `estado: false`, sin `DELETE`. Bodegas, sub-bodegas y stands sí se borran de verdad, pero solo si están vacíos (409 si no). La bodega pertenece a un centro de formación. El Administrador la crea y se la asigna al usuario en Usuarios. Quien no es administrador solo ve esas bodegas. Si otro perfil con permiso de crear bodega crea una, queda asignada a él. Admin bodega no trae `bodega.crear` ni `bodega.eliminar`. Elementos todavía no tienen `DELETE`. Un elemento nuevo no puede quedar con cantidad menor a 10. Recuperar contraseña (`/auth/recover`) sigue siendo la tarea aparte; los tests están en skip.
 
 Contrato para el frontend: [readme-frontend.md](./readme-frontend.md).

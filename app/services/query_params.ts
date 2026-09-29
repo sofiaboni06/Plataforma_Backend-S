@@ -3,6 +3,15 @@ export function parsePositiveInt(value: unknown, fallback: number) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback
 }
 
+export function parseOptionalPositiveInt(value: unknown) {
+  if (value === undefined || value === null || value === '') {
+    return undefined
+  }
+
+  const parsed = parsePositiveInt(value, 0)
+  return parsed > 0 ? parsed : undefined
+}
+
 export function parseOptionalBoolean(value: unknown) {
   if (value === undefined || value === null || value === '') {
     return undefined

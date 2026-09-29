@@ -265,8 +265,17 @@ router
           .get('/', [controllers.CodigosEstandar, 'index'])
           .use(middleware.permission('elemento.ver'))
         router
+          .post('/', [controllers.CodigosEstandar, 'store'])
+          .use(middleware.permission('codigo_estandar.crear'))
+        router
           .get(':id', [controllers.CodigosEstandar, 'show'])
           .use(middleware.permission('elemento.ver'))
+        router
+          .patch(':id', [controllers.CodigosEstandar, 'update'])
+          .use(middleware.permission('codigo_estandar.editar'))
+        router
+          .delete(':id', [controllers.CodigosEstandar, 'destroy'])
+          .use(middleware.permission('codigo_estandar.eliminar'))
       })
       .prefix('codigos-estandar')
       .as('codigosEstandar')
@@ -279,8 +288,17 @@ router
           .get('/', [controllers.UnidadesMedida, 'index'])
           .use(middleware.permission('unidad_medida.ver'))
         router
+          .post('/', [controllers.UnidadesMedida, 'store'])
+          .use(middleware.permission('unidad_medida.crear'))
+        router
           .get(':id', [controllers.UnidadesMedida, 'show'])
           .use(middleware.permission('unidad_medida.ver'))
+        router
+          .patch(':id', [controllers.UnidadesMedida, 'update'])
+          .use(middleware.permission('unidad_medida.editar'))
+        router
+          .delete(':id', [controllers.UnidadesMedida, 'destroy'])
+          .use(middleware.permission('unidad_medida.eliminar'))
       })
       .prefix('unidades-medida')
       .as('unidadesMedida')

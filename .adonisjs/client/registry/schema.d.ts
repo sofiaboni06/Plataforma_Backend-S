@@ -847,6 +847,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['index']>>>
     }
   }
+  'codigosEstandar.codigos_estandar.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/codigos-estandar'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/codigo_estandar').createCodigoEstandarValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/codigo_estandar').createCodigoEstandarValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'codigosEstandar.codigos_estandar.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/codigos-estandar/:id'
@@ -857,6 +869,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['show']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['show']>>>
+    }
+  }
+  'codigosEstandar.codigos_estandar.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/codigos-estandar/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/codigo_estandar').updateCodigoEstandarValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/codigo_estandar').updateCodigoEstandarValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'codigosEstandar.codigos_estandar.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/codigos-estandar/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['destroy']>>>
     }
   }
   'unidadesMedida.unidades_medida.index': {
@@ -871,6 +907,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['index']>>>
     }
   }
+  'unidadesMedida.unidades_medida.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/unidades-medida'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/unidad_medida').createUnidadMedidaValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/unidad_medida').createUnidadMedidaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'unidadesMedida.unidades_medida.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/unidades-medida/:id'
@@ -881,6 +929,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['show']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['show']>>>
+    }
+  }
+  'unidadesMedida.unidades_medida.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/unidades-medida/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/unidad_medida').updateUnidadMedidaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/unidad_medida').updateUnidadMedidaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'unidadesMedida.unidades_medida.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/unidades-medida/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['destroy']>>>
     }
   }
 }

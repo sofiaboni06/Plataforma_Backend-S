@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { resolveScope } from '#services/access_control'
 import ClasificacionElementoService from '#services/clasificacion_elemento_service'
-import { parseOptionalBoolean } from '#services/query_params'
+import { parseOptionalBoolean, parseOptionalPositiveInt } from '#services/query_params'
 import ClasificacionElementoTransformer from '#transformers/clasificacion_elemento_transformer'
 import {
   createClasificacionElementoValidator,
@@ -9,23 +9,27 @@ import {
 } from '#validators/clasificacion_elemento'
 
 export default class ClasificacionesElementoController {
-  async index({ request, serialize }: HttpContext) {
-    const clasificaciones = await new ClasificacionElementoService().index({
+  async index({ auth, request, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const clasificaciones = await new ClasificacionElementoService().index(scope, {
       estado: parseOptionalBoolean(request.input('estado')),
+      idCformacion: parseOptionalPositiveInt(request.input('idCformacion')),
     })
 
     return serialize(ClasificacionElementoTransformer.transform(clasificaciones))
   }
 
-  async show({ params, serialize }: HttpContext) {
-    const clasificacion = await new ClasificacionElementoService().show(Number(params.id))
+  async show({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const clasificacion = await new ClasificacionElementoService().show(scope, Number(params.id))
 
     return serialize(ClasificacionElementoTransformer.transform(clasificacion))
   }
 
-  async store({ request, serialize }: HttpContext) {
+  async store({ auth, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(createClasificacionElementoValidator)
-    const clasificacion = await new ClasificacionElementoService().store(payload)
+    const scope = await resolveScope(auth.getUserOrFail())
+    const clasificacion = await new ClasificacionElementoService().store(scope, payload)
 
     return serialize(ClasificacionElementoTransformer.transform(clasificacion))
   }
@@ -42,8 +46,9 @@ export default class ClasificacionesElementoController {
     return serialize(ClasificacionElementoTransformer.transform(clasificacion))
   }
 
-  async destroy({ params, serialize }: HttpContext) {
-    const result = await new ClasificacionElementoService().remove(Number(params.id))
+  async destroy({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const result = await new ClasificacionElementoService().remove(scope, Number(params.id))
 
     return serialize(result)
   }
