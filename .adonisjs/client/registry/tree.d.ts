@@ -75,6 +75,9 @@ export interface ApiDefinition {
       index: typeof routes['elementos.elementos.index']
       store: typeof routes['elementos.elementos.store']
       show: typeof routes['elementos.elementos.show']
+      showFoto: typeof routes['elementos.elementos.show_foto']
+      storeFoto: typeof routes['elementos.elementos.store_foto']
+      destroyFoto: typeof routes['elementos.elementos.destroy_foto']
       update: typeof routes['elementos.elementos.update']
     }
   }

@@ -36,4 +36,12 @@ export default await Env.create(new URL('../', import.meta.url), {
   DB_USER: Env.schema.string(),
   DB_PASSWORD: Env.schema.string.optional(),
   DB_DATABASE: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Carpeta de las fotografías de elementos. En producción es
+  | obligatoria y absoluta; en desarrollo cae en storage/fotos.
+  |----------------------------------------------------------
+  */
+  FOTOS_DIR: Env.schema.string.optional(),
 })

@@ -427,6 +427,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['show']>>>
     }
   }
+  'elementos.elementos.show_foto': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/elementos/:id/fotografia'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['showFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['showFoto']>>>
+    }
+  }
+  'elementos.elementos.store_foto': {
+    methods: ["POST"]
+    pattern: '/api/v1/inventario/elementos/:id/fotografia'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/elemento').fotoElementoValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/elemento').fotoElementoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['storeFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['storeFoto']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'elementos.elementos.destroy_foto': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/inventario/elementos/:id/fotografia'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['destroyFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['destroyFoto']>>>
+    }
+  }
   'elementos.elementos.update': {
     methods: ["PATCH"]
     pattern: '/api/v1/inventario/elementos/:id'

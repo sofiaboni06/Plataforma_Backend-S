@@ -216,6 +216,24 @@ const routes = {
     tokens: [{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"elementos","end":""},{"old":"/api/v1/inventario/elementos/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['elementos.elementos.show']['types'],
   },
+  'elementos.elementos.show_foto': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/inventario/elementos/:id/fotografia',
+    tokens: [{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"elementos","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":1,"val":"id","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"fotografia","end":""}],
+    types: placeholder as Registry['elementos.elementos.show_foto']['types'],
+  },
+  'elementos.elementos.store_foto': {
+    methods: ["POST"],
+    pattern: '/api/v1/inventario/elementos/:id/fotografia',
+    tokens: [{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"elementos","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":1,"val":"id","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"fotografia","end":""}],
+    types: placeholder as Registry['elementos.elementos.store_foto']['types'],
+  },
+  'elementos.elementos.destroy_foto': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/inventario/elementos/:id/fotografia',
+    tokens: [{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"elementos","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":1,"val":"id","end":""},{"old":"/api/v1/inventario/elementos/:id/fotografia","type":0,"val":"fotografia","end":""}],
+    types: placeholder as Registry['elementos.elementos.destroy_foto']['types'],
+  },
   'elementos.elementos.update': {
     methods: ["PATCH"],
     pattern: '/api/v1/inventario/elementos/:id',

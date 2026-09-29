@@ -20,7 +20,6 @@ export const createElementoValidator = vine.compile(
     descripcion: vine.string().trim().maxLength(5000).optional(),
     marca: vine.string().trim().maxLength(80).optional(),
     color: vine.string().trim().maxLength(80).optional(),
-    urlFotografia: vine.string().trim().maxLength(500).optional(),
     idClasificacion: vine
       .number()
       .positive()
@@ -52,7 +51,6 @@ export const updateElementoValidator = vine.compile(
     descripcion: vine.string().trim().maxLength(5000).optional(),
     marca: vine.string().trim().maxLength(80).nullable().optional(),
     color: vine.string().trim().maxLength(80).nullable().optional(),
-    urlFotografia: vine.string().trim().maxLength(500).nullable().optional(),
     idClasificacion: vine
       .number()
       .positive()
@@ -67,5 +65,14 @@ export const updateElementoValidator = vine.compile(
       .exists({ table: 'codigo_estandar', column: 'id_codigo_estandar' })
       .nullable()
       .optional(),
+  })
+)
+
+export const fotoElementoValidator = vine.compile(
+  vine.object({
+    fotografia: vine.file({
+      size: '8mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp'],
+    }),
   })
 )

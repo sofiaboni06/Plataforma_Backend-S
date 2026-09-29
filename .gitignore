@@ -4,6 +4,10 @@ build
 tmp/*
 !tmp/.gitkeep
 
+# Fotos de elementos. En producción viven en FOTOS_DIR, fuera del repositorio.
+/storage/fotos/**
+!/storage/fotos/.gitkeep
+
 # Secrets
 .env
 .env.local
