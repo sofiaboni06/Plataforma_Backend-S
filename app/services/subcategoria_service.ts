@@ -1,20 +1,39 @@
 import Subcategoria from '#models/subcategoria'
+import {
+  assertCategoriaInScope,
+  assertSubcategoriaInScope,
+  subcategoriaIdsQuery,
+  type AccessScope,
+} from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 export default class SubcategoriaService {
-  async index() {
-    return Subcategoria.query().orderBy('id_subcategoria', 'asc')
+  async index(scope: AccessScope) {
+    const query = Subcategoria.query().orderBy('id_subcategoria', 'asc')
+
+    if (!scope.isAdmin) {
+      query.whereIn('id_subcategoria', subcategoriaIdsQuery(scope))
+    }
+
+    return query
   }
 
-  async show(id: number) {
+  async show(scope: AccessScope, id: number) {
+    await assertSubcategoriaInScope(scope, id)
+
     return Subcategoria.findOrFail(id)
   }
 
-  async store(payload: {
-    idCategoria: number
-    nombre: string
-    estado?: boolean
-  }) {
+  async store(
+    scope: AccessScope,
+    payload: {
+      idCategoria: number
+      nombre: string
+      estado?: boolean
+    }
+  ) {
+    await assertCategoriaInScope(scope, payload.idCategoria)
+
     try {
       return await Subcategoria.create({
         idCategoria: payload.idCategoria,
@@ -27,6 +46,7 @@ export default class SubcategoriaService {
   }
 
   async update(
+    scope: AccessScope,
     id: number,
     payload: {
       idCategoria?: number
@@ -34,12 +54,18 @@ export default class SubcategoriaService {
       estado?: boolean
     }
   ) {
+    await assertSubcategoriaInScope(scope, id)
+
+    if (payload.idCategoria !== undefined) {
+      await assertCategoriaInScope(scope, payload.idCategoria)
+    }
+
     const subcategoria = await Subcategoria.findOrFail(id)
 
     subcategoria.merge({
-      idCategoria: payload.idCategoria,
-      nombre: payload.nombre,
-      estado: payload.estado,
+      ...(payload.idCategoria !== undefined ? { idCategoria: payload.idCategoria } : {}),
+      ...(payload.nombre !== undefined ? { nombre: payload.nombre } : {}),
+      ...(payload.estado !== undefined ? { estado: payload.estado } : {}),
     })
 
     try {

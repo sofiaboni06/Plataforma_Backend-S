@@ -1,6 +1,7 @@
 import { BaseModel, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
 import type { HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import Modulo from '#models/modulo'
+import Permiso from '#models/permiso'
 import User from '#models/usuario'
 
 export default class Perfil extends BaseModel {
@@ -30,4 +31,14 @@ export default class Perfil extends BaseModel {
     pivotColumns: ['estado'],
   })
   declare modulos: ManyToMany<typeof Modulo>
+
+  @manyToMany(() => Permiso, {
+    pivotTable: 'perfil_permiso',
+    localKey: 'id',
+    pivotForeignKey: 'id_perfil',
+    relatedKey: 'code',
+    pivotRelatedForeignKey: 'codigo',
+    pivotColumns: ['estado'],
+  })
+  declare permisos: ManyToMany<typeof Permiso>
 }

@@ -1,6 +1,7 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import Modulo from '#models/modulo'
 import Perfil from '#models/perfil'
+import Permiso from '#models/permiso'
 import { buildModuleTree } from '#services/module_tree'
 
 export default class RoleService {
@@ -14,6 +15,9 @@ export default class RoleService {
       .preload('modulos', (query) => {
         query.where('modulo.estado', true).wherePivot('estado', true)
       })
+      .preload('permisos', (query) => {
+        query.where('permiso.estado', true).wherePivot('estado', true)
+      })
       .first()
 
     if (!role) {
@@ -26,6 +30,7 @@ export default class RoleService {
     return {
       role,
       moduleIds: [...grantedIds],
+      permissionCodes: role.permisos.map((item) => item.code),
       tree: buildModuleTree(catalog, grantedIds),
     }
   }
@@ -94,6 +99,77 @@ export default class RoleService {
 
     const pivot = Object.fromEntries(uniqueIds.map((moduleId) => [moduleId, { estado: true }]))
     await role.related('modulos').sync(pivot)
+    await this.pruneOrphanPermissions(role, uniqueIds)
+
     return this.show(id)
+  }
+
+  async assignPermissions(id: number, permissionCodes: string[]) {
+    const role = await Perfil.find(id)
+    if (!role) {
+      throw new Exception('El perfil no existe', { status: 404, code: 'E_NOT_FOUND' })
+    }
+
+    const uniqueCodes = [...new Set(permissionCodes)]
+
+    if (uniqueCodes.length) {
+      const found = await Permiso.query().whereIn('codigo', uniqueCodes).where('estado', true)
+      const foundCodes = new Set<string>(found.map((permiso) => permiso.code))
+      const unknown = uniqueCodes.filter((code) => !foundCodes.has(code))
+
+      if (unknown.length) {
+        throw new Exception(
+          `Estos permisos no existen o están inactivos: ${unknown.join(', ')}`,
+          { status: 422, code: 'E_VALIDATION_ERROR' }
+        )
+      }
+
+      const grantedModuleIds = await this.grantedModuleIds(role)
+      const outsideModules = found.filter((permiso) => !grantedModuleIds.includes(permiso.idModulo))
+
+      if (outsideModules.length) {
+        throw new Exception(
+          `El perfil no tiene acceso al módulo de estos permisos: ${outsideModules
+            .map((permiso) => permiso.code)
+            .join(', ')}. Asigna primero el módulo.`,
+          { status: 422, code: 'E_VALIDATION_ERROR' }
+        )
+      }
+    }
+
+    const pivot = Object.fromEntries(uniqueCodes.map((code) => [code, { estado: true }]))
+    await role.related('permisos').sync(pivot)
+
+    return this.show(id)
+  }
+
+  private async grantedModuleIds(role: Perfil) {
+    const modulos = await role
+      .related('modulos')
+      .query()
+      .wherePivot('estado', true)
+      .where('modulo.estado', true)
+      .select('modulo.id_modulo')
+
+    return modulos.map((modulo) => modulo.id)
+  }
+
+  /**
+   * Revoking a module must drop the permissions that hang from it, otherwise a
+   * profile would keep hitting the API for a module it can no longer see.
+   */
+  private async pruneOrphanPermissions(role: Perfil, grantedModuleIds: number[]) {
+    const permisos = await role
+      .related('permisos')
+      .query()
+      .select('permiso.codigo', 'permiso.id_modulo')
+
+    const orphans = permisos
+      .filter((permiso) => !grantedModuleIds.includes(permiso.idModulo))
+      .map((permiso) => permiso.code)
+
+    if (orphans.length) {
+      await role.related('permisos').detach(orphans)
+    }
   }
 }

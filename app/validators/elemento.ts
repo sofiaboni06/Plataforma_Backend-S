@@ -2,13 +2,10 @@ import vine from '@vinejs/vine'
 
 export const createElementoValidator = vine.compile(
   vine.object({
-    idSubcategoria: vine
-      .number()
-      .positive()
-      .exists({ table: 'subcategoria', column: 'id_subcategoria' }),
+    idItem: vine.number().positive().exists({ table: 'item', column: 'id_item' }),
     idStand: vine.number().positive().exists({ table: 'stand', column: 'id_stand' }),
-    nombre: vine.string().trim().minLength(1).maxLength(150),
-    cantidad: vine.number().min(0),
+    cantidad: vine.number().min(10),
+    gramaje: vine.number().min(0).optional(),
     estado: vine.boolean(),
     idUnidadMedida: vine
       .number()
@@ -22,20 +19,29 @@ export const createElementoValidator = vine.compile(
       .unique({ table: 'elemento', column: 'codigo' }),
     descripcion: vine.string().trim().maxLength(5000).optional(),
     marca: vine.string().trim().maxLength(80).optional(),
+    color: vine.string().trim().maxLength(80).optional(),
     urlFotografia: vine.string().trim().maxLength(500).optional(),
+    idClasificacion: vine
+      .number()
+      .positive()
+      .exists({ table: 'clasificacion_elemento', column: 'id_clasificacion_elemento' })
+      .optional(),
+    valorUnitarioPromedio: vine.number().min(0).optional(),
+    porcentajeAumento: vine.number().min(0).optional(),
+    idCodigoEstandar: vine
+      .number()
+      .positive()
+      .exists({ table: 'codigo_estandar', column: 'id_codigo_estandar' })
+      .optional(),
   })
 )
 
 export const updateElementoValidator = vine.compile(
   vine.object({
-    idSubcategoria: vine
-      .number()
-      .positive()
-      .exists({ table: 'subcategoria', column: 'id_subcategoria' })
-      .optional(),
+    idItem: vine.number().positive().exists({ table: 'item', column: 'id_item' }).optional(),
     idStand: vine.number().positive().exists({ table: 'stand', column: 'id_stand' }).optional(),
-    nombre: vine.string().trim().minLength(1).maxLength(150).optional(),
-    cantidad: vine.number().min(0).optional(),
+    cantidad: vine.number().min(10).optional(),
+    gramaje: vine.number().min(0).nullable().optional(),
     estado: vine.boolean().optional(),
     idUnidadMedida: vine
       .number()
@@ -45,6 +51,21 @@ export const updateElementoValidator = vine.compile(
     codigo: vine.string().trim().minLength(1).maxLength(50).optional(),
     descripcion: vine.string().trim().maxLength(5000).optional(),
     marca: vine.string().trim().maxLength(80).nullable().optional(),
+    color: vine.string().trim().maxLength(80).nullable().optional(),
     urlFotografia: vine.string().trim().maxLength(500).nullable().optional(),
+    idClasificacion: vine
+      .number()
+      .positive()
+      .exists({ table: 'clasificacion_elemento', column: 'id_clasificacion_elemento' })
+      .nullable()
+      .optional(),
+    valorUnitarioPromedio: vine.number().min(0).nullable().optional(),
+    porcentajeAumento: vine.number().min(0).nullable().optional(),
+    idCodigoEstandar: vine
+      .number()
+      .positive()
+      .exists({ table: 'codigo_estandar', column: 'id_codigo_estandar' })
+      .nullable()
+      .optional(),
   })
 )

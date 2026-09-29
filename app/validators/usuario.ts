@@ -57,6 +57,11 @@ export const createUserValidator = vine.create({
   passwordConfirmation: adminPassword().sameAs('password'),
   idPerfil: vine.number().positive().exists({ table: 'perfil', column: 'id_perfil' }),
   idCformacion: vine.number().positive().exists({ table: 'c_formacion', column: 'id_cformacion' }),
+  bodegaIds: vine.array(vine.number().positive()).optional(),
+})
+
+export const assignBodegasValidator = vine.create({
+  bodegaIds: vine.array(vine.number().positive()),
 })
 
 export const updateUserValidator = vine.create({

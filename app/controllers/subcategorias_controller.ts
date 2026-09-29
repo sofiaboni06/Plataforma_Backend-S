@@ -1,39 +1,39 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import SubcategoriaService from '#services/subcategoria_service'
 import SubcategoriaTransformer from '#transformers/subcategoria_transformer'
+import { resolveScope } from '#services/access_control'
 import {
   createSubcategoriaValidator,
   updateSubcategoriaValidator,
 } from '#validators/subcategoria'
 
 export default class SubcategoriasController {
-  async index({ serialize }: HttpContext) {
-    const subcategorias = await new SubcategoriaService().index()
+  async index({ auth, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const subcategorias = await new SubcategoriaService().index(scope)
 
     return serialize(SubcategoriaTransformer.transform(subcategorias))
   }
 
-  async show({ params, serialize }: HttpContext) {
-    const subcategoria = await new SubcategoriaService().show(Number(params.id))
+  async show({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const subcategoria = await new SubcategoriaService().show(scope, Number(params.id))
 
     return serialize(SubcategoriaTransformer.transform(subcategoria))
   }
 
-  async store({ request, serialize }: HttpContext) {
+  async store({ auth, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(createSubcategoriaValidator)
-
-    const subcategoria = await new SubcategoriaService().store(payload)
+    const scope = await resolveScope(auth.getUserOrFail())
+    const subcategoria = await new SubcategoriaService().store(scope, payload)
 
     return serialize(SubcategoriaTransformer.transform(subcategoria))
   }
 
-  async update({ params, request, serialize }: HttpContext) {
+  async update({ auth, params, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(updateSubcategoriaValidator)
-
-    const subcategoria = await new SubcategoriaService().update(
-      Number(params.id),
-      payload
-    )
+    const scope = await resolveScope(auth.getUserOrFail())
+    const subcategoria = await new SubcategoriaService().update(scope, Number(params.id), payload)
 
     return serialize(SubcategoriaTransformer.transform(subcategoria))
   }
