@@ -19,15 +19,19 @@ export type ScannedRoutes = {
     'roles.roles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'roles.roles.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'roles.roles.sync_permissions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.options': { paramsTuple?: []; params?: {} }
     'users.users.index': { paramsTuple?: []; params?: {} }
     'users.users.store': { paramsTuple?: []; params?: {} }
     'users.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'users.users.sync_bodegas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'permissions.permissions.index': { paramsTuple?: []; params?: {} }
     'categorias.categorias.index': { paramsTuple?: []; params?: {} }
     'categorias.categorias.store': { paramsTuple?: []; params?: {} }
     'categorias.categorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'categorias.categorias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'categorias.categorias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'subcategorias.subcategorias.index': { paramsTuple?: []; params?: {} }
     'subcategorias.subcategorias.store': { paramsTuple?: []; params?: {} }
     'subcategorias.subcategorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -36,6 +40,11 @@ export type ScannedRoutes = {
     'elementos.elementos.store': { paramsTuple?: []; params?: {} }
     'elementos.elementos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'items.items.index': { paramsTuple?: []; params?: {} }
+    'items.items.store': { paramsTuple?: []; params?: {} }
+    'items.items.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'items.items.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'items.items.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.index': { paramsTuple?: []; params?: {} }
     'bodegas.bodega.store': { paramsTuple?: []; params?: {} }
     'bodegas.stand.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -46,6 +55,13 @@ export type ScannedRoutes = {
     'bodegas.bodega.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.index': { paramsTuple?: []; params?: {} }
+    'clasificacionesElemento.clasificaciones_elemento.store': { paramsTuple?: []; params?: {} }
+    'clasificacionesElemento.clasificaciones_elemento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'codigosEstandar.codigos_estandar.index': { paramsTuple?: []; params?: {} }
+    'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
@@ -59,16 +75,23 @@ export type ScannedRoutes = {
     'users.users.options': { paramsTuple?: []; params?: {} }
     'users.users.index': { paramsTuple?: []; params?: {} }
     'users.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'permissions.permissions.index': { paramsTuple?: []; params?: {} }
     'categorias.categorias.index': { paramsTuple?: []; params?: {} }
     'categorias.categorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'subcategorias.subcategorias.index': { paramsTuple?: []; params?: {} }
     'subcategorias.subcategorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.index': { paramsTuple?: []; params?: {} }
     'elementos.elementos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'items.items.index': { paramsTuple?: []; params?: {} }
+    'items.items.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.index': { paramsTuple?: []; params?: {} }
     'bodegas.stand.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.index': { paramsTuple?: []; params?: {} }
+    'clasificacionesElemento.clasificaciones_elemento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'codigosEstandar.codigos_estandar.index': { paramsTuple?: []; params?: {} }
+    'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
@@ -82,16 +105,23 @@ export type ScannedRoutes = {
     'users.users.options': { paramsTuple?: []; params?: {} }
     'users.users.index': { paramsTuple?: []; params?: {} }
     'users.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'permissions.permissions.index': { paramsTuple?: []; params?: {} }
     'categorias.categorias.index': { paramsTuple?: []; params?: {} }
     'categorias.categorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'subcategorias.subcategorias.index': { paramsTuple?: []; params?: {} }
     'subcategorias.subcategorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.index': { paramsTuple?: []; params?: {} }
     'elementos.elementos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'items.items.index': { paramsTuple?: []; params?: {} }
+    'items.items.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.index': { paramsTuple?: []; params?: {} }
     'bodegas.stand.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.index': { paramsTuple?: []; params?: {} }
+    'clasificacionesElemento.clasificaciones_elemento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'codigosEstandar.codigos_estandar.index': { paramsTuple?: []; params?: {} }
+    'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
@@ -105,8 +135,10 @@ export type ScannedRoutes = {
     'categorias.categorias.store': { paramsTuple?: []; params?: {} }
     'subcategorias.subcategorias.store': { paramsTuple?: []; params?: {} }
     'elementos.elementos.store': { paramsTuple?: []; params?: {} }
+    'items.items.store': { paramsTuple?: []; params?: {} }
     'bodegas.bodega.store': { paramsTuple?: []; params?: {} }
     'bodegas.stand.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'account.profile.update': { paramsTuple?: []; params?: {} }
@@ -116,15 +148,22 @@ export type ScannedRoutes = {
     'categorias.categorias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'subcategorias.subcategorias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'items.items.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'roles.roles.sync_permissions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'users.users.sync_bodegas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
+    'categorias.categorias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'items.items.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

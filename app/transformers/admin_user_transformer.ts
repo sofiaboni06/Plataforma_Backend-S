@@ -21,6 +21,11 @@ export default class AdminUserTransformer extends BaseTransformer<User> {
       trainingCenterId: this.resource.idCformacion,
       location: [trainingCenter?.nombre, regional?.nombre].filter(Boolean).join(' — '),
       active: this.resource.estado,
+      bodegaIds: (this.resource.bodegas ?? []).map((bodega) => bodega.id),
+      bodegas: (this.resource.bodegas ?? []).map((bodega) => ({
+        id: bodega.id,
+        name: bodega.nombre,
+      })),
     }
   }
 }

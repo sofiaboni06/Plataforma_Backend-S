@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import StandService from '#services/stand_service'
 import StandTransformer from '#transformers/stand_transformer'
+import { resolveScope } from '#services/access_control'
 import { createStandValidator, updateStandValidator } from '#validators/stand'
 
 function parsePositiveInt(value: unknown, fallback: number) {
@@ -27,13 +28,15 @@ function parseOptionalBoolean(value: unknown) {
 export default class StandsController {
   private service = new StandService()
 
-  async index({ params, request, serialize }: HttpContext) {
+  async index({ auth, params, request, serialize }: HttpContext) {
     const page = parsePositiveInt(request.input('page'), 1)
     const perPage = Math.min(parsePositiveInt(request.input('perPage'), 20), 100)
     const search = String(request.input('search', '')).trim() || undefined
     const estado = parseOptionalBoolean(request.input('estado'))
+    const scope = await resolveScope(auth.getUserOrFail())
 
     const result = await this.service.list({
+    const result = await this.service.list(scope, {
       idSubBodega: Number(params.id),
       page,
       perPage,
@@ -44,36 +47,42 @@ export default class StandsController {
     return serialize(StandTransformer.paginate(result.all(), result.getMeta()))
   }
 
-  async store({ params, request, serialize }: HttpContext) {
+  async store({ auth, params, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(createStandValidator)
 
     const stand = await this.service.create(
       Number(params.id),
       payload
     )
+    const scope = await resolveScope(auth.getUserOrFail())
+    const stand = await this.service.create(scope, Number(params.id), payload)
 
     return serialize(StandTransformer.transform(stand))
   }
 
-  async show({ params, serialize }: HttpContext) {
-    const stand = await this.service.show(Number(params.id))
+  async show({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const stand = await this.service.show(scope, Number(params.id))
 
     return serialize(StandTransformer.transform(stand))
   }
 
-  async update({ params, request, serialize }: HttpContext) {
+  async update({ auth, params, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(updateStandValidator)
 
     const stand = await this.service.update(
       Number(params.id),
       payload
     )
+    const scope = await resolveScope(auth.getUserOrFail())
+    const stand = await this.service.update(scope, Number(params.id), payload)
 
     return serialize(StandTransformer.transform(stand))
   }
 
-  async destroy({ params, serialize }: HttpContext) {
-    const result = await this.service.remove(Number(params.id))
+  async destroy({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const result = await this.service.remove(scope, Number(params.id))
 
     return serialize(result)
   }

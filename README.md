@@ -110,6 +110,8 @@ Si no han hecho backend, empiecen aquí (orden modelo → validador → servicio
 
 Resumen de URLs: [docs/guia-endpoints.md](docs/guia-endpoints.md).
 
+Contrato para que el frontend arme las mismas pantallas: [docs/readme-frontend.md](docs/readme-frontend.md).
+
 ### `GET /api/v1/modules`
 
 Requiere autenticación y cuenta activa. Devuelve los módulos de `modulo` asignados al `perfil` del usuario en `modulo_perfil` (`estado = true` en ambos).
