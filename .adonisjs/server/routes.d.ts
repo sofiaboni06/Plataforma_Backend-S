@@ -52,9 +52,14 @@ export type ScannedRoutes = {
     'bodegas.bodega.store': { paramsTuple?: []; params?: {} }
     'bodegas.stand.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -90,7 +95,9 @@ export type ScannedRoutes = {
     'items.items.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.index': { paramsTuple?: []; params?: {} }
     'bodegas.stand.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.index': { paramsTuple?: []; params?: {} }
     'clasificacionesElemento.clasificaciones_elemento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -121,7 +128,9 @@ export type ScannedRoutes = {
     'items.items.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.index': { paramsTuple?: []; params?: {} }
     'bodegas.stand.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.index': { paramsTuple?: []; params?: {} }
     'clasificacionesElemento.clasificaciones_elemento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -144,6 +153,7 @@ export type ScannedRoutes = {
     'items.items.store': { paramsTuple?: []; params?: {} }
     'bodegas.bodega.store': { paramsTuple?: []; params?: {} }
     'bodegas.stand.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
@@ -155,6 +165,7 @@ export type ScannedRoutes = {
     'subcategorias.subcategorias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'items.items.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -168,6 +179,7 @@ export type ScannedRoutes = {
     'categorias.categorias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.destroy_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'items.items.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.stand.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

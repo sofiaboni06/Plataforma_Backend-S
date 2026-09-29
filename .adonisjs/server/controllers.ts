@@ -17,6 +17,7 @@ export const controllers = {
   Profile: () => import('#controllers/profile_controller'),
   Roles: () => import('#controllers/roles_controller'),
   Stand: () => import('#controllers/stand_controller'),
+  SubBodegas: () => import('#controllers/sub_bodegas_controller'),
   Subcategorias: () => import('#controllers/subcategorias_controller'),
   UnidadesMedida: () => import('#controllers/unidades_medida_controller'),
   Users: () => import('#controllers/users_controller'),

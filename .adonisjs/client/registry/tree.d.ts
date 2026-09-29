@@ -105,6 +105,13 @@ export interface ApiDefinition {
       update: typeof routes['bodegas.stand.update']
       destroy: typeof routes['bodegas.stand.destroy']
     }
+    subBodegas: {
+      show: typeof routes['bodegas.sub_bodegas.show']
+      update: typeof routes['bodegas.sub_bodegas.update']
+      destroy: typeof routes['bodegas.sub_bodegas.destroy']
+      index: typeof routes['bodegas.sub_bodegas.index']
+      store: typeof routes['bodegas.sub_bodegas.store']
+    }
   }
   clasificacionesElemento: {
     clasificacionesElemento: {

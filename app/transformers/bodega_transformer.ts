@@ -19,7 +19,6 @@ export default class BodegaTransformer extends BaseTransformer<Bodega> {
             nombre: center.nombre,
           }
         : null,
-      subBodegas: SubBodegaTransformer.transform(subBodegas),
       subBodegas: SubBodegaTransformer.transform(subBodegas).useVariant('toSummary'),
       totalSubBodegas: subBodegas.length,
     }

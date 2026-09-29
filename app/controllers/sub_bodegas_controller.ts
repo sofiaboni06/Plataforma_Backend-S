@@ -1,70 +1,46 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import SubBodegaService from '#services/sub_bodega_service'
 import SubBodegaTransformer from '#transformers/sub_bodega_transformer'
-import {
-  createSubBodegaValidator,
-  updateSubBodegaValidator,
-} from '#validators/sub_bodega'
+import { resolveScope } from '#services/access_control'
+import { createSubBodegaValidator, updateSubBodegaValidator } from '#validators/sub_bodega'
 
 export default class SubBodegasController {
-  async index({ params, serialize }: HttpContext) {
-    const subBodegas = await new SubBodegaService().index(
-      Number(params.id)
-    )
+  async index({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const subBodegas = await new SubBodegaService().index(scope, Number(params.id))
 
-    return serialize(
-      SubBodegaTransformer.transform(subBodegas)
-    )
+    return serialize(SubBodegaTransformer.transform(subBodegas))
   }
 
-  async show({ params, serialize }: HttpContext) {
-    const subBodega = await new SubBodegaService().show(
-      Number(params.id)
-    )
+  async show({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const subBodega = await new SubBodegaService().show(scope, Number(params.id))
 
-    return serialize(
-      SubBodegaTransformer.transform(subBodega)
-    )
+    return serialize(SubBodegaTransformer.transform(subBodega))
   }
 
-  async store({ params, request, serialize }: HttpContext) {
-    const payload = await request.validateUsing(
-      createSubBodegaValidator
-    )
-
-    const subBodega = await new SubBodegaService().store({
+  async store({ auth, params, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(createSubBodegaValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    const subBodega = await new SubBodegaService().store(scope, {
       idBodega: Number(params.id),
       ...payload,
     })
 
-    return serialize(
-      SubBodegaTransformer.transform(subBodega)
-    )
+    return serialize(SubBodegaTransformer.transform(subBodega))
   }
 
-  async update({
-    params,
-    request,
-    serialize,
-  }: HttpContext) {
-    const payload = await request.validateUsing(
-      updateSubBodegaValidator
-    )
+  async update({ auth, params, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(updateSubBodegaValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    const subBodega = await new SubBodegaService().update(scope, Number(params.id), payload)
 
-    const subBodega = await new SubBodegaService().update(
-      Number(params.id),
-      payload
-    )
-
-    return serialize(
-      SubBodegaTransformer.transform(subBodega)
-    )
+    return serialize(SubBodegaTransformer.transform(subBodega))
   }
 
-  async destroy({ params, serialize }: HttpContext) {
-    const result = await new SubBodegaService().remove(
-      Number(params.id)
-    )
+  async destroy({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const result = await new SubBodegaService().remove(scope, Number(params.id))
 
     return serialize(result)
   }

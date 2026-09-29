@@ -294,6 +294,24 @@ const routes = {
     tokens: [{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"sub-bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"stands","end":""}],
     types: placeholder as Registry['bodegas.stand.store']['types'],
   },
+  'bodegas.sub_bodegas.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/bodegas/sub-bodegas/:id',
+    tokens: [{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"sub-bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bodegas.sub_bodegas.show']['types'],
+  },
+  'bodegas.sub_bodegas.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/bodegas/sub-bodegas/:id',
+    tokens: [{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"sub-bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bodegas.sub_bodegas.update']['types'],
+  },
+  'bodegas.sub_bodegas.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/bodegas/sub-bodegas/:id',
+    tokens: [{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":0,"val":"sub-bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bodegas.sub_bodegas.destroy']['types'],
+  },
   'bodegas.stand.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/bodegas/stands/:id',
@@ -311,6 +329,18 @@ const routes = {
     pattern: '/api/v1/bodegas/stands/:id',
     tokens: [{"old":"/api/v1/bodegas/stands/:id","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/stands/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/stands/:id","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/stands/:id","type":0,"val":"stands","end":""},{"old":"/api/v1/bodegas/stands/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['bodegas.stand.destroy']['types'],
+  },
+  'bodegas.sub_bodegas.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/bodegas/:id/sub-bodegas',
+    tokens: [{"old":"/api/v1/bodegas/:id/sub-bodegas","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id/sub-bodegas","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id/sub-bodegas","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id/sub-bodegas","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/:id/sub-bodegas","type":0,"val":"sub-bodegas","end":""}],
+    types: placeholder as Registry['bodegas.sub_bodegas.index']['types'],
+  },
+  'bodegas.sub_bodegas.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/bodegas/:id/sub-bodegas',
+    tokens: [{"old":"/api/v1/bodegas/:id/sub-bodegas","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id/sub-bodegas","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id/sub-bodegas","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id/sub-bodegas","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/:id/sub-bodegas","type":0,"val":"sub-bodegas","end":""}],
+    types: placeholder as Registry['bodegas.sub_bodegas.store']['types'],
   },
   'bodegas.bodega.show': {
     methods: ["GET","HEAD"],
