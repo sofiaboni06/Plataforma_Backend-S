@@ -68,6 +68,11 @@ export type ScannedRoutes = {
     'clasificacionesElemento.clasificaciones_elemento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usosPresupuestales.usos_presupuestales.index': { paramsTuple?: []; params?: {} }
+    'usosPresupuestales.usos_presupuestales.store': { paramsTuple?: []; params?: {} }
+    'usosPresupuestales.usos_presupuestales.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usosPresupuestales.usos_presupuestales.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usosPresupuestales.usos_presupuestales.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'codigosEstandar.codigos_estandar.index': { paramsTuple?: []; params?: {} }
     'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
@@ -101,6 +106,8 @@ export type ScannedRoutes = {
     'bodegas.bodega.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.index': { paramsTuple?: []; params?: {} }
     'clasificacionesElemento.clasificaciones_elemento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usosPresupuestales.usos_presupuestales.index': { paramsTuple?: []; params?: {} }
+    'usosPresupuestales.usos_presupuestales.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'codigosEstandar.codigos_estandar.index': { paramsTuple?: []; params?: {} }
     'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
@@ -134,6 +141,8 @@ export type ScannedRoutes = {
     'bodegas.bodega.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.index': { paramsTuple?: []; params?: {} }
     'clasificacionesElemento.clasificaciones_elemento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usosPresupuestales.usos_presupuestales.index': { paramsTuple?: []; params?: {} }
+    'usosPresupuestales.usos_presupuestales.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'codigosEstandar.codigos_estandar.index': { paramsTuple?: []; params?: {} }
     'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
@@ -155,6 +164,7 @@ export type ScannedRoutes = {
     'bodegas.stand.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.sub_bodegas.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.store': { paramsTuple?: []; params?: {} }
+    'usosPresupuestales.usos_presupuestales.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'account.profile.update': { paramsTuple?: []; params?: {} }
@@ -169,6 +179,7 @@ export type ScannedRoutes = {
     'bodegas.stand.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usosPresupuestales.usos_presupuestales.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -183,6 +194,7 @@ export type ScannedRoutes = {
     'bodegas.stand.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clasificacionesElemento.clasificaciones_elemento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usosPresupuestales.usos_presupuestales.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

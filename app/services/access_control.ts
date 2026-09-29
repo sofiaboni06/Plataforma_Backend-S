@@ -11,6 +11,7 @@ import { buildPermissionCatalog, type PermissionCode } from '#data/permission_ca
 export const ADMIN_PROFILE_NAME = 'Administrador'
 
 export type AccessScope = {
+  idUsuario: number
   isAdmin: boolean
   /** Training center the user belongs to (`usuario.id_cformacion`). */
   idCformacion: number
@@ -50,6 +51,7 @@ async function loadScope(user: User): Promise<AccessScope> {
     .firstOrFail()
 
   return {
+    idUsuario: account.id,
     isAdmin: account.perfil?.nombre === ADMIN_PROFILE_NAME,
     idCformacion: account.idCformacion,
     bodegaIds: account.bodegas.map((bodega) => bodega.id),

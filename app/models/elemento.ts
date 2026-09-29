@@ -9,6 +9,7 @@ import Prestamo from '#models/prestamo'
 import Stand from '#models/stand'
 import Subcategoria from '#models/subcategoria'
 import UnidadMedida from '#models/unidad_medida'
+import UsoPresupuestal from '#models/uso_presupuestal'
 
 export default class Elemento extends BaseModel {
   static table = 'elemento'
@@ -88,6 +89,9 @@ export default class Elemento extends BaseModel {
   @column({ columnName: 'id_codigo_estandar' })
   declare idCodigoEstandar: number | null
 
+  @column({ columnName: 'id_uso_presupuestal' })
+  declare idUsoPresupuestal: number | null
+
   @column({ columnName: 'id_item' })
   declare idItem: number | null
 
@@ -111,6 +115,9 @@ export default class Elemento extends BaseModel {
 
   @belongsTo(() => ClasificacionElemento, { foreignKey: 'idClasificacion' })
   declare clasificacion: BelongsTo<typeof ClasificacionElemento>
+
+  @belongsTo(() => UsoPresupuestal, { foreignKey: 'idUsoPresupuestal' })
+  declare usoPresupuestal: BelongsTo<typeof UsoPresupuestal>
 
   @hasMany(() => Prestamo, { foreignKey: 'idElemento' })
   declare prestamos: HasMany<typeof Prestamo>

@@ -775,6 +775,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['destroy']>>>
     }
   }
+  'usosPresupuestales.usos_presupuestales.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/usos-presupuestales'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['index']>>>
+    }
+  }
+  'usosPresupuestales.usos_presupuestales.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/usos-presupuestales'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/uso_presupuestal').createUsoPresupuestalValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/uso_presupuestal').createUsoPresupuestalValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'usosPresupuestales.usos_presupuestales.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/usos-presupuestales/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['show']>>>
+    }
+  }
+  'usosPresupuestales.usos_presupuestales.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/usos-presupuestales/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/uso_presupuestal').updateUsoPresupuestalValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/uso_presupuestal').updateUsoPresupuestalValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'usosPresupuestales.usos_presupuestales.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/usos-presupuestales/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/usos_presupuestales_controller').default['destroy']>>>
+    }
+  }
   'codigosEstandar.codigos_estandar.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/codigos-estandar'

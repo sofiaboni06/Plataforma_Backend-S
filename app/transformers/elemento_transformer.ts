@@ -10,6 +10,7 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
     const item = this.resource.item
     const codigoEstandar = this.resource.codigoEstandar
     const clasificacion = this.resource.clasificacion
+    const usoPresupuestal = this.resource.usoPresupuestal
 
     return {
       id: this.resource.id,
@@ -18,6 +19,7 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       idStand: this.resource.idStand,
       nombre: this.resource.nombre,
       cantidad: this.resource.cantidad,
+      cantidadMinima: this.resource.cantidadMinima,
       gramaje: this.resource.gramaje,
       idClasificacion: this.resource.idClasificacion,
       clasificacion: clasificacion ? { id: clasificacion.id, nombre: clasificacion.nombre } : null,
@@ -28,12 +30,16 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       idUnidadMedida: this.resource.idUnidadMedida,
       codigo: this.resource.codigo,
       idCodigoEstandar: this.resource.idCodigoEstandar,
+      idUsoPresupuestal: this.resource.idUsoPresupuestal,
       codigoEstandar: codigoEstandar
         ? {
             id: codigoEstandar.id,
             codigo: codigoEstandar.codigo,
             nombre: codigoEstandar.nombre,
           }
+        : null,
+      usoPresupuestal: usoPresupuestal
+        ? { id: usoPresupuestal.id, nombre: usoPresupuestal.nombre }
         : null,
       descripcion: this.resource.descripcionTecnica,
       marca: this.resource.marca,

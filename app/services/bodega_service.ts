@@ -1,6 +1,7 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import Bodega from '#models/bodega'
 import SubBodega from '#models/sub_bodega'
+import User from '#models/usuario'
 import { assertBodegaInScope, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
@@ -78,6 +79,10 @@ export default class BodegaService {
         estado: payload.estado ?? true,
       })
 
+      if (!scope.isAdmin) {
+        await this.asignarAlCreador(scope, bodega.id)
+      }
+
       return this.show(scope, bodega.id)
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudo crear la bodega')
@@ -126,5 +131,15 @@ export default class BodegaService {
     }
 
     return { message: 'Bodega eliminada correctamente' }
+  }
+
+  /**
+   * A non-admin only sees the bodegas assigned to them, so the one they just
+   * created is assigned right away; otherwise it would vanish from their list.
+   */
+  private async asignarAlCreador(scope: AccessScope, idBodega: number) {
+    const user = await User.findOrFail(scope.idUsuario)
+    await user.related('bodegas').attach({ [idBodega]: { estado: true } })
+    scope.bodegaIds.push(idBodega)
   }
 }

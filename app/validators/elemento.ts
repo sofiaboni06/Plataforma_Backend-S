@@ -5,6 +5,7 @@ export const createElementoValidator = vine.compile(
     idItem: vine.number().positive().exists({ table: 'item', column: 'id_item' }),
     idStand: vine.number().positive().exists({ table: 'stand', column: 'id_stand' }),
     cantidad: vine.number().min(10),
+    cantidadMinima: vine.number().min(0).optional(),
     gramaje: vine.number().min(0).optional(),
     estado: vine.boolean(),
     idUnidadMedida: vine
@@ -32,6 +33,11 @@ export const createElementoValidator = vine.compile(
       .positive()
       .exists({ table: 'codigo_estandar', column: 'id_codigo_estandar' })
       .optional(),
+    idUsoPresupuestal: vine
+      .number()
+      .positive()
+      .exists({ table: 'uso_presupuestal', column: 'id_uso_presupuestal' })
+      .optional(),
   })
 )
 
@@ -40,6 +46,7 @@ export const updateElementoValidator = vine.compile(
     idItem: vine.number().positive().exists({ table: 'item', column: 'id_item' }).optional(),
     idStand: vine.number().positive().exists({ table: 'stand', column: 'id_stand' }).optional(),
     cantidad: vine.number().min(10).optional(),
+    cantidadMinima: vine.number().min(0).optional(),
     gramaje: vine.number().min(0).nullable().optional(),
     estado: vine.boolean().optional(),
     idUnidadMedida: vine
@@ -63,6 +70,12 @@ export const updateElementoValidator = vine.compile(
       .number()
       .positive()
       .exists({ table: 'codigo_estandar', column: 'id_codigo_estandar' })
+      .nullable()
+      .optional(),
+    idUsoPresupuestal: vine
+      .number()
+      .positive()
+      .exists({ table: 'uso_presupuestal', column: 'id_uso_presupuestal' })
       .nullable()
       .optional(),
   })

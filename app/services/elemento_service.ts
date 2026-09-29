@@ -13,6 +13,7 @@ type ElementoPayload = {
   idItem: number
   idStand: number
   cantidad: number
+  cantidadMinima?: number
   gramaje?: number | null
   estado: boolean
   idUnidadMedida: number
@@ -24,6 +25,7 @@ type ElementoPayload = {
   valorUnitarioPromedio?: number | null
   porcentajeAumento?: number | null
   idCodigoEstandar?: number | null
+  idUsoPresupuestal?: number | null
 }
 
 type UpdateElementoPayload = Partial<ElementoPayload>
@@ -50,6 +52,7 @@ export default class ElementoService {
         idStand: payload.idStand,
         nombre: item.nombre,
         cantidad: payload.cantidad,
+        cantidadMinima: payload.cantidadMinima ?? 10,
         gramaje: payload.gramaje ?? null,
         estado: payload.estado,
         idUnidadMedida: payload.idUnidadMedida,
@@ -61,6 +64,7 @@ export default class ElementoService {
         valorUnitarioPromedio: payload.valorUnitarioPromedio ?? null,
         porcentajeAumento: payload.porcentajeAumento ?? null,
         idCodigoEstandar: payload.idCodigoEstandar ?? null,
+        idUsoPresupuestal: payload.idUsoPresupuestal ?? null,
       })
 
       return this.findById(scope, elemento.id)
@@ -97,6 +101,7 @@ export default class ElementoService {
         : {}),
       ...(payload.idStand !== undefined && { idStand: payload.idStand }),
       ...(payload.cantidad !== undefined && { cantidad: payload.cantidad }),
+      ...(payload.cantidadMinima !== undefined && { cantidadMinima: payload.cantidadMinima }),
       ...(payload.gramaje !== undefined && { gramaje: payload.gramaje }),
       ...(payload.estado !== undefined && { estado: payload.estado }),
       ...(payload.idUnidadMedida !== undefined && { idUnidadMedida: payload.idUnidadMedida }),
@@ -113,6 +118,9 @@ export default class ElementoService {
       }),
       ...(payload.idCodigoEstandar !== undefined && {
         idCodigoEstandar: payload.idCodigoEstandar,
+      }),
+      ...(payload.idUsoPresupuestal !== undefined && {
+        idUsoPresupuestal: payload.idUsoPresupuestal,
       }),
     })
 
@@ -168,5 +176,6 @@ export default class ElementoService {
       .preload('clasificacion')
       .preload('unidadMedida')
       .preload('codigoEstandar')
+      .preload('usoPresupuestal')
   }
 }
