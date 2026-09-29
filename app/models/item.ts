@@ -1,6 +1,7 @@
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Elemento from '#models/elemento'
+import Subcategoria from '#models/subcategoria'
 
 export default class Item extends BaseModel {
   static table = 'item'
@@ -8,15 +9,21 @@ export default class Item extends BaseModel {
   @column({ isPrimary: true, columnName: 'id_item' })
   declare id: number
 
-  @column({ columnName: 'id_elemento' })
-  declare idElemento: number
+  @column({ columnName: 'id_subcategoria' })
+  declare idSubcategoria: number
 
-  @column({ columnName: 'numero_serial' })
-  declare numeroSerial: string
+  @column()
+  declare nombre: string
+
+  @column()
+  declare descripcion: string | null
 
   @column()
   declare estado: boolean
 
-  @belongsTo(() => Elemento, { foreignKey: 'idElemento' })
-  declare elemento: BelongsTo<typeof Elemento>
+  @belongsTo(() => Subcategoria, { foreignKey: 'idSubcategoria' })
+  declare subcategoria: BelongsTo<typeof Subcategoria>
+
+  @hasMany(() => Elemento, { foreignKey: 'idItem' })
+  declare elementos: HasMany<typeof Elemento>
 }

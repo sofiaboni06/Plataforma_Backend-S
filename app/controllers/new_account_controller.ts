@@ -3,6 +3,7 @@ import { signupValidator } from '#validators/usuario'
 import type { HttpContext } from '@adonisjs/core/http'
 import UserTransformer from '#transformers/user_transformer'
 import ProfileService from '#services/profile_service'
+import { effectivePermissionCodes, resolveScope } from '#services/access_control'
 
 export default class NewAccountController {
   async store({ request, serialize }: HttpContext) {
@@ -21,10 +22,11 @@ export default class NewAccountController {
     })
 
     const profile = await new ProfileService().load(user)
+    const scope = await resolveScope(user)
     const token = await User.accessTokens.create(user)
 
     return serialize({
-      user: UserTransformer.transform(profile),
+      user: UserTransformer.transform(profile, effectivePermissionCodes(scope), scope.isAdmin),
       token: token.value!.release(),
     })
   }

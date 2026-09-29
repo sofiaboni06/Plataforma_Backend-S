@@ -187,6 +187,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/roles_controller').default['syncModules']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'roles.roles.sync_permissions': {
+    methods: ["PUT"]
+    pattern: '/api/v1/roles/:id/permissions'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/role').assignPermissionsValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/role').assignPermissionsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/roles_controller').default['syncPermissions']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/roles_controller').default['syncPermissions']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'users.users.options': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/users/options'
@@ -247,6 +259,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'users.users.sync_bodegas': {
+    methods: ["PUT"]
+    pattern: '/api/v1/users/:id/bodegas'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/usuario').assignBodegasValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/usuario').assignBodegasValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/users_controller').default['syncBodegas']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['syncBodegas']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'permissions.permissions.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/permissions'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/permissions_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permissions_controller').default['index']>>>
+    }
+  }
   'categorias.categorias.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/categorias'
@@ -293,6 +329,18 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/categoria').updateCategoriaValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['update']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'categorias.categorias.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/categorias/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/categorias_controller').default['destroy']>>>
     }
   }
   'subcategorias.subcategorias.index': {
@@ -391,6 +439,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'items.items.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/items'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/items_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/items_controller').default['index']>>>
+    }
+  }
+  'items.items.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/inventario/items'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/item').createItemValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/item').createItemValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/items_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/items_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'items.items.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/items/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/items_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/items_controller').default['show']>>>
+    }
+  }
+  'items.items.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/inventario/items/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/item').updateItemValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/item').updateItemValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/items_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/items_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'items.items.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/inventario/items/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/items_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/items_controller').default['destroy']>>>
+    }
+  }
   'bodegas.bodega.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/bodegas'
@@ -417,7 +525,7 @@ export interface Registry {
   }
   'bodegas.stand.index': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/bodegas/:id/stands'
+    pattern: '/api/v1/bodegas/sub-bodegas/:id/stands'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -429,7 +537,7 @@ export interface Registry {
   }
   'bodegas.stand.store': {
     methods: ["POST"]
-    pattern: '/api/v1/bodegas/:id/stands'
+    pattern: '/api/v1/bodegas/sub-bodegas/:id/stands'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/stand').createStandValidator)>>
       paramsTuple: [ParamValue]
@@ -509,6 +617,90 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/bodega_controller').default['destroy']>>>
+    }
+  }
+  'clasificacionesElemento.clasificaciones_elemento.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/clasificaciones-elemento'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['index']>>>
+    }
+  }
+  'clasificacionesElemento.clasificaciones_elemento.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/clasificaciones-elemento'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/clasificacion_elemento').createClasificacionElementoValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/clasificacion_elemento').createClasificacionElementoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'clasificacionesElemento.clasificaciones_elemento.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/clasificaciones-elemento/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['show']>>>
+    }
+  }
+  'clasificacionesElemento.clasificaciones_elemento.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/clasificaciones-elemento/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/clasificacion_elemento').updateClasificacionElementoValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/clasificacion_elemento').updateClasificacionElementoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'clasificacionesElemento.clasificaciones_elemento.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/clasificaciones-elemento/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clasificaciones_elemento_controller').default['destroy']>>>
+    }
+  }
+  'codigosEstandar.codigos_estandar.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/codigos-estandar'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['index']>>>
+    }
+  }
+  'codigosEstandar.codigos_estandar.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/codigos-estandar/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/codigos_estandar_controller').default['show']>>>
     }
   }
   'unidadesMedida.unidades_medida.index': {

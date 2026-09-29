@@ -6,28 +6,48 @@
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type AdminUserTransformer from '#transformers/admin_user_transformer'
+import type BodegaTransformer from '#transformers/bodega_transformer'
 import type CategoriaTransformer from '#transformers/categoria_transformer'
+import type ClasificacionElementoTransformer from '#transformers/clasificacion_elemento_transformer'
+import type CodigoEstandarTransformer from '#transformers/codigo_estandar_transformer'
 import type ElementoTransformer from '#transformers/elemento_transformer'
+import type ItemTransformer from '#transformers/item_transformer'
 import type ModuleTransformer from '#transformers/module_transformer'
 import type RoleTransformer from '#transformers/role_transformer'
-import type SubcategoriaTransformer from '#transformers/subcategoria_transformer'
-import type UserTransformer from '#transformers/user_transformer'
-import type UnidadMedidaTransformer from '#transformers/unidad_medida_transformer'
 import type StandTransformer from '#transformers/stand_transformer'
-import type BodegaTransformer from '#transformers/bodega_transformer'
+import type SubBodegaTransformer from '#transformers/sub_bodega_transformer'
+import type SubcategoriaTransformer from '#transformers/subcategoria_transformer'
+import type UnidadMedidaTransformer from '#transformers/unidad_medida_transformer'
+import type UserTransformer from '#transformers/user_transformer'
 
 export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
   export namespace AdminUser {
     export type Variants = InferVariants<AdminUserTransformer>
   }
+  export type Bodega = InferData<BodegaTransformer>
+  export namespace Bodega {
+    export type Variants = InferVariants<BodegaTransformer>
+  }
   export type Categoria = InferData<CategoriaTransformer>
   export namespace Categoria {
     export type Variants = InferVariants<CategoriaTransformer>
   }
+  export type ClasificacionElemento = InferData<ClasificacionElementoTransformer>
+  export namespace ClasificacionElemento {
+    export type Variants = InferVariants<ClasificacionElementoTransformer>
+  }
+  export type CodigoEstandar = InferData<CodigoEstandarTransformer>
+  export namespace CodigoEstandar {
+    export type Variants = InferVariants<CodigoEstandarTransformer>
+  }
   export type Elemento = InferData<ElementoTransformer>
   export namespace Elemento {
     export type Variants = InferVariants<ElementoTransformer>
+  }
+  export type Item = InferData<ItemTransformer>
+  export namespace Item {
+    export type Variants = InferVariants<ItemTransformer>
   }
   export type Module = InferData<ModuleTransformer>
   export namespace Module {
@@ -37,24 +57,24 @@ export namespace Data {
   export namespace Role {
     export type Variants = InferVariants<RoleTransformer>
   }
+  export type Stand = InferData<StandTransformer>
+  export namespace Stand {
+    export type Variants = InferVariants<StandTransformer>
+  }
+  export type SubBodega = InferData<SubBodegaTransformer>
+  export namespace SubBodega {
+    export type Variants = InferVariants<SubBodegaTransformer>
+  }
   export type Subcategoria = InferData<SubcategoriaTransformer>
   export namespace Subcategoria {
     export type Variants = InferVariants<SubcategoriaTransformer>
-  }
-  export type User = InferData<UserTransformer>
-  export namespace User {
-    export type Variants = InferVariants<UserTransformer>
   }
   export type UnidadMedida = InferData<UnidadMedidaTransformer>
   export namespace UnidadMedida {
     export type Variants = InferVariants<UnidadMedidaTransformer>
   }
-  export type Stand = InferData<StandTransformer>
-  export namespace Stand {
-    export type Variants = InferVariants<StandTransformer>
-  }
-  export type Bodega = InferData<BodegaTransformer>
-  export namespace Bodega {
-    export type Variants = InferVariants<BodegaTransformer>
+  export type User = InferData<UserTransformer>
+  export namespace User {
+    export type Variants = InferVariants<UserTransformer>
   }
 }

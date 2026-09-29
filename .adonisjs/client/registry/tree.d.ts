@@ -35,6 +35,7 @@ export interface ApiDefinition {
       show: typeof routes['roles.roles.show']
       update: typeof routes['roles.roles.update']
       syncModules: typeof routes['roles.roles.sync_modules']
+      syncPermissions: typeof routes['roles.roles.sync_permissions']
     }
   }
   users: {
@@ -44,6 +45,12 @@ export interface ApiDefinition {
       store: typeof routes['users.users.store']
       show: typeof routes['users.users.show']
       update: typeof routes['users.users.update']
+      syncBodegas: typeof routes['users.users.sync_bodegas']
+    }
+  }
+  permissions: {
+    permissions: {
+      index: typeof routes['permissions.permissions.index']
     }
   }
   categorias: {
@@ -52,6 +59,7 @@ export interface ApiDefinition {
       store: typeof routes['categorias.categorias.store']
       show: typeof routes['categorias.categorias.show']
       update: typeof routes['categorias.categorias.update']
+      destroy: typeof routes['categorias.categorias.destroy']
     }
   }
   subcategorias: {
@@ -70,6 +78,15 @@ export interface ApiDefinition {
       update: typeof routes['elementos.elementos.update']
     }
   }
+  items: {
+    items: {
+      index: typeof routes['items.items.index']
+      store: typeof routes['items.items.store']
+      show: typeof routes['items.items.show']
+      update: typeof routes['items.items.update']
+      destroy: typeof routes['items.items.destroy']
+    }
+  }
   bodegas: {
     bodega: {
       index: typeof routes['bodegas.bodega.index']
@@ -84,6 +101,21 @@ export interface ApiDefinition {
       show: typeof routes['bodegas.stand.show']
       update: typeof routes['bodegas.stand.update']
       destroy: typeof routes['bodegas.stand.destroy']
+    }
+  }
+  clasificacionesElemento: {
+    clasificacionesElemento: {
+      index: typeof routes['clasificacionesElemento.clasificaciones_elemento.index']
+      store: typeof routes['clasificacionesElemento.clasificaciones_elemento.store']
+      show: typeof routes['clasificacionesElemento.clasificaciones_elemento.show']
+      update: typeof routes['clasificacionesElemento.clasificaciones_elemento.update']
+      destroy: typeof routes['clasificacionesElemento.clasificaciones_elemento.destroy']
+    }
+  }
+  codigosEstandar: {
+    codigosEstandar: {
+      index: typeof routes['codigosEstandar.codigos_estandar.index']
+      show: typeof routes['codigosEstandar.codigos_estandar.show']
     }
   }
   unidadesMedida: {

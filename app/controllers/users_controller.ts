@@ -1,6 +1,10 @@
 import UsuarioService from '#services/usuario_service'
 import AdminUserTransformer from '#transformers/admin_user_transformer'
-import { createUserValidator, updateUserValidator } from '#validators/usuario'
+import {
+  assignBodegasValidator,
+  createUserValidator,
+  updateUserValidator,
+} from '#validators/usuario'
 import { Exception } from '@adonisjs/core/exceptions'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -30,6 +34,7 @@ export default class UsersController {
       password: payload.password,
       idPerfil: payload.idPerfil,
       idCformacion: payload.idCformacion,
+      bodegaIds: payload.bodegaIds,
     })
     return serialize(AdminUserTransformer.transform(user))
   }
@@ -62,6 +67,12 @@ export default class UsersController {
       },
       actor.id
     )
+    return serialize(AdminUserTransformer.transform(user))
+  }
+
+  async syncBodegas({ params, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(assignBodegasValidator)
+    const user = await new UsuarioService().syncBodegas(Number(params.id), payload.bodegaIds)
     return serialize(AdminUserTransformer.transform(user))
   }
 }

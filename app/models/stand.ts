@@ -1,7 +1,7 @@
 import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-import Bodega from '#models/bodega'
 import Elemento from '#models/elemento'
+import SubBodega from '#models/sub_bodega'
 
 export default class Stand extends BaseModel {
   static table = 'stand'
@@ -9,8 +9,8 @@ export default class Stand extends BaseModel {
   @column({ isPrimary: true, columnName: 'id_stand' })
   declare id: number
 
-  @column({ columnName: 'id_bodega' })
-  declare idBodega: number
+  @column({ columnName: 'id_sub_bodega' })
+  declare idSubBodega: number
 
   @column()
   declare nombre: string
@@ -18,8 +18,8 @@ export default class Stand extends BaseModel {
   @column()
   declare estado: boolean
 
-  @belongsTo(() => Bodega, { foreignKey: 'idBodega' })
-  declare bodega: BelongsTo<typeof Bodega>
+  @belongsTo(() => SubBodega, { foreignKey: 'idSubBodega' })
+  declare subBodega: BelongsTo<typeof SubBodega>
 
   @hasMany(() => Elemento, { foreignKey: 'idStand' })
   declare elementos: HasMany<typeof Elemento>

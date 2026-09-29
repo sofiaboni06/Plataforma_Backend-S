@@ -96,6 +96,12 @@ const routes = {
     tokens: [{"old":"/api/v1/roles/:id/modules","type":0,"val":"api","end":""},{"old":"/api/v1/roles/:id/modules","type":0,"val":"v1","end":""},{"old":"/api/v1/roles/:id/modules","type":0,"val":"roles","end":""},{"old":"/api/v1/roles/:id/modules","type":1,"val":"id","end":""},{"old":"/api/v1/roles/:id/modules","type":0,"val":"modules","end":""}],
     types: placeholder as Registry['roles.roles.sync_modules']['types'],
   },
+  'roles.roles.sync_permissions': {
+    methods: ["PUT"],
+    pattern: '/api/v1/roles/:id/permissions',
+    tokens: [{"old":"/api/v1/roles/:id/permissions","type":0,"val":"api","end":""},{"old":"/api/v1/roles/:id/permissions","type":0,"val":"v1","end":""},{"old":"/api/v1/roles/:id/permissions","type":0,"val":"roles","end":""},{"old":"/api/v1/roles/:id/permissions","type":1,"val":"id","end":""},{"old":"/api/v1/roles/:id/permissions","type":0,"val":"permissions","end":""}],
+    types: placeholder as Registry['roles.roles.sync_permissions']['types'],
+  },
   'users.users.options': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/users/options',
@@ -126,6 +132,18 @@ const routes = {
     tokens: [{"old":"/api/v1/users/:id","type":0,"val":"api","end":""},{"old":"/api/v1/users/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/users/:id","type":0,"val":"users","end":""},{"old":"/api/v1/users/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['users.users.update']['types'],
   },
+  'users.users.sync_bodegas': {
+    methods: ["PUT"],
+    pattern: '/api/v1/users/:id/bodegas',
+    tokens: [{"old":"/api/v1/users/:id/bodegas","type":0,"val":"api","end":""},{"old":"/api/v1/users/:id/bodegas","type":0,"val":"v1","end":""},{"old":"/api/v1/users/:id/bodegas","type":0,"val":"users","end":""},{"old":"/api/v1/users/:id/bodegas","type":1,"val":"id","end":""},{"old":"/api/v1/users/:id/bodegas","type":0,"val":"bodegas","end":""}],
+    types: placeholder as Registry['users.users.sync_bodegas']['types'],
+  },
+  'permissions.permissions.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/permissions',
+    tokens: [{"old":"/api/v1/permissions","type":0,"val":"api","end":""},{"old":"/api/v1/permissions","type":0,"val":"v1","end":""},{"old":"/api/v1/permissions","type":0,"val":"permissions","end":""}],
+    types: placeholder as Registry['permissions.permissions.index']['types'],
+  },
   'categorias.categorias.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/categorias',
@@ -149,6 +167,12 @@ const routes = {
     pattern: '/api/v1/categorias/:id',
     tokens: [{"old":"/api/v1/categorias/:id","type":0,"val":"api","end":""},{"old":"/api/v1/categorias/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/categorias/:id","type":0,"val":"categorias","end":""},{"old":"/api/v1/categorias/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['categorias.categorias.update']['types'],
+  },
+  'categorias.categorias.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/categorias/:id',
+    tokens: [{"old":"/api/v1/categorias/:id","type":0,"val":"api","end":""},{"old":"/api/v1/categorias/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/categorias/:id","type":0,"val":"categorias","end":""},{"old":"/api/v1/categorias/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['categorias.categorias.destroy']['types'],
   },
   'subcategorias.subcategorias.index': {
     methods: ["GET","HEAD"],
@@ -198,6 +222,36 @@ const routes = {
     tokens: [{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"elementos","end":""},{"old":"/api/v1/inventario/elementos/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['elementos.elementos.update']['types'],
   },
+  'items.items.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/inventario/items',
+    tokens: [{"old":"/api/v1/inventario/items","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/items","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/items","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/items","type":0,"val":"items","end":""}],
+    types: placeholder as Registry['items.items.index']['types'],
+  },
+  'items.items.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/inventario/items',
+    tokens: [{"old":"/api/v1/inventario/items","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/items","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/items","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/items","type":0,"val":"items","end":""}],
+    types: placeholder as Registry['items.items.store']['types'],
+  },
+  'items.items.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/inventario/items/:id',
+    tokens: [{"old":"/api/v1/inventario/items/:id","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"items","end":""},{"old":"/api/v1/inventario/items/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['items.items.show']['types'],
+  },
+  'items.items.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/inventario/items/:id',
+    tokens: [{"old":"/api/v1/inventario/items/:id","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"items","end":""},{"old":"/api/v1/inventario/items/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['items.items.update']['types'],
+  },
+  'items.items.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/inventario/items/:id',
+    tokens: [{"old":"/api/v1/inventario/items/:id","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/items/:id","type":0,"val":"items","end":""},{"old":"/api/v1/inventario/items/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['items.items.destroy']['types'],
+  },
   'bodegas.bodega.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/bodegas',
@@ -212,14 +266,14 @@ const routes = {
   },
   'bodegas.stand.index': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/bodegas/:id/stands',
-    tokens: [{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id/stands","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"stands","end":""}],
+    pattern: '/api/v1/bodegas/sub-bodegas/:id/stands',
+    tokens: [{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"sub-bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"stands","end":""}],
     types: placeholder as Registry['bodegas.stand.index']['types'],
   },
   'bodegas.stand.store': {
     methods: ["POST"],
-    pattern: '/api/v1/bodegas/:id/stands',
-    tokens: [{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id/stands","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/:id/stands","type":0,"val":"stands","end":""}],
+    pattern: '/api/v1/bodegas/sub-bodegas/:id/stands',
+    tokens: [{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"sub-bodegas","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":1,"val":"id","end":""},{"old":"/api/v1/bodegas/sub-bodegas/:id/stands","type":0,"val":"stands","end":""}],
     types: placeholder as Registry['bodegas.stand.store']['types'],
   },
   'bodegas.stand.show': {
@@ -257,6 +311,48 @@ const routes = {
     pattern: '/api/v1/bodegas/:id',
     tokens: [{"old":"/api/v1/bodegas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/bodegas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/bodegas/:id","type":0,"val":"bodegas","end":""},{"old":"/api/v1/bodegas/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['bodegas.bodega.destroy']['types'],
+  },
+  'clasificacionesElemento.clasificaciones_elemento.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/clasificaciones-elemento',
+    tokens: [{"old":"/api/v1/clasificaciones-elemento","type":0,"val":"api","end":""},{"old":"/api/v1/clasificaciones-elemento","type":0,"val":"v1","end":""},{"old":"/api/v1/clasificaciones-elemento","type":0,"val":"clasificaciones-elemento","end":""}],
+    types: placeholder as Registry['clasificacionesElemento.clasificaciones_elemento.index']['types'],
+  },
+  'clasificacionesElemento.clasificaciones_elemento.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/clasificaciones-elemento',
+    tokens: [{"old":"/api/v1/clasificaciones-elemento","type":0,"val":"api","end":""},{"old":"/api/v1/clasificaciones-elemento","type":0,"val":"v1","end":""},{"old":"/api/v1/clasificaciones-elemento","type":0,"val":"clasificaciones-elemento","end":""}],
+    types: placeholder as Registry['clasificacionesElemento.clasificaciones_elemento.store']['types'],
+  },
+  'clasificacionesElemento.clasificaciones_elemento.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/clasificaciones-elemento/:id',
+    tokens: [{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"api","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"clasificaciones-elemento","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['clasificacionesElemento.clasificaciones_elemento.show']['types'],
+  },
+  'clasificacionesElemento.clasificaciones_elemento.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/clasificaciones-elemento/:id',
+    tokens: [{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"api","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"clasificaciones-elemento","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['clasificacionesElemento.clasificaciones_elemento.update']['types'],
+  },
+  'clasificacionesElemento.clasificaciones_elemento.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/clasificaciones-elemento/:id',
+    tokens: [{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"api","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":0,"val":"clasificaciones-elemento","end":""},{"old":"/api/v1/clasificaciones-elemento/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['clasificacionesElemento.clasificaciones_elemento.destroy']['types'],
+  },
+  'codigosEstandar.codigos_estandar.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/codigos-estandar',
+    tokens: [{"old":"/api/v1/codigos-estandar","type":0,"val":"api","end":""},{"old":"/api/v1/codigos-estandar","type":0,"val":"v1","end":""},{"old":"/api/v1/codigos-estandar","type":0,"val":"codigos-estandar","end":""}],
+    types: placeholder as Registry['codigosEstandar.codigos_estandar.index']['types'],
+  },
+  'codigosEstandar.codigos_estandar.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/codigos-estandar/:id',
+    tokens: [{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"api","end":""},{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/codigos-estandar/:id","type":0,"val":"codigos-estandar","end":""},{"old":"/api/v1/codigos-estandar/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['codigosEstandar.codigos_estandar.show']['types'],
   },
   'unidadesMedida.unidades_medida.index': {
     methods: ["GET","HEAD"],

@@ -1,6 +1,13 @@
 import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
 
+type AdminUserPayload = {
+  id: number
+  email: string
+  role: string
+  active: boolean
+}
+
 async function login(client: ApiClient, email: string, password = '123456') {
   const response = await client.post('/api/v1/auth/login').json({ email, password })
   response.assertStatus(200)
@@ -57,9 +64,10 @@ test.group('Admin users', () => {
     })
 
     created.assertStatus(200)
-    assert.equal(created.body().data.email, 'luisa.gomez@correo.com')
-    assert.equal(created.body().data.role, 'Almacenista')
-    assert.equal(created.body().data.active, true)
+    const createdUser = created.body().data as AdminUserPayload
+    assert.equal(createdUser.email, 'luisa.gomez@correo.com')
+    assert.equal(createdUser.role, 'Almacenista')
+    assert.equal(createdUser.active, true)
 
     const userToken = await login(client, 'luisa.gomez@correo.com', '123456')
     const modules = await client.get('/api/v1/modules').bearerToken(userToken)
@@ -95,15 +103,16 @@ test.group('Admin users', () => {
       idCformacion: centers[0].id,
     })
     created.assertStatus(200)
+    const createdUser = created.body().data as AdminUserPayload
 
     const updated = await client
-      .patch(`/api/v1/users/${created.body().data.id}`)
+      .patch(`/api/v1/users/${createdUser.id}`)
       .bearerToken(token)
       .json({
         idPerfil: funcionario!.id,
       })
     updated.assertStatus(200)
-    assert.equal(updated.body().data.role, 'Funcionario')
+    assert.equal((updated.body().data as AdminUserPayload).role, 'Funcionario')
 
     const userToken = await login(client, 'andres.rojas@correo.com')
     const modules = await client.get('/api/v1/modules').bearerToken(userToken)
