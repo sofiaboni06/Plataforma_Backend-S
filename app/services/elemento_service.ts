@@ -20,7 +20,6 @@ type ElementoPayload = {
   descripcion?: string | null
   marca?: string | null
   color?: string | null
-  urlFotografia?: string | null
   idClasificacion?: number | null
   valorUnitarioPromedio?: number | null
   porcentajeAumento?: number | null
@@ -58,7 +57,6 @@ export default class ElementoService {
         descripcionTecnica: payload.descripcion ?? null,
         marca: payload.marca ?? null,
         color: payload.color ?? null,
-        urlFotografia: payload.urlFotografia ?? null,
         idClasificacion: payload.idClasificacion ?? null,
         valorUnitarioPromedio: payload.valorUnitarioPromedio ?? null,
         porcentajeAumento: payload.porcentajeAumento ?? null,
@@ -106,7 +104,6 @@ export default class ElementoService {
       ...(payload.descripcion !== undefined && { descripcionTecnica: payload.descripcion }),
       ...(payload.marca !== undefined && { marca: payload.marca }),
       ...(payload.color !== undefined && { color: payload.color }),
-      ...(payload.urlFotografia !== undefined && { urlFotografia: payload.urlFotografia }),
       ...(payload.idClasificacion !== undefined && { idClasificacion: payload.idClasificacion }),
       ...(payload.valorUnitarioPromedio !== undefined && {
         valorUnitarioPromedio: payload.valorUnitarioPromedio,
@@ -123,6 +120,23 @@ export default class ElementoService {
       await elemento.save()
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudo actualizar el elemento')
+    }
+
+    return this.findById(scope, id)
+  }
+
+  /**
+   * The column stores a relative path. Callers pass null to detach the file.
+   */
+  async asignarFotografia(scope: AccessScope, id: number, ruta: string | null) {
+    const elemento = await Elemento.findOrFail(id)
+    await assertStandInScope(scope, elemento.idStand)
+    elemento.urlFotografia = ruta
+
+    try {
+      await elemento.save()
+    } catch (error) {
+      rethrowDatabaseError(error, 'No se pudo guardar la fotografía del elemento')
     }
 
     return this.findById(scope, id)

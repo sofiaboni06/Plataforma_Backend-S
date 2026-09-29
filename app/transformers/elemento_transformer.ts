@@ -20,9 +20,7 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       cantidad: this.resource.cantidad,
       gramaje: this.resource.gramaje,
       idClasificacion: this.resource.idClasificacion,
-      clasificacion: clasificacion
-        ? { id: clasificacion.id, nombre: clasificacion.nombre }
-        : null,
+      clasificacion: clasificacion ? { id: clasificacion.id, nombre: clasificacion.nombre } : null,
       valorUnitarioPromedio: this.resource.valorUnitarioPromedio,
       porcentajeAumento: this.resource.porcentajeAumento,
       valorConAumento: this.resource.valorConAumento(),
@@ -40,7 +38,7 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       descripcion: this.resource.descripcionTecnica,
       marca: this.resource.marca,
       color: this.resource.color,
-      urlFotografia: this.resource.urlFotografia,
+      urlFotografia: urlFotografiaPublica(this.resource),
       item: item
         ? {
             id: item.id,
@@ -79,4 +77,25 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
         : null,
     }
   }
+}
+
+/**
+ * The column stores a relative path. Clients receive the API route that
+ * streams the file. A legacy absolute URL is returned unchanged.
+ */
+function urlFotografiaPublica(elemento: Elemento) {
+  const ruta = elemento.urlFotografia
+  if (!ruta) {
+    return null
+  }
+
+  if (/^https?:\/\//i.test(ruta)) {
+    return ruta
+  }
+
+  if (ruta === `elementos/${elemento.id}/foto.webp`) {
+    return `/api/v1/inventario/elementos/${elemento.id}/fotografia`
+  }
+
+  return null
 }

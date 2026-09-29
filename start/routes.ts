@@ -1,3 +1,4 @@
+import '#config/fotos'
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
@@ -132,6 +133,15 @@ router
         router
           .get(':id', [controllers.Elementos, 'show'])
           .use(middleware.permission('elemento.ver'))
+        router
+          .get(':id/fotografia', [controllers.Elementos, 'showFoto'])
+          .use(middleware.permission('elemento.ver'))
+        router
+          .post(':id/fotografia', [controllers.Elementos, 'storeFoto'])
+          .use(middleware.permission('elemento.editar'))
+        router
+          .delete(':id/fotografia', [controllers.Elementos, 'destroyFoto'])
+          .use(middleware.permission('elemento.editar'))
         router
           .patch(':id', [controllers.Elementos, 'update'])
           .use(middleware.permission('elemento.editar'))
