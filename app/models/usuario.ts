@@ -1,14 +1,16 @@
 import { timingSafeEqual } from 'node:crypto'
 import hash from '@adonisjs/core/services/hash'
-import { BaseModel, belongsTo, column, computed, manyToMany } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, computed, hasMany, manyToMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { type AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
-import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import Bodega from '#models/bodega'
+import Modulo from '#models/modulo'
+import Novedad from '#models/novedad'
 import Perfil from '#models/perfil'
 import Permiso from '#models/permiso'
+import Prestamo from '#models/prestamo'
 import TrainingCenter from '#models/training_center'
-import Modulo from '#models/modulo'
 
 const AuthFinder = withAuthFinder(hash, {
   uids: ['email', 'numeroDocumento'],
@@ -57,6 +59,12 @@ export default class User extends AuthFinder(BaseModel) {
 
   @belongsTo(() => Perfil, { foreignKey: 'idPerfil' })
   declare perfil: BelongsTo<typeof Perfil>
+
+  @hasMany(() => Prestamo, { foreignKey: 'idUsuario' })
+  declare prestamos: HasMany<typeof Prestamo>
+
+  @hasMany(() => Novedad, { foreignKey: 'idUsuario' })
+  declare novedades: HasMany<typeof Novedad>
 
   @belongsTo(() => TrainingCenter, { foreignKey: 'idCformacion' })
   declare trainingCenter: BelongsTo<typeof TrainingCenter>

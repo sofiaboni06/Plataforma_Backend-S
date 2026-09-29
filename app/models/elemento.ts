@@ -1,8 +1,11 @@
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import Alerta from '#models/alerta'
 import ClasificacionElemento from '#models/clasificacion_elemento'
 import CodigoEstandar from '#models/codigo_estandar'
 import Item from '#models/item'
+import Novedad from '#models/novedad'
+import Prestamo from '#models/prestamo'
 import Stand from '#models/stand'
 import Subcategoria from '#models/subcategoria'
 import UnidadMedida from '#models/unidad_medida'
@@ -24,6 +27,9 @@ export default class Elemento extends BaseModel {
 
   @column()
   declare cantidad: number
+
+  @column({ columnName: 'cantidad_minima' })
+  declare cantidadMinima: number
 
   @column()
   declare estado: boolean
@@ -105,4 +111,13 @@ export default class Elemento extends BaseModel {
 
   @belongsTo(() => ClasificacionElemento, { foreignKey: 'idClasificacion' })
   declare clasificacion: BelongsTo<typeof ClasificacionElemento>
+
+  @hasMany(() => Prestamo, { foreignKey: 'idElemento' })
+  declare prestamos: HasMany<typeof Prestamo>
+
+  @hasMany(() => Novedad, { foreignKey: 'idElemento' })
+  declare novedades: HasMany<typeof Novedad>
+
+  @hasMany(() => Alerta, { foreignKey: 'idElemento' })
+  declare alertas: HasMany<typeof Alerta>
 }
