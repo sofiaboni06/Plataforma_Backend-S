@@ -64,6 +64,12 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
               : null,
           }
         : null,
+      stand: stand
+        ? {
+            id: stand.id,
+            nombre: stand.nombre,
+          }
+        : null,
       unidadMedida: unidadMedida
         ? {
             id: unidadMedida.id,

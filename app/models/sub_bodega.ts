@@ -24,3 +24,4 @@ export default class SubBodega extends BaseModel {
   @hasMany(() => Stand, { foreignKey: 'idSubBodega' })
   declare stands: HasMany<typeof Stand>
 }
+}

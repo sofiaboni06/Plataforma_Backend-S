@@ -21,6 +21,9 @@ export default class StandTransformer extends BaseTransformer<Stand> {
         ? {
             id: subBodega.id,
             nombre: subBodega.nombre,
+        ? {
+            id: subBodega.id,
+            nombre: subBodega.nombre,
             idBodega: subBodega.idBodega,
           }
         : null,

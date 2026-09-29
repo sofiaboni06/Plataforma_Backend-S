@@ -2,6 +2,7 @@ import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import SubBodega from '#models/sub_bodega'
 import TrainingCenter from '#models/training_center'
+import SubBodega from '#models/sub_bodega'
 
 export default class Bodega extends BaseModel {
   static table = 'bodega'
@@ -23,4 +24,5 @@ export default class Bodega extends BaseModel {
 
   @hasMany(() => SubBodega, { foreignKey: 'idBodega' })
   declare subBodegas: HasMany<typeof SubBodega>
+}
 }

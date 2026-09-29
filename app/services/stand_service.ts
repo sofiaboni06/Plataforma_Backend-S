@@ -1,5 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import { Exception } from '@adonisjs/core/exceptions'
+import SubBodega from '#models/sub_bodega'
 import Stand from '#models/stand'
 import SubBodega from '#models/sub_bodega'
 import {
@@ -10,11 +11,24 @@ import {
 import { rethrowDatabaseError } from '#services/database_error'
 
 export type StandPayload = {
+  idSubBodega?: number
   nombre?: string
   estado?: boolean
 }
 
 export default class StandService {
+  async list(options: {
+    idSubBodega: number
+    page: number
+    perPage: number
+    search?: string
+    estado?: boolean
+  }) {
+    await SubBodega.findOrFail(options.idSubBodega)
+
+    const query = Stand.query()
+      .where('id_sub_bodega', options.idSubBodega)
+      .preload('subBodega')
   async list(
     scope: AccessScope,
     options: {
@@ -44,6 +58,15 @@ export default class StandService {
     return query.paginate(options.page, options.perPage)
   }
 
+  async show(id: number) {
+    return Stand.query()
+      .where('id_stand', id)
+      .preload('subBodega')
+      .firstOrFail()
+  }
+
+  async create(idSubBodega: number, payload: StandPayload) {
+    await SubBodega.findOrFail(idSubBodega)
   async show(scope: AccessScope, id: number) {
     await assertStandInScope(scope, id)
 
@@ -78,6 +101,12 @@ export default class StandService {
     await assertStandInScope(scope, id)
 
     const stand = await Stand.findOrFail(id)
+
+    if (payload.idSubBodega !== undefined) {
+      await SubBodega.findOrFail(payload.idSubBodega)
+    }
+
+    stand.merge(payload)
     stand.merge({
       ...(payload.nombre !== undefined ? { nombre: payload.nombre } : {}),
       ...(payload.estado !== undefined ? { estado: payload.estado } : {}),
@@ -96,14 +125,22 @@ export default class StandService {
     await assertStandInScope(scope, id)
 
     const stand = await Stand.findOrFail(id)
-    const elementCount = await db.from('elemento').where('id_stand', id).count('* as total')
+
+    const elementCount = await db
+      .from('elemento')
+      .where('id_stand', id)
+      .count('* as total')
+
     const total = Number(elementCount[0].total)
 
     if (total > 0) {
-      throw new Exception('No se puede eliminar el stand porque tiene elementos asociados', {
-        status: 409,
-        code: 'E_STAND_HAS_ELEMENTS',
-      })
+      throw new Exception(
+        'No se puede eliminar el stand porque tiene elementos asociados',
+        {
+          status: 409,
+          code: 'E_STAND_HAS_ELEMENTS',
+        }
+      )
     }
 
     try {
