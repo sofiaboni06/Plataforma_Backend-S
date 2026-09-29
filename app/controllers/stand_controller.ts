@@ -34,7 +34,7 @@ export default class StandsController {
     const estado = parseOptionalBoolean(request.input('estado'))
 
     const result = await this.service.list({
-      idBodega: Number(params.id),
+      idSubBodega: Number(params.id),
       page,
       perPage,
       search,
@@ -46,7 +46,11 @@ export default class StandsController {
 
   async store({ params, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(createStandValidator)
-    const stand = await this.service.create(Number(params.id), payload)
+
+    const stand = await this.service.create(
+      Number(params.id),
+      payload
+    )
 
     return serialize(StandTransformer.transform(stand))
   }
@@ -59,7 +63,11 @@ export default class StandsController {
 
   async update({ params, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(updateStandValidator)
-    const stand = await this.service.update(Number(params.id), payload)
+
+    const stand = await this.service.update(
+      Number(params.id),
+      payload
+    )
 
     return serialize(StandTransformer.transform(stand))
   }

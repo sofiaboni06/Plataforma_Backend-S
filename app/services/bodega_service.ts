@@ -1,6 +1,6 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import Bodega from '#models/bodega'
-import Stand from '#models/stand'
+import SubBodega from '#models/sub_bodega'
 import { rethrowDatabaseError } from '#services/database_error'
 
 export type BodegaPayload = {
@@ -19,7 +19,9 @@ export default class BodegaService {
   }) {
     const query = Bodega.query()
       .preload('trainingCenter')
-      .preload('stands', (standsQuery) => standsQuery.orderBy('id_stand', 'asc'))
+      .preload('subBodegas', (subBodegasQuery) =>
+        subBodegasQuery.orderBy('id_sub_bodega', 'asc')
+      )
       .orderBy('id_bodega', 'asc')
 
     if (options.search) {
@@ -41,12 +43,15 @@ export default class BodegaService {
     return Bodega.query()
       .where('id_bodega', id)
       .preload('trainingCenter')
-      .preload('stands', (query) => query.orderBy('id_stand', 'asc'))
+      .preload('subBodegas', (subBodegasQuery) =>
+        subBodegasQuery.orderBy('id_sub_bodega', 'asc')
+      )
       .firstOrFail()
   }
 
   async create(
-    payload: Required<Pick<BodegaPayload, 'nombre' | 'idCformacion'>> & Pick<BodegaPayload, 'estado'>
+    payload: Required<Pick<BodegaPayload, 'nombre' | 'idCformacion'>> &
+      Pick<BodegaPayload, 'estado'>
   ) {
     try {
       const bodega = await Bodega.create({
@@ -57,7 +62,10 @@ export default class BodegaService {
 
       return this.show(bodega.id)
     } catch (error) {
-      rethrowDatabaseError(error, 'No se pudo crear la bodega')
+      rethrowDatabaseError(
+        error,
+        'No se pudo crear la bodega'
+      )
     }
   }
 
@@ -69,7 +77,10 @@ export default class BodegaService {
     try {
       await bodega.save()
     } catch (error) {
-      rethrowDatabaseError(error, 'No se pudo actualizar la bodega')
+      rethrowDatabaseError(
+        error,
+        'No se pudo actualizar la bodega'
+      )
     }
 
     return this.show(id)
@@ -77,22 +88,35 @@ export default class BodegaService {
 
   async remove(id: number) {
     const bodega = await Bodega.findOrFail(id)
-    const standCount = await Stand.query().where('id_bodega', id).count('* as total')
-    const total = Number(standCount[0].$extras.total)
+
+    const subBodegaCount = await SubBodega
+      .query()
+      .where('id_bodega', id)
+      .count('* as total')
+
+    const total = Number(subBodegaCount[0].$extras.total)
 
     if (total > 0) {
-      throw new Exception('No se puede eliminar la bodega porque tiene stands asociados', {
-        status: 409,
-        code: 'E_BODEGA_HAS_STANDS',
-      })
+      throw new Exception(
+        'No se puede eliminar la bodega porque tiene sub-bodegas asociadas',
+        {
+          status: 409,
+          code: 'E_BODEGA_HAS_SUB_BODEGAS',
+        }
+      )
     }
 
     try {
       await bodega.delete()
     } catch (error) {
-      rethrowDatabaseError(error, 'No se pudo eliminar la bodega')
+      rethrowDatabaseError(
+        error,
+        'No se pudo eliminar la bodega'
+      )
     }
 
-    return { message: 'Bodega eliminada correctamente' }
+    return {
+      message: 'Bodega eliminada correctamente',
+    }
   }
 }

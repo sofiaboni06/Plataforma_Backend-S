@@ -1,24 +1,22 @@
 import vine from '@vinejs/vine'
 
-export const createStandValidator = vine.create({
+export const createSubBodegaValidator = vine.create({
   nombre: vine
     .string()
     .trim()
     .minLength(1)
     .maxLength(150),
 
-  estado: vine
-    .boolean()
-    .optional(),
+  estado: vine.boolean().optional(),
 })
 
-export const updateStandValidator = vine.create({
-  idSubBodega: vine
+export const updateSubBodegaValidator = vine.create({
+  idBodega: vine
     .number()
     .positive()
     .exists({
-      table: 'sub_bodega',
-      column: 'id_sub_bodega',
+      table: 'bodega',
+      column: 'id_bodega',
     })
     .optional(),
 
@@ -29,7 +27,5 @@ export const updateStandValidator = vine.create({
     .maxLength(150)
     .optional(),
 
-  estado: vine
-    .boolean()
-    .optional(),
+  estado: vine.boolean().optional(),
 })

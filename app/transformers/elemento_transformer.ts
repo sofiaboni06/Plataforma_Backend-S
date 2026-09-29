@@ -22,7 +22,12 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       subcategoria: subcategoria
         ? { id: subcategoria.id, nombre: subcategoria.nombre }
         : null,
-      stand: stand ? { id: stand.id, nombre: stand.nombre, idBodega: stand.idBodega } : null,
+      stand: stand
+        ? {
+            id: stand.id,
+            nombre: stand.nombre,
+          }
+        : null,
       unidadMedida: unidadMedida
         ? {
             id: unidadMedida.id,

@@ -1,11 +1,11 @@
 import { BaseTransformer } from '@adonisjs/core/transformers'
 import type Bodega from '#models/bodega'
-import StandTransformer from '#transformers/stand_transformer'
+import SubBodegaTransformer from '#transformers/sub_bodega_transformer'
 
 export default class BodegaTransformer extends BaseTransformer<Bodega> {
   toObject() {
     const center = this.resource.trainingCenter
-    const stands = this.resource.stands ?? []
+    const subBodegas = this.resource.subBodegas ?? []
 
     return {
       id: this.resource.id,
@@ -19,8 +19,8 @@ export default class BodegaTransformer extends BaseTransformer<Bodega> {
             nombre: center.nombre,
           }
         : null,
-      stands: StandTransformer.transform(stands).useVariant('toSummary'),
-      totalStands: stands.length,
+      subBodegas: SubBodegaTransformer.transform(subBodegas),
+      totalSubBodegas: subBodegas.length,
     }
   }
 }

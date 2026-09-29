@@ -11,15 +11,15 @@ export default class StandTransformer extends BaseTransformer<Stand> {
   }
 
   toObject() {
-    const bodega = this.resource.bodega
+    const subBodega = this.resource.subBodega
 
     return {
       ...this.toSummary(),
-      idBodega: this.resource.idBodega,
-      bodega: bodega
+      idSubBodega: this.resource.idSubBodega,
+      subBodega: subBodega
         ? {
-            id: bodega.id,
-            nombre: bodega.nombre,
+            id: subBodega.id,
+            nombre: subBodega.nombre,
           }
         : null,
     }
