@@ -480,6 +480,72 @@ const routes = {
     tokens: [{"old":"/api/v1/unidades-medida/:id","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"unidades-medida","end":""},{"old":"/api/v1/unidades-medida/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['unidadesMedida.unidades_medida.destroy']['types'],
   },
+  'actividades.actividades.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/actividades',
+    tokens: [{"old":"/api/v1/actividades","type":0,"val":"api","end":""},{"old":"/api/v1/actividades","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades","type":0,"val":"actividades","end":""}],
+    types: placeholder as Registry['actividades.actividades.index']['types'],
+  },
+  'actividades.actividades.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/actividades',
+    tokens: [{"old":"/api/v1/actividades","type":0,"val":"api","end":""},{"old":"/api/v1/actividades","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades","type":0,"val":"actividades","end":""}],
+    types: placeholder as Registry['actividades.actividades.store']['types'],
+  },
+  'actividades.actividades.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/actividades/:id',
+    tokens: [{"old":"/api/v1/actividades/:id","type":0,"val":"api","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"actividades","end":""},{"old":"/api/v1/actividades/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['actividades.actividades.show']['types'],
+  },
+  'actividades.actividades.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/actividades/:id',
+    tokens: [{"old":"/api/v1/actividades/:id","type":0,"val":"api","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"actividades","end":""},{"old":"/api/v1/actividades/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['actividades.actividades.update']['types'],
+  },
+  'actividades.actividades.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/actividades/:id',
+    tokens: [{"old":"/api/v1/actividades/:id","type":0,"val":"api","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"actividades","end":""},{"old":"/api/v1/actividades/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['actividades.actividades.destroy']['types'],
+  },
+  'prestamos.prestamos.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/prestamos',
+    tokens: [{"old":"/api/v1/prestamos","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos","type":0,"val":"prestamos","end":""}],
+    types: placeholder as Registry['prestamos.prestamos.index']['types'],
+  },
+  'prestamos.prestamos.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/prestamos',
+    tokens: [{"old":"/api/v1/prestamos","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos","type":0,"val":"prestamos","end":""}],
+    types: placeholder as Registry['prestamos.prestamos.store']['types'],
+  },
+  'prestamos.prestamos.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/prestamos/:id',
+    tokens: [{"old":"/api/v1/prestamos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos/:id","type":0,"val":"prestamos","end":""},{"old":"/api/v1/prestamos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['prestamos.prestamos.show']['types'],
+  },
+  'prestamos.prestamos.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/prestamos/:id',
+    tokens: [{"old":"/api/v1/prestamos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos/:id","type":0,"val":"prestamos","end":""},{"old":"/api/v1/prestamos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['prestamos.prestamos.update']['types'],
+  },
+  'prestamos.prestamos.return': {
+    methods: ["POST"],
+    pattern: '/api/v1/prestamos/:id/devolucion',
+    tokens: [{"old":"/api/v1/prestamos/:id/devolucion","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos/:id/devolucion","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos/:id/devolucion","type":0,"val":"prestamos","end":""},{"old":"/api/v1/prestamos/:id/devolucion","type":1,"val":"id","end":""},{"old":"/api/v1/prestamos/:id/devolucion","type":0,"val":"devolucion","end":""}],
+    types: placeholder as Registry['prestamos.prestamos.return']['types'],
+  },
+  'prestamos.prestamos.change_status': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/prestamos/:id/estado',
+    tokens: [{"old":"/api/v1/prestamos/:id/estado","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos/:id/estado","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos/:id/estado","type":0,"val":"prestamos","end":""},{"old":"/api/v1/prestamos/:id/estado","type":1,"val":"id","end":""},{"old":"/api/v1/prestamos/:id/estado","type":0,"val":"estado","end":""}],
+    types: placeholder as Registry['prestamos.prestamos.change_status']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

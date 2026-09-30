@@ -955,4 +955,136 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['destroy']>>>
     }
   }
+  'actividades.actividades.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/actividades'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'actividades.actividades.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/actividades'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'actividades.actividades.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/actividades/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'actividades.actividades.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/actividades/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'actividades.actividades.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/actividades/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'prestamos.prestamos.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/prestamos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'prestamos.prestamos.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/prestamos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'prestamos.prestamos.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/prestamos/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'prestamos.prestamos.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/prestamos/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'prestamos.prestamos.return': {
+    methods: ["POST"]
+    pattern: '/api/v1/prestamos/:id/devolucion'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'prestamos.prestamos.change_status': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/prestamos/:id/estado'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
 }

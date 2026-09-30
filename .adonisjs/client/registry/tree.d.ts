@@ -149,4 +149,23 @@ export interface ApiDefinition {
       destroy: typeof routes['unidadesMedida.unidades_medida.destroy']
     }
   }
+  actividades: {
+    actividades: {
+      index: typeof routes['actividades.actividades.index']
+      store: typeof routes['actividades.actividades.store']
+      show: typeof routes['actividades.actividades.show']
+      update: typeof routes['actividades.actividades.update']
+      destroy: typeof routes['actividades.actividades.destroy']
+    }
+  }
+  prestamos: {
+    prestamos: {
+      index: typeof routes['prestamos.prestamos.index']
+      store: typeof routes['prestamos.prestamos.store']
+      show: typeof routes['prestamos.prestamos.show']
+      update: typeof routes['prestamos.prestamos.update']
+      return: typeof routes['prestamos.prestamos.return']
+      changeStatus: typeof routes['prestamos.prestamos.change_status']
+    }
+  }
 }

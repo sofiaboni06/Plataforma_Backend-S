@@ -2,6 +2,8 @@ import '#config/fotos'
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import ActividadesController from '#controllers/actividades_controller'
+import PrestamosController from '#controllers/prestamos_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -304,5 +306,32 @@ router
       .as('unidadesMedida')
       .use(middleware.auth())
       .use(middleware.account())
+
+      router
+  .group(() => {
+    router.get('/', [ActividadesController, 'index'])
+    router.post('/', [ActividadesController, 'store'])
+    router.get(':id', [ActividadesController, 'show'])
+    router.patch(':id', [ActividadesController, 'update'])
+    router.delete(':id', [ActividadesController, 'destroy'])
+  })
+  .prefix('actividades')
+  .as('actividades')
+  .use(middleware.auth())
+  .use(middleware.account())
+
+router
+  .group(() => {
+    router.get('/', [PrestamosController, 'index'])
+    router.post('/', [PrestamosController, 'store'])
+    router.get(':id', [PrestamosController, 'show'])
+    router.patch(':id', [PrestamosController, 'update'])
+    router.post(':id/devolucion', [PrestamosController, 'return'])
+    router.patch(':id/estado', [PrestamosController, 'changeStatus'])
+  })
+  .prefix('prestamos')
+  .as('prestamos')
+  .use(middleware.auth())
+  .use(middleware.account())
   })
   .prefix('/api/v1')

@@ -5,6 +5,7 @@
 
 export const controllers = {
   AccessTokens: () => import('#controllers/access_tokens_controller'),
+  Actividades: () => import('#controllers/actividades_controller'),
   Bodega: () => import('#controllers/bodega_controller'),
   Categorias: () => import('#controllers/categorias_controller'),
   ClasificacionesElemento: () => import('#controllers/clasificaciones_elemento_controller'),
@@ -14,6 +15,7 @@ export const controllers = {
   Modules: () => import('#controllers/modules_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Permissions: () => import('#controllers/permissions_controller'),
+  Prestamos: () => import('#controllers/prestamos_controller'),
   Profile: () => import('#controllers/profile_controller'),
   Roles: () => import('#controllers/roles_controller'),
   Stand: () => import('#controllers/stand_controller'),
