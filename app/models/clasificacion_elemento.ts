@@ -1,5 +1,6 @@
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
+import type { CaracterElemento } from '#data/clasificaciones_elemento'
 import Elemento from '#models/elemento'
 
 export default class ClasificacionElemento extends BaseModel {
@@ -13,6 +14,9 @@ export default class ClasificacionElemento extends BaseModel {
 
   @column()
   declare nombre: string
+
+  @column()
+  declare caracter: CaracterElemento
 
   @column()
   declare estado: boolean

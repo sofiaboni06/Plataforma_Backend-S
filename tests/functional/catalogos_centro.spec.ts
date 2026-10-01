@@ -19,7 +19,11 @@ test.group('Catálogos del elemento por centro', () => {
     const clasificacionAjena = await client
       .post('/api/v1/clasificaciones-elemento')
       .bearerToken(admin)
-      .json({ nombre: `SOLO CENTRO 2 ${suffix}`, idCformacion: 2 })
+      .json({
+        nombre: `SOLO CENTRO 2 ${suffix}`,
+        caracter: 'consumo',
+        idCformacion: 2,
+      })
     clasificacionAjena.assertStatus(200)
     assert.equal(clasificacionAjena.body().data.idCformacion, 2)
 
@@ -53,7 +57,11 @@ test.group('Catálogos del elemento por centro', () => {
     const forzada = await client
       .post('/api/v1/clasificaciones-elemento')
       .bearerToken(bodegaUser)
-      .json({ nombre: `FORZADA ${suffix}`, idCformacion: 2 })
+      .json({
+        nombre: `FORZADA ${suffix}`,
+        caracter: 'devolutivo',
+        idCformacion: 2,
+      })
     forzada.assertStatus(200)
     assert.equal(forzada.body().data.idCformacion, 1)
 

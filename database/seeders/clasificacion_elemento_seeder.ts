@@ -25,6 +25,7 @@ export default class extends BaseSeeder {
         await ClasificacionElemento.create({
           idCformacion: center.id,
           nombre: item.nombre,
+          caracter: item.caracter,
           estado: true,
         })
       }

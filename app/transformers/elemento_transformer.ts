@@ -23,7 +23,13 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       cantidadMinima: this.resource.cantidadMinima,
       gramaje: this.resource.gramaje,
       idClasificacion: this.resource.idClasificacion,
-      clasificacion: clasificacion ? { id: clasificacion.id, nombre: clasificacion.nombre } : null,
+      clasificacion: clasificacion
+        ? {
+            id: clasificacion.id,
+            nombre: clasificacion.nombre,
+            caracter: clasificacion.caracter,
+          }
+        : null,
       valorUnitarioPromedio: this.resource.valorUnitarioPromedio,
       porcentajeAumento: this.resource.porcentajeAumento,
       valorConAumento: this.resource.valorConAumento(),

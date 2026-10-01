@@ -29,6 +29,7 @@ export default class UserTransformer extends BaseTransformer<User> {
       address: '',
       trainingCenter: trainingCenter?.nombre ?? '',
       trainingCenterId: this.resource.idCformacion,
+      regional: regional?.nombre ?? '',
       groupCode: '',
       role: roleName,
       initials: this.resource.initials,

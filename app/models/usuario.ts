@@ -6,10 +6,10 @@ import { type AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_
 import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import Bodega from '#models/bodega'
 import Modulo from '#models/modulo'
-import Novedad from '#models/novedad'
 import Perfil from '#models/perfil'
 import Permiso from '#models/permiso'
-import Prestamo from '#models/prestamo'
+import SolicitudEquipo from '#models/solicitud_equipo'
+import SolicitudMaterial from '#models/solicitud_material'
 import TrainingCenter from '#models/training_center'
 
 const AuthFinder = withAuthFinder(hash, {
@@ -60,11 +60,11 @@ export default class User extends AuthFinder(BaseModel) {
   @belongsTo(() => Perfil, { foreignKey: 'idPerfil' })
   declare perfil: BelongsTo<typeof Perfil>
 
-  @hasMany(() => Prestamo, { foreignKey: 'idUsuario' })
-  declare prestamos: HasMany<typeof Prestamo>
+  @hasMany(() => SolicitudMaterial, { foreignKey: 'idUsuario' })
+  declare solicitudesMaterial: HasMany<typeof SolicitudMaterial>
 
-  @hasMany(() => Novedad, { foreignKey: 'idUsuario' })
-  declare novedades: HasMany<typeof Novedad>
+  @hasMany(() => SolicitudEquipo, { foreignKey: 'idUsuario' })
+  declare solicitudesEquipo: HasMany<typeof SolicitudEquipo>
 
   @belongsTo(() => TrainingCenter, { foreignKey: 'idCformacion' })
   declare trainingCenter: BelongsTo<typeof TrainingCenter>
