@@ -1,4 +1,5 @@
 import { Exception } from '@adonisjs/core/exceptions'
+import type { CaracterElemento } from '#data/clasificaciones_elemento'
 import ClasificacionElemento from '#models/clasificacion_elemento'
 import {
   assertCan,
@@ -11,6 +12,7 @@ import { rethrowDatabaseError } from '#services/database_error'
 type ClasificacionPayload = {
   idCformacion?: number
   nombre: string
+  caracter: CaracterElemento
   estado?: boolean
 }
 
@@ -38,6 +40,7 @@ export default class ClasificacionElementoService {
       return await ClasificacionElemento.create({
         idCformacion: centerIdFor(scope, payload.idCformacion),
         nombre: payload.nombre,
+        caracter: payload.caracter,
         estado: payload.estado ?? true,
       })
     } catch (error) {
@@ -54,6 +57,7 @@ export default class ClasificacionElementoService {
 
     clasificacion.merge({
       ...(payload.nombre !== undefined ? { nombre: payload.nombre } : {}),
+      ...(payload.caracter !== undefined ? { caracter: payload.caracter } : {}),
       ...(payload.estado !== undefined ? { estado: payload.estado } : {}),
     })
 

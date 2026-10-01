@@ -27,6 +27,7 @@ test.group('Profile', () => {
     assert.equal(profile.role, 'Administrador')
     assert.equal(profile.roleLabel, 'Administrador')
     assert.equal(profile.trainingCenter, 'Centro de Comercio y Servicios')
+    assert.equal(profile.regional, 'Regional Cauca')
     assert.equal(profile.location, 'Centro de Comercio y Servicios — Regional Cauca')
   })
 })

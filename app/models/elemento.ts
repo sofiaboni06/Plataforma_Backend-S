@@ -4,8 +4,8 @@ import Alerta from '#models/alerta'
 import ClasificacionElemento from '#models/clasificacion_elemento'
 import CodigoEstandar from '#models/codigo_estandar'
 import Item from '#models/item'
-import Novedad from '#models/novedad'
-import Prestamo from '#models/prestamo'
+import SolicitudEquipo from '#models/solicitud_equipo'
+import SolicitudMaterial from '#models/solicitud_material'
 import Stand from '#models/stand'
 import Subcategoria from '#models/subcategoria'
 import UnidadMedida from '#models/unidad_medida'
@@ -119,11 +119,11 @@ export default class Elemento extends BaseModel {
   @belongsTo(() => UsoPresupuestal, { foreignKey: 'idUsoPresupuestal' })
   declare usoPresupuestal: BelongsTo<typeof UsoPresupuestal>
 
-  @hasMany(() => Prestamo, { foreignKey: 'idElemento' })
-  declare prestamos: HasMany<typeof Prestamo>
+  @hasMany(() => SolicitudMaterial, { foreignKey: 'idElemento' })
+  declare solicitudesMaterial: HasMany<typeof SolicitudMaterial>
 
-  @hasMany(() => Novedad, { foreignKey: 'idElemento' })
-  declare novedades: HasMany<typeof Novedad>
+  @hasMany(() => SolicitudEquipo, { foreignKey: 'idElemento' })
+  declare solicitudesEquipo: HasMany<typeof SolicitudEquipo>
 
   @hasMany(() => Alerta, { foreignKey: 'idElemento' })
   declare alertas: HasMany<typeof Alerta>

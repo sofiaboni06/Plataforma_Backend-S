@@ -12,6 +12,7 @@ export const createClasificacionElementoValidator = vine.compile(
       .exists({ table: 'c_formacion', column: 'id_cformacion' })
       .optional(),
     nombre: vine.string().trim().minLength(1).maxLength(150),
+    caracter: vine.enum(['consumo', 'devolutivo']),
     estado: vine.boolean().optional(),
   })
 )
@@ -19,6 +20,7 @@ export const createClasificacionElementoValidator = vine.compile(
 export const updateClasificacionElementoValidator = vine.compile(
   vine.object({
     nombre: vine.string().trim().minLength(1).maxLength(150).optional(),
+    caracter: vine.enum(['consumo', 'devolutivo']).optional(),
     estado: vine.boolean().optional(),
   })
 )
