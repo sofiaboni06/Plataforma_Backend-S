@@ -955,9 +955,9 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['destroy']>>>
     }
   }
-  'actividades.actividades.index': {
+  'solicitudesEquipo.solicitud_equipo.index': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/actividades'
+    pattern: '/api/v1/solicitudes-equipo'
     types: {
       body: {}
       paramsTuple: []
@@ -967,9 +967,9 @@ export interface Registry {
       errorResponse: unknown
     }
   }
-  'actividades.actividades.store': {
+  'solicitudesEquipo.solicitud_equipo.store': {
     methods: ["POST"]
-    pattern: '/api/v1/actividades'
+    pattern: '/api/v1/solicitudes-equipo'
     types: {
       body: {}
       paramsTuple: []
@@ -979,9 +979,9 @@ export interface Registry {
       errorResponse: unknown
     }
   }
-  'actividades.actividades.show': {
+  'solicitudesEquipo.solicitud_equipo.show': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/actividades/:id'
+    pattern: '/api/v1/solicitudes-equipo/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -991,9 +991,9 @@ export interface Registry {
       errorResponse: unknown
     }
   }
-  'actividades.actividades.update': {
+  'solicitudesEquipo.solicitud_equipo.entregar': {
     methods: ["PATCH"]
-    pattern: '/api/v1/actividades/:id'
+    pattern: '/api/v1/solicitudes-equipo/:id/entregar'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1003,21 +1003,9 @@ export interface Registry {
       errorResponse: unknown
     }
   }
-  'actividades.actividades.destroy': {
-    methods: ["DELETE"]
-    pattern: '/api/v1/actividades/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'prestamos.prestamos.index': {
+  'solicitudesMaterial.solicitud_material.index': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/prestamos'
+    pattern: '/api/v1/solicitudes-material'
     types: {
       body: {}
       paramsTuple: []
@@ -1027,9 +1015,9 @@ export interface Registry {
       errorResponse: unknown
     }
   }
-  'prestamos.prestamos.store': {
+  'solicitudesMaterial.solicitud_material.store': {
     methods: ["POST"]
-    pattern: '/api/v1/prestamos'
+    pattern: '/api/v1/solicitudes-material'
     types: {
       body: {}
       paramsTuple: []
@@ -1039,9 +1027,9 @@ export interface Registry {
       errorResponse: unknown
     }
   }
-  'prestamos.prestamos.show': {
+  'solicitudesMaterial.solicitud_material.show': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v1/prestamos/:id'
+    pattern: '/api/v1/solicitudes-material/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1051,33 +1039,9 @@ export interface Registry {
       errorResponse: unknown
     }
   }
-  'prestamos.prestamos.update': {
+  'solicitudesMaterial.solicitud_material.entregar': {
     methods: ["PATCH"]
-    pattern: '/api/v1/prestamos/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'prestamos.prestamos.return': {
-    methods: ["POST"]
-    pattern: '/api/v1/prestamos/:id/devolucion'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'prestamos.prestamos.change_status': {
-    methods: ["PATCH"]
-    pattern: '/api/v1/prestamos/:id/estado'
+    pattern: '/api/v1/solicitudes-material/:id/entregar'
     types: {
       body: {}
       paramsTuple: [ParamValue]

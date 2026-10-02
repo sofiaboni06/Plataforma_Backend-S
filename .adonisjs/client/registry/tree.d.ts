@@ -149,23 +149,20 @@ export interface ApiDefinition {
       destroy: typeof routes['unidadesMedida.unidades_medida.destroy']
     }
   }
-  actividades: {
-    actividades: {
-      index: typeof routes['actividades.actividades.index']
-      store: typeof routes['actividades.actividades.store']
-      show: typeof routes['actividades.actividades.show']
-      update: typeof routes['actividades.actividades.update']
-      destroy: typeof routes['actividades.actividades.destroy']
+  solicitudesEquipo: {
+    solicitudEquipo: {
+      index: typeof routes['solicitudesEquipo.solicitud_equipo.index']
+      store: typeof routes['solicitudesEquipo.solicitud_equipo.store']
+      show: typeof routes['solicitudesEquipo.solicitud_equipo.show']
+      entregar: typeof routes['solicitudesEquipo.solicitud_equipo.entregar']
     }
   }
-  prestamos: {
-    prestamos: {
-      index: typeof routes['prestamos.prestamos.index']
-      store: typeof routes['prestamos.prestamos.store']
-      show: typeof routes['prestamos.prestamos.show']
-      update: typeof routes['prestamos.prestamos.update']
-      return: typeof routes['prestamos.prestamos.return']
-      changeStatus: typeof routes['prestamos.prestamos.change_status']
+  solicitudesMaterial: {
+    solicitudMaterial: {
+      index: typeof routes['solicitudesMaterial.solicitud_material.index']
+      store: typeof routes['solicitudesMaterial.solicitud_material.store']
+      show: typeof routes['solicitudesMaterial.solicitud_material.show']
+      entregar: typeof routes['solicitudesMaterial.solicitud_material.entregar']
     }
   }
 }

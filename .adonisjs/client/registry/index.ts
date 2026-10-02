@@ -480,71 +480,53 @@ const routes = {
     tokens: [{"old":"/api/v1/unidades-medida/:id","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"unidades-medida","end":""},{"old":"/api/v1/unidades-medida/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['unidadesMedida.unidades_medida.destroy']['types'],
   },
-  'actividades.actividades.index': {
+  'solicitudesEquipo.solicitud_equipo.index': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/actividades',
-    tokens: [{"old":"/api/v1/actividades","type":0,"val":"api","end":""},{"old":"/api/v1/actividades","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades","type":0,"val":"actividades","end":""}],
-    types: placeholder as Registry['actividades.actividades.index']['types'],
+    pattern: '/api/v1/solicitudes-equipo',
+    tokens: [{"old":"/api/v1/solicitudes-equipo","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo","type":0,"val":"solicitudes-equipo","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.index']['types'],
   },
-  'actividades.actividades.store': {
+  'solicitudesEquipo.solicitud_equipo.store': {
     methods: ["POST"],
-    pattern: '/api/v1/actividades',
-    tokens: [{"old":"/api/v1/actividades","type":0,"val":"api","end":""},{"old":"/api/v1/actividades","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades","type":0,"val":"actividades","end":""}],
-    types: placeholder as Registry['actividades.actividades.store']['types'],
+    pattern: '/api/v1/solicitudes-equipo',
+    tokens: [{"old":"/api/v1/solicitudes-equipo","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo","type":0,"val":"solicitudes-equipo","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.store']['types'],
   },
-  'actividades.actividades.show': {
+  'solicitudesEquipo.solicitud_equipo.show': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/actividades/:id',
-    tokens: [{"old":"/api/v1/actividades/:id","type":0,"val":"api","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"actividades","end":""},{"old":"/api/v1/actividades/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['actividades.actividades.show']['types'],
+    pattern: '/api/v1/solicitudes-equipo/:id',
+    tokens: [{"old":"/api/v1/solicitudes-equipo/:id","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo/:id","type":0,"val":"solicitudes-equipo","end":""},{"old":"/api/v1/solicitudes-equipo/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.show']['types'],
   },
-  'actividades.actividades.update': {
+  'solicitudesEquipo.solicitud_equipo.entregar': {
     methods: ["PATCH"],
-    pattern: '/api/v1/actividades/:id',
-    tokens: [{"old":"/api/v1/actividades/:id","type":0,"val":"api","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"actividades","end":""},{"old":"/api/v1/actividades/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['actividades.actividades.update']['types'],
+    pattern: '/api/v1/solicitudes-equipo/:id/entregar',
+    tokens: [{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"solicitudes-equipo","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"entregar","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.entregar']['types'],
   },
-  'actividades.actividades.destroy': {
-    methods: ["DELETE"],
-    pattern: '/api/v1/actividades/:id',
-    tokens: [{"old":"/api/v1/actividades/:id","type":0,"val":"api","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/actividades/:id","type":0,"val":"actividades","end":""},{"old":"/api/v1/actividades/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['actividades.actividades.destroy']['types'],
-  },
-  'prestamos.prestamos.index': {
+  'solicitudesMaterial.solicitud_material.index': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/prestamos',
-    tokens: [{"old":"/api/v1/prestamos","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos","type":0,"val":"prestamos","end":""}],
-    types: placeholder as Registry['prestamos.prestamos.index']['types'],
+    pattern: '/api/v1/solicitudes-material',
+    tokens: [{"old":"/api/v1/solicitudes-material","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material","type":0,"val":"solicitudes-material","end":""}],
+    types: placeholder as Registry['solicitudesMaterial.solicitud_material.index']['types'],
   },
-  'prestamos.prestamos.store': {
+  'solicitudesMaterial.solicitud_material.store': {
     methods: ["POST"],
-    pattern: '/api/v1/prestamos',
-    tokens: [{"old":"/api/v1/prestamos","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos","type":0,"val":"prestamos","end":""}],
-    types: placeholder as Registry['prestamos.prestamos.store']['types'],
+    pattern: '/api/v1/solicitudes-material',
+    tokens: [{"old":"/api/v1/solicitudes-material","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material","type":0,"val":"solicitudes-material","end":""}],
+    types: placeholder as Registry['solicitudesMaterial.solicitud_material.store']['types'],
   },
-  'prestamos.prestamos.show': {
+  'solicitudesMaterial.solicitud_material.show': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/prestamos/:id',
-    tokens: [{"old":"/api/v1/prestamos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos/:id","type":0,"val":"prestamos","end":""},{"old":"/api/v1/prestamos/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['prestamos.prestamos.show']['types'],
+    pattern: '/api/v1/solicitudes-material/:id',
+    tokens: [{"old":"/api/v1/solicitudes-material/:id","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material/:id","type":0,"val":"solicitudes-material","end":""},{"old":"/api/v1/solicitudes-material/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['solicitudesMaterial.solicitud_material.show']['types'],
   },
-  'prestamos.prestamos.update': {
+  'solicitudesMaterial.solicitud_material.entregar': {
     methods: ["PATCH"],
-    pattern: '/api/v1/prestamos/:id',
-    tokens: [{"old":"/api/v1/prestamos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos/:id","type":0,"val":"prestamos","end":""},{"old":"/api/v1/prestamos/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['prestamos.prestamos.update']['types'],
-  },
-  'prestamos.prestamos.return': {
-    methods: ["POST"],
-    pattern: '/api/v1/prestamos/:id/devolucion',
-    tokens: [{"old":"/api/v1/prestamos/:id/devolucion","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos/:id/devolucion","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos/:id/devolucion","type":0,"val":"prestamos","end":""},{"old":"/api/v1/prestamos/:id/devolucion","type":1,"val":"id","end":""},{"old":"/api/v1/prestamos/:id/devolucion","type":0,"val":"devolucion","end":""}],
-    types: placeholder as Registry['prestamos.prestamos.return']['types'],
-  },
-  'prestamos.prestamos.change_status': {
-    methods: ["PATCH"],
-    pattern: '/api/v1/prestamos/:id/estado',
-    tokens: [{"old":"/api/v1/prestamos/:id/estado","type":0,"val":"api","end":""},{"old":"/api/v1/prestamos/:id/estado","type":0,"val":"v1","end":""},{"old":"/api/v1/prestamos/:id/estado","type":0,"val":"prestamos","end":""},{"old":"/api/v1/prestamos/:id/estado","type":1,"val":"id","end":""},{"old":"/api/v1/prestamos/:id/estado","type":0,"val":"estado","end":""}],
-    types: placeholder as Registry['prestamos.prestamos.change_status']['types'],
+    pattern: '/api/v1/solicitudes-material/:id/entregar',
+    tokens: [{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"solicitudes-material","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"entregar","end":""}],
+    types: placeholder as Registry['solicitudesMaterial.solicitud_material.entregar']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

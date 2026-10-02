@@ -2,8 +2,8 @@ import '#config/fotos'
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
-import ActividadesController from '#controllers/actividades_controller'
-import PrestamosController from '#controllers/prestamos_controller'
+import SolicitudEquipoController from '#controllers/solicitud_equipo_controller'
+import SolicitudMaterialController from '#controllers/solicitud_material_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -307,30 +307,27 @@ router
       .use(middleware.auth())
       .use(middleware.account())
 
-      router
+  router
   .group(() => {
-    router.get('/', [ActividadesController, 'index'])
-    router.post('/', [ActividadesController, 'store'])
-    router.get(':id', [ActividadesController, 'show'])
-    router.patch(':id', [ActividadesController, 'update'])
-    router.delete(':id', [ActividadesController, 'destroy'])
+    router.get('/', [SolicitudEquipoController, 'index'])
+    router.post('/', [SolicitudEquipoController, 'store'])
+    router.get(':id', [SolicitudEquipoController, 'show'])
+    router.patch(':id/entregar', [SolicitudEquipoController, 'entregar' as any])
   })
-  .prefix('actividades')
-  .as('actividades')
+  .prefix('solicitudes-equipo')
+  .as('solicitudesEquipo')
   .use(middleware.auth())
   .use(middleware.account())
 
-router
+  router
   .group(() => {
-    router.get('/', [PrestamosController, 'index'])
-    router.post('/', [PrestamosController, 'store'])
-    router.get(':id', [PrestamosController, 'show'])
-    router.patch(':id', [PrestamosController, 'update'])
-    router.post(':id/devolucion', [PrestamosController, 'return'])
-    router.patch(':id/estado', [PrestamosController, 'changeStatus'])
+    router.get('/', [SolicitudMaterialController, 'index'])
+    router.post('/', [SolicitudMaterialController, 'store'])
+    router.get(':id', [SolicitudMaterialController, 'show'])
+    router.patch(':id/entregar', [SolicitudMaterialController, 'entregar'])
   })
-  .prefix('prestamos')
-  .as('prestamos')
+  .prefix('solicitudes-material')
+  .as('solicitudesMaterial')
   .use(middleware.auth())
   .use(middleware.account())
   })

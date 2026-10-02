@@ -66,4 +66,5 @@ export default class RolesController {
     )
     return serialize(roleDetail(result))
   }
+  
 }

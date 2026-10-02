@@ -1,33 +1,34 @@
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import {
+  BaseModel,
+  column,
+  belongsTo,
+} from '@adonisjs/lucid/orm'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+
 import Elemento from '#models/elemento'
 import Obra from '#models/obra'
 import User from '#models/usuario'
 
-export type EstadoSolicitudEquipo = 'pendiente' | 'entregado' | 'devuelto'
-
-export type EstadoElementoPrestado = 'bueno' | 'danado' | 'perdido' | 'en_reparacion'
-
 export default class SolicitudEquipo extends BaseModel {
-  static table = 'solicitud_equipo'
+  public static table = 'solicitud_equipo'
 
-  @column({ isPrimary: true, columnName: 'id_solicitud_equipo' })
-  declare id: number
+  @column({ isPrimary: true })
+  declare idSolicitudEquipo: number
 
-  @column({ columnName: 'codigo_solicitud' })
+  @column()
   declare codigoSolicitud: string
 
-  @column({ columnName: 'id_obra' })
+  @column()
   declare idObra: number
 
-  @column({ columnName: 'id_elemento' })
+  @column()
   declare idElemento: number
 
-  @column({ columnName: 'id_usuario' })
+  @column()
   declare idUsuario: number
 
-  @column({ columnName: 'id_usuario_entrega' })
+  @column()
   declare idUsuarioEntrega: number | null
 
   @column()
@@ -36,37 +37,36 @@ export default class SolicitudEquipo extends BaseModel {
   @column()
   declare ficha: string | null
 
-  @column.dateTime()
-  declare fecha: DateTime
-
-  @column.dateTime({ columnName: 'fecha_entrega' })
-  declare fechaEntrega: DateTime | null
-
-  @column.dateTime({ columnName: 'fecha_devolucion' })
-  declare fechaDevolucion: DateTime | null
+  @column()
+  declare estado: 'pendiente' | 'entregado' | 'devuelto'
 
   @column()
-  declare estado: EstadoSolicitudEquipo
+  declare estadoElemento: 'bueno' | 'danado' | 'perdido' | 'en_reparacion' | null
 
-  /**
-   * Novedad del bien prestado. Null mientras está pendiente o recién
-   * entregado; se llena al devolver. No hay tabla de novedad ni de devolución.
-   */
-  @column({ columnName: 'estado_elemento' })
-  declare estadoElemento: EstadoElementoPrestado | null
+  @column.dateTime({ autoCreate: true })
+  declare fecha: DateTime
+
+  @column.dateTime()
+  declare fechaEntrega: DateTime | null
+
+  @column.dateTime()
+  declare fechaDevolucion: DateTime | null
 
   @column()
   declare observacion: string | null
 
-  @belongsTo(() => Obra, { foreignKey: 'idObra' })
-  declare obra: BelongsTo<typeof Obra>
-
-  @belongsTo(() => Elemento, { foreignKey: 'idElemento' })
+  @belongsTo(() => Elemento, {
+    foreignKey: 'idElemento',
+  })
   declare elemento: BelongsTo<typeof Elemento>
 
-  @belongsTo(() => User, { foreignKey: 'idUsuario' })
-  declare usuario: BelongsTo<typeof User>
+  @belongsTo(() => Obra, {
+    foreignKey: 'idObra',
+  })
+  declare obra: BelongsTo<typeof Obra>
 
-  @belongsTo(() => User, { foreignKey: 'idUsuarioEntrega' })
-  declare usuarioEntrega: BelongsTo<typeof User>
+  @belongsTo(() => User, {
+    foreignKey: 'idUsuario',
+  })
+  declare usuario: BelongsTo<typeof User>
 }
