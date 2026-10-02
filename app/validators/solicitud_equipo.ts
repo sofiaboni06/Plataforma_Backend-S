@@ -15,3 +15,16 @@ export const createSolicitudEquipoValidator = vine.compile(
     observacion: vine.string().trim().optional(),
   })
 )
+
+export const devolverSolicitudEquipoValidator = vine.compile(
+  vine.object({
+    estadoElemento: vine.enum([
+      'bueno',
+      'danado',
+      'perdido',
+      'en_reparacion',
+    ] as const),
+
+    observacion: vine.string().trim().optional(),
+  })
+)

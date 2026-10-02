@@ -3,6 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import SolicitudEquipoService from '#services/solicitud_equipo_service'
 import {
   createSolicitudEquipoValidator,
+  devolverSolicitudEquipoValidator,
 } from '#validators/solicitud_equipo'
 
 export default class SolicitudEquipoController {
@@ -68,4 +69,21 @@ export default class SolicitudEquipoController {
     data: solicitud,
   })
 }
+
+  async devolver({ params, request, response }: HttpContext) {
+    const payload = await request.validateUsing(
+      devolverSolicitudEquipoValidator
+    )
+
+    const solicitud = await this.service.devolver(
+      Number(params.id),
+      payload.estadoElemento,
+      payload.observacion
+    )
+
+    return response.ok({
+      message: 'Equipo devuelto correctamente',
+      data: solicitud,
+    })
+  }
 }
