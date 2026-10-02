@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
 import Bodega from '#models/bodega'
 import { buildPermissionCatalog } from '#data/permission_catalog'
+import { ADMIN_BODEGA_EXCLUDED_PERMISSIONS } from '#database/seeders/admin_bodega_seeder'
 
 async function login(client: ApiClient, email = 'adminbodega@correo.com') {
   const response = await client.post('/api/v1/auth/login').json({ email, password: '123456' })
@@ -22,7 +23,7 @@ test.group('Admin bodega', () => {
     const inventario = buildPermissionCatalog()
       .filter((definition) => definition.module === 'Inventario')
       .map((definition) => definition.code)
-      .filter((code) => code !== 'bodega.crear' && code !== 'bodega.eliminar')
+      .filter((code) => !ADMIN_BODEGA_EXCLUDED_PERMISSIONS.has(code))
     assert.includeMembers(data.permissions, inventario)
     assert.isFalse(data.permissions.includes('bodega.crear'))
     assert.isFalse(data.permissions.includes('bodega.eliminar'))

@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
+import Item from '#models/item'
 
 async function login(client: ApiClient, email: string) {
   const response = await client.post('/api/v1/auth/login').json({ email, password: '123456' })
@@ -7,8 +8,8 @@ async function login(client: ApiClient, email: string) {
   return response.body().data.token as string
 }
 
-test.group('Catálogos del elemento por centro', () => {
-  test('un centro no ve clasificaciones, unidades, usos ni UNSPSC de otro', async ({
+test.group('Catálogos estándar de la plataforma', () => {
+  test('una clasificación o categoría nueva la ven todos y el centro no la crea', async ({
     client,
     assert,
   }) => {
@@ -16,180 +17,112 @@ test.group('Catálogos del elemento por centro', () => {
     const bodegaUser = await login(client, 'adminbodega@correo.com')
     const suffix = Date.now()
 
-    const clasificacionAjena = await client
+    const creada = await client
       .post('/api/v1/clasificaciones-elemento')
       .bearerToken(admin)
-      .json({
-        nombre: `SOLO CENTRO 2 ${suffix}`,
-        caracter: 'consumo',
-        idCformacion: 2,
-      })
-    clasificacionAjena.assertStatus(200)
-    assert.equal(clasificacionAjena.body().data.idCformacion, 2)
+      .json({ nombre: `GLOBAL ${suffix}`, caracter: 'consumo' })
+    creada.assertStatus(200)
 
-    const propias = await client.get('/api/v1/clasificaciones-elemento').bearerToken(admin)
-    propias.assertStatus(200)
-    const propiasRows = propias.body().data as {
-      id: number
-      nombre: string
-      idCformacion: number
-    }[]
-    assert.isTrue(propiasRows.every((row) => row.idCformacion === 1))
-    assert.isTrue(propiasRows.some((row) => row.nombre === 'CONSUMO'))
-    assert.isFalse(propiasRows.some((row) => row.nombre === `SOLO CENTRO 2 ${suffix}`))
+    const delAdmin = await client.get('/api/v1/clasificaciones-elemento').bearerToken(admin)
+    const delCentro = await client.get('/api/v1/clasificaciones-elemento').bearerToken(bodegaUser)
+    delAdmin.assertStatus(200)
+    delCentro.assertStatus(200)
 
-    const delCentro2 = await client
-      .get('/api/v1/clasificaciones-elemento')
-      .bearerToken(admin)
-      .qs({ idCformacion: 2 })
-    delCentro2.assertStatus(200)
-    const centro2Rows = delCentro2.body().data as { nombre: string; idCformacion: number }[]
-    assert.isTrue(centro2Rows.every((row) => row.idCformacion === 2))
-    assert.isTrue(centro2Rows.some((row) => row.nombre === `SOLO CENTRO 2 ${suffix}`))
-    assert.isFalse(centro2Rows.some((row) => row.nombre === 'CONSUMO'))
+    const idsAdmin = (delAdmin.body().data as { id: number; nombre: string }[]).map((row) => row.id)
+    const idsCentro = (delCentro.body().data as { id: number }[]).map((row) => row.id)
+    assert.include(idsAdmin, creada.body().data.id)
+    assert.include(idsCentro, creada.body().data.id)
+    assert.isTrue(
+      (delAdmin.body().data as { nombre: string }[]).some((row) => row.nombre === 'CONSUMO')
+    )
+    assert.isTrue(
+      (delCentro.body().data as { nombre: string }[]).some((row) => row.nombre === 'CONSUMO')
+    )
 
-    const comoBodega = await client.get('/api/v1/clasificaciones-elemento').bearerToken(bodegaUser)
-    comoBodega.assertStatus(200)
-    const bodegaRows = comoBodega.body().data as { nombre: string; idCformacion: number }[]
-    assert.isTrue(bodegaRows.every((row) => row.idCformacion === 1))
-    assert.isFalse(bodegaRows.some((row) => row.nombre === `SOLO CENTRO 2 ${suffix}`))
-
-    const forzada = await client
+    const noPuede = await client
       .post('/api/v1/clasificaciones-elemento')
       .bearerToken(bodegaUser)
-      .json({
-        nombre: `FORZADA ${suffix}`,
-        caracter: 'devolutivo',
-        idCformacion: 2,
-      })
-    forzada.assertStatus(200)
-    assert.equal(forzada.body().data.idCformacion, 1)
+      .json({ nombre: `NO ${suffix}`, caracter: 'devolutivo' })
+    noPuede.assertStatus(403)
 
-    const unidadAjena = await client
-      .post('/api/v1/unidades-medida')
-      .bearerToken(admin)
-      .json({
-        nombre: `Libra ${suffix}`,
-        abreviatura: `LB${String(suffix).slice(-6)}`,
-        idCformacion: 2,
-      })
-    unidadAjena.assertStatus(200)
-    assert.equal(unidadAjena.body().data.idCformacion, 2)
-
-    const unidades = await client.get('/api/v1/unidades-medida').bearerToken(bodegaUser)
-    unidades.assertStatus(200)
-    const unidadRows = unidades.body().data as { id: number; idCformacion: number }[]
-    assert.isAbove(unidadRows.length, 0)
-    assert.isTrue(unidadRows.every((row) => row.idCformacion === 1))
-    assert.isFalse(unidadRows.some((row) => row.id === unidadAjena.body().data.id))
-
-    const unidadesCentro2 = await client
-      .get('/api/v1/unidades-medida')
-      .bearerToken(admin)
-      .qs({ idCformacion: 2 })
-    unidadesCentro2.assertStatus(200)
-    const unidades2 = unidadesCentro2.body().data as { id: number; idCformacion: number }[]
-    assert.isTrue(unidades2.every((row) => row.idCformacion === 2))
-    assert.isTrue(unidades2.some((row) => row.id === unidadAjena.body().data.id))
-
-    const codigoAjeno = await client
-      .post('/api/v1/codigos-estandar')
-      .bearerToken(admin)
-      .json({ codigo: `U${String(suffix).slice(-8)}`, nombre: `Resina ${suffix}`, idCformacion: 2 })
-    codigoAjeno.assertStatus(200)
-    assert.equal(codigoAjeno.body().data.idCformacion, 2)
-
-    const codigos = await client.get('/api/v1/codigos-estandar').bearerToken(bodegaUser)
-    codigos.assertStatus(200)
-    const codigoRows = codigos.body().data as { id: number; codigo: string; idCformacion: number }[]
-    assert.isAbove(codigoRows.length, 0)
-    assert.isTrue(codigoRows.every((row) => row.idCformacion === 1))
-    assert.isTrue(codigoRows.some((row) => row.codigo === '13111305'))
-    assert.isFalse(codigoRows.some((row) => row.id === codigoAjeno.body().data.id))
-
-    const usoAjeno = await client
-      .post('/api/v1/usos-presupuestales')
-      .bearerToken(admin)
-      .json({ nombre: `PARTIDA ${suffix}`, idCformacion: 2 })
-    usoAjeno.assertStatus(200)
-    assert.equal(usoAjeno.body().data.idCformacion, 2)
-
-    const usos = await client.get('/api/v1/usos-presupuestales').bearerToken(bodegaUser)
-    usos.assertStatus(200)
-    const usoRows = usos.body().data as { id: number; nombre: string; idCformacion: number }[]
-    assert.isTrue(usoRows.every((row) => row.idCformacion === 1))
-    assert.isTrue(usoRows.some((row) => row.nombre === 'MINERALES; ELECTRICIDAD, GAS Y AGUA'))
-    assert.isFalse(usoRows.some((row) => row.id === usoAjeno.body().data.id))
-
-    const categoriaRes = await client
+    const categoria = await client
       .post('/api/v1/categorias')
       .bearerToken(admin)
-      .json({ nombre: `Cat centro ${suffix}` })
-    categoriaRes.assertStatus(200)
+      .json({ nombre: `Cat global ${suffix}` })
+    categoria.assertStatus(200)
 
-    const subcategoriaRes = await client
+    const subcategoria = await client
       .post('/api/v1/subcategorias')
       .bearerToken(admin)
-      .json({ idCategoria: categoriaRes.body().data.id, nombre: `Sub centro ${suffix}` })
-    subcategoriaRes.assertStatus(200)
+      .json({ idCategoria: categoria.body().data.id, nombre: `Sub global ${suffix}` })
+    subcategoria.assertStatus(200)
 
-    const itemRes = await client
-      .post('/api/v1/inventario/items')
-      .bearerToken(admin)
-      .json({
-        nombre: `Item centro ${suffix}`,
-        idSubcategoria: subcategoriaRes.body().data.id,
-      })
-    itemRes.assertStatus(200)
-
-    const bodegas = await client.get('/api/v1/bodegas').bearerToken(admin).qs({ idCformacion: 1 })
-    const bodega = (bodegas.body().data as { id: number; idCformacion: number }[]).find(
-      (row) => row.idCformacion === 1
+    const categoriasCentro = await client.get('/api/v1/categorias').bearerToken(bodegaUser)
+    categoriasCentro.assertStatus(200)
+    assert.isTrue(
+      (categoriasCentro.body().data as { id: number }[]).some(
+        (row) => row.id === categoria.body().data.id
+      )
     )
-    assert.exists(bodega)
 
-    const subRes = await client
-      .post(`/api/v1/bodegas/${bodega!.id}/sub-bodegas`)
-      .bearerToken(admin)
-      .json({ nombre: `Sub bodega ${suffix}` })
-    subRes.assertStatus(200)
+    const categoriaAjena = await client
+      .post('/api/v1/categorias')
+      .bearerToken(bodegaUser)
+      .json({ nombre: `Cat del centro ${suffix}` })
+    categoriaAjena.assertStatus(403)
 
-    const standRes = await client
-      .post(`/api/v1/bodegas/sub-bodegas/${subRes.body().data.id}/stands`)
-      .bearerToken(admin)
-      .json({ nombre: `Stand ${suffix}` })
-    standRes.assertStatus(200)
+    const itemAjeno = await Item.create({
+      idSubcategoria: subcategoria.body().data.id,
+      idCformacion: 2,
+      nombre: `Item cauca ${suffix}`,
+      estado: true,
+    })
 
-    const cruzado = await client
-      .post('/api/v1/inventario/elementos')
-      .bearerToken(admin)
+    const items = await client
+      .get('/api/v1/inventario/items')
+      .bearerToken(bodegaUser)
+      .qs({ search: `Item cauca ${suffix}`, perPage: 100 })
+    items.assertStatus(200)
+    assert.isFalse((items.body().data as { id: number }[]).some((row) => row.id === itemAjeno.id))
+
+    const itemPropio = await client
+      .post('/api/v1/inventario/items')
+      .bearerToken(bodegaUser)
       .json({
-        idItem: itemRes.body().data.id,
-        idStand: standRes.body().data.id,
-        cantidad: 10,
-        estado: true,
-        idUnidadMedida: unidadRows[0].id,
-        idClasificacion: clasificacionAjena.body().data.id,
-        codigo: `CRUZ-${suffix}`,
+        nombre: `Item valle ${suffix}`,
+        idSubcategoria: subcategoria.body().data.id,
       })
-    cruzado.assertStatus(422)
+    itemPropio.assertStatus(200)
+  })
 
-    const consumo = propiasRows.find((row) => row.nombre === 'CONSUMO')
-    assert.exists(consumo)
+  test('el administrador crea una bodega en otro centro y queda para asignarla', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await login(client, 'carlos@correo.com')
+    const suffix = Date.now()
 
-    const propio = await client
-      .post('/api/v1/inventario/elementos')
+    const creada = await client
+      .post('/api/v1/bodegas')
       .bearerToken(admin)
-      .json({
-        idItem: itemRes.body().data.id,
-        idStand: standRes.body().data.id,
-        cantidad: 10,
-        estado: true,
-        idUnidadMedida: unidadRows[0].id,
-        idClasificacion: consumo!.id,
-        codigo: `OK-${suffix}`,
-      })
-    propio.assertStatus(200)
-    assert.equal(propio.body().data.clasificacion.nombre, 'CONSUMO')
+      .json({ nombre: `Bodega para asignar ${suffix}`, idCformacion: 2 })
+    creada.assertStatus(200)
+    assert.equal(creada.body().data.idCformacion, 2)
+    assert.equal(creada.body().data.nombre, `Bodega para asignar ${suffix}`)
+
+    const listado = await client.get('/api/v1/bodegas').bearerToken(admin).qs({ perPage: 100 })
+    listado.assertStatus(200)
+    const rows = listado.body().data as { id: number }[]
+    assert.isFalse(rows.some((row) => row.id === creada.body().data.id))
+
+    const detalle = await client.get(`/api/v1/bodegas/${creada.body().data.id}`).bearerToken(admin)
+    detalle.assertStatus(403)
+
+    const options = await client.get('/api/v1/users/options').bearerToken(admin)
+    options.assertStatus(200)
+    const bodegas = options.body().data.bodegas as { id: number; trainingCenterId: number }[]
+    assert.isTrue(
+      bodegas.some((bodega) => bodega.id === creada.body().data.id && bodega.trainingCenterId === 2)
+    )
   })
 })

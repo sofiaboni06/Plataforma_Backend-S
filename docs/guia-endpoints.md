@@ -19,7 +19,7 @@ Después de restaurar el dump, **los dos comandos son obligatorios**:
 
 ```bash
 node ace migration:run   # tablas nuevas (tokens, permiso, perfil_permiso, usuario_bodega, codigo_estandar, uso_presupuestal), ficha de elemento e item
-node ace db:seed         # llena permisos, y en el primer centro los UNSPSC, clasificaciones y usos. El perfil Admin bodega también. Un centro nuevo no hereda esos catálogos
+node ace db:seed         # llena permisos y, una sola vez para toda la red, los UNSPSC, clasificaciones y usos. El perfil Admin bodega también
 ```
 
 Si te saltas `db:seed`, la tabla `permiso` queda vacía y **no hay ningún mensaje de error**: el
@@ -41,7 +41,7 @@ Los permisos se asignan **al perfil**, no al usuario. Lo único que se asigna po
 bodega. Un perfil solo puede recibir permisos de un módulo que ya tenga concedido, y si le quitas
 el módulo, sus permisos de ese módulo se revocan solos.
 
-El perfil `Administrador` se salta todas estas validaciones y ve todos los centros de formación.
+El perfil `Administrador` se salta la revisión de permisos. No lista el inventario de otros centros: ítems, elementos y el árbol de bodegas quedan en el centro de su cuenta. Sí crea bodegas para cualquier centro (`idCformacion` en el POST) y mantiene los catálogos estándar, que son una sola lista para toda la red.
 
 ## Endpoints listos
 
@@ -63,27 +63,27 @@ El perfil `Administrador` se salta todas estas validaciones y ve todos los centr
 | `GET/POST` | `/users` | listar / crear usuario con `idPerfil` y `bodegaIds`, solo admin |
 | `GET/PATCH` | `/users/:id` | ficha y cambio de perfil/datos, solo admin |
 | `PUT` | `/users/:id/bodegas` | `{ bodegaIds }`. Solo bodegas del centro del usuario |
-| `GET/POST` | `/categorias` | categorías del centro. El listado oculta las deshabilitadas; `?estado=false` las muestra |
+| `GET/POST` | `/categorias` | lista global. El listado oculta las deshabilitadas; `?estado=false` las muestra. Crear y editar es del administrador |
 | `GET/PATCH/DELETE` | `/categorias/:id` | `DELETE` **deshabilita** (`estado=false`). Falla 409 si tiene subcategorías activas |
-| `GET/POST` | `/subcategorias` | cuelga de la categoría: `idCategoria`, `nombre`, `estado?`. Quien no es admin solo ve las de su centro |
+| `GET/POST` | `/subcategorias` | lista global. Cuelga de la categoría: `idCategoria`, `nombre`, `estado?`. Crear y editar es del administrador |
 | `GET/PATCH` | `/subcategorias/:id` | no hay `DELETE`. Apagarla es `estado: false` |
 | `GET/POST` | `/inventario/items` | ficha del producto: `nombre`, `descripcion`, `idSubcategoria`. El nombre es lo específico, por ejemplo "pintura para techos vinilo color rojo". `?idSubcategoria=` / `?search=` / `?estado=` |
 | `GET/PATCH/DELETE` | `/inventario/items/:id` | `DELETE` deshabilita. Falla 409 si tiene elementos activos |
-| `GET/POST` | `/inventario/elementos` | stock de un item. `idItem` obligatorio, `cantidad` mínimo 10, `cantidadMinima` opcional (default 10, umbral de alerta), `gramaje` opcional. Ficha: `idClasificacion`, `idUsoPresupuestal` (partida, no es el UNSPSC), `valorUnitarioPromedio`, `porcentajeAumento` (editable) y `idCodigoEstandar`. Esos ids tienen que ser del mismo centro que el stand. `valorConAumento` se calcula: cantidad × valor unitario × (1 + porcentaje / 100). Nombre y subcategoría se copian del item. `codigo` sigue siendo el código propio del elemento |
+| `GET/POST` | `/inventario/elementos` | stock de un item del centro. `idItem` obligatorio y del mismo centro que el stand (`E_ITEM_OTRO_CENTRO`), `cantidad` mínimo 10, `cantidadMinima` opcional (default 10, umbral de alerta), `gramaje` opcional. Ficha: `idClasificacion`, `idUsoPresupuestal` (partida, no es el UNSPSC), `valorUnitarioPromedio`, `porcentajeAumento` (editable) y `idCodigoEstandar`. Esos cuatro ids son de las listas globales. `valorConAumento` se calcula: cantidad × valor unitario × (1 + porcentaje / 100). Nombre y subcategoría se copian del item. `codigo` sigue siendo el código propio del elemento |
 | `GET/PATCH` | `/inventario/elementos/:id` | |
-| `GET/POST` | `/bodegas` | listado paginado: `{ data, metadata }`. La bodega es la del centro (`idCformacion`): cada centro solo ve la suya. Borrar una bodega con sub-bodegas responde 409 |
+| `GET/POST` | `/bodegas` | listado paginado del centro de quien entra. El administrador puede crear en otro centro con `idCformacion`; esa bodega no sale en su `GET /bodegas` y el `GET /bodegas/:id` responde 403. Sí sale en `GET /users/options` para asignarla. Borrar una bodega con sub-bodegas responde 409 |
 | `GET/PATCH/DELETE` | `/bodegas/:id` | |
 | `GET/POST` | `/bodegas/:id/sub-bodegas` | la sub-bodega cuelga de la bodega. Permisos de bodega. Borrar una con stands responde 409 |
 | `GET/PATCH/DELETE` | `/bodegas/sub-bodegas/:id` | |
 | `GET/POST` | `/bodegas/sub-bodegas/:id/stands` | el stand cuelga de esa sub-bodega |
 | `GET/PATCH/DELETE` | `/bodegas/stands/:id` | borrar un stand con elementos responde 409 |
-| `GET/POST` | `/clasificaciones-elemento` | catálogo de la ficha del centro (ACCESORIO, EPP, …). `?idCformacion=` (solo admin). Un centro nuevo llega vacío. `POST` crea una en el centro de quien entra; el admin puede mandar `idCformacion`. `DELETE` la deshabilita |
+| `GET/POST` | `/clasificaciones-elemento` | lista global (ACCESORIO, EPP, …). Body: `nombre`, `caracter` (`consumo` o `devolutivo`). Sin centro. Crear, editar y borrar es del administrador. `DELETE` la deshabilita |
 | `GET/PATCH/DELETE` | `/clasificaciones-elemento/:id` | |
-| `GET/POST` | `/usos-presupuestales` | partida del centro (MINERALES; ELECTRICIDAD, GAS Y AGUA, …). No es el código UNSPSC. Mismas reglas de centro que la clasificación |
+| `GET/POST` | `/usos-presupuestales` | partida global (MINERALES; ELECTRICIDAD, GAS Y AGUA, …). No es el código UNSPSC. Sin centro. Crear, editar y borrar es del administrador |
 | `GET/PATCH/DELETE` | `/usos-presupuestales/:id` | |
-| `GET/POST` | `/codigos-estandar` | UNSPSC del centro. Ej. `{ idCformacion, codigo: "13111305", nombre: "RESINA O ESPUMA" }`. `GET` usa `elemento.ver`. Crear, editar y borrar usan `codigo_estandar.*`. Un centro nuevo llega vacío |
+| `GET/POST` | `/codigos-estandar` | UNSPSC global. Ej. `{ codigo: "13111305", nombre: "RESINA O ESPUMA" }`. `GET` usa `elemento.ver`. Crear, editar y borrar usan `codigo_estandar.*` (el administrador) |
 | `GET/PATCH/DELETE` | `/codigos-estandar/:id` | borrar con elementos que lo usan responde 409 |
-| `GET/POST` | `/unidades-medida` | unidades del centro. `POST`: `nombre`, `abreviatura`. Un centro nuevo llega vacío. `DELETE` deshabilita |
+| `GET/POST` | `/unidades-medida` | unidades globales. `POST`: `nombre`, `abreviatura`. Sin centro. `DELETE` deshabilita |
 | `GET/PATCH/DELETE` | `/unidades-medida/:id` | |
 
 El login y `GET /account/profile` devuelven `permissions` (lista de códigos), `isAdmin` y `bodegas`,

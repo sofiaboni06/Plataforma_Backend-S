@@ -2,12 +2,7 @@ import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
 import Elemento from '#models/elemento'
 import Item from '#models/item'
-import {
-  assertStandInScope,
-  assertSubcategoriaInScope,
-  standIdsQuery,
-  type AccessScope,
-} from '#services/access_control'
+import { assertStandInScope, standIdsQuery, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type ElementoPayload = {
@@ -33,21 +28,13 @@ type UpdateElementoPayload = Partial<ElementoPayload>
 
 export default class ElementoService {
   async list(scope: AccessScope) {
-    const query = this.query().orderBy('id_elemento', 'asc')
-
-    if (!scope.isAdmin) {
-      query.whereIn('id_stand', standIdsQuery(scope))
-    }
-
-    return query
+    return this.query().whereIn('id_stand', standIdsQuery(scope)).orderBy('id_elemento', 'asc')
   }
 
   async create(scope: AccessScope, payload: ElementoPayload) {
     await assertStandInScope(scope, payload.idStand)
     const item = await this.itemEnUso(scope, payload.idItem)
-    const idCformacion = await this.centerOfStand(payload.idStand)
-    await this.assertItemDelCentro(item.id, idCformacion)
-    await this.assertFichaDelCentro(idCformacion, payload)
+    await this.assertItemDelCentro(item.id, await this.centerOfStand(payload.idStand))
 
     try {
       const elemento = await Elemento.create({
@@ -96,21 +83,7 @@ export default class ElementoService {
       payload.idItem !== undefined ? await this.itemEnUso(scope, payload.idItem) : undefined
 
     const idStand = payload.idStand ?? elemento.idStand
-    const idCformacion = await this.centerOfStand(idStand)
-    await this.assertItemDelCentro(item?.id ?? elemento.idItem, idCformacion)
-    await this.assertFichaDelCentro(idCformacion, {
-      idUnidadMedida: payload.idUnidadMedida ?? elemento.idUnidadMedida,
-      idClasificacion:
-        payload.idClasificacion !== undefined ? payload.idClasificacion : elemento.idClasificacion,
-      idCodigoEstandar:
-        payload.idCodigoEstandar !== undefined
-          ? payload.idCodigoEstandar
-          : elemento.idCodigoEstandar,
-      idUsoPresupuestal:
-        payload.idUsoPresupuestal !== undefined
-          ? payload.idUsoPresupuestal
-          : elemento.idUsoPresupuestal,
-    })
+    await this.assertItemDelCentro(item?.id ?? elemento.idItem, await this.centerOfStand(idStand))
 
     elemento.merge({
       ...(item
@@ -192,13 +165,7 @@ export default class ElementoService {
       return
     }
 
-    const row = await db
-      .from('item')
-      .join('subcategoria', 'subcategoria.id_subcategoria', 'item.id_subcategoria')
-      .join('categoria', 'categoria.id_categoria', 'subcategoria.id_categoria')
-      .where('item.id_item', idItem)
-      .select('categoria.id_cformacion')
-      .first()
+    const row = await db.from('item').where('id_item', idItem).select('id_cformacion').first()
 
     if (!row || Number(row.id_cformacion) !== idCformacion) {
       throw new Exception('El item no pertenece al centro de formación de ese stand', {
@@ -208,70 +175,19 @@ export default class ElementoService {
     }
   }
 
-  private async assertFichaDelCentro(
-    idCformacion: number,
-    ids: {
-      idUnidadMedida?: number | null
-      idClasificacion?: number | null
-      idCodigoEstandar?: number | null
-      idUsoPresupuestal?: number | null
-    }
-  ) {
-    await this.assertCatalogoDelCentro(
-      'unidad_medida',
-      'id_unidad_medida',
-      ids.idUnidadMedida,
-      idCformacion,
-      'La unidad de medida no pertenece al centro de formación de ese stand'
-    )
-    await this.assertCatalogoDelCentro(
-      'clasificacion_elemento',
-      'id_clasificacion_elemento',
-      ids.idClasificacion,
-      idCformacion,
-      'La clasificación no pertenece al centro de formación de ese stand'
-    )
-    await this.assertCatalogoDelCentro(
-      'codigo_estandar',
-      'id_codigo_estandar',
-      ids.idCodigoEstandar,
-      idCformacion,
-      'El código UNSPSC no pertenece al centro de formación de ese stand'
-    )
-    await this.assertCatalogoDelCentro(
-      'uso_presupuestal',
-      'id_uso_presupuestal',
-      ids.idUsoPresupuestal,
-      idCformacion,
-      'El uso presupuestal no pertenece al centro de formación de ese stand'
-    )
-  }
-
-  private async assertCatalogoDelCentro(
-    table: string,
-    idColumn: string,
-    id: number | null | undefined,
-    idCformacion: number,
-    message: string
-  ) {
-    if (id === null || id === undefined) {
-      return
-    }
-
-    const row = await db.from(table).where(idColumn, id).select('id_cformacion').first()
-
-    if (!row || Number(row.id_cformacion) !== idCformacion) {
-      throw new Exception(message, { status: 422, code: 'E_CATALOGO_OTRO_CENTRO' })
-    }
-  }
-
   /**
    * Stock always hangs from a catalog item. A disabled item cannot receive
    * new elementos.
    */
   private async itemEnUso(scope: AccessScope, idItem: number) {
     const item = await Item.findOrFail(idItem)
-    await assertSubcategoriaInScope(scope, item.idSubcategoria)
+
+    if (item.idCformacion !== scope.idCformacion) {
+      throw new Exception('El item no pertenece a tu centro de formación', {
+        status: 422,
+        code: 'E_ITEM_OTRO_CENTRO',
+      })
+    }
 
     if (item.estado === false) {
       throw new Exception('El item está deshabilitado', {

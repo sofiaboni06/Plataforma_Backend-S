@@ -32,9 +32,6 @@ export default class BodegasController {
     const page = parsePositiveInt(request.input('page'), 1)
     const perPage = Math.min(parsePositiveInt(request.input('perPage'), 10), 100)
     const search = String(request.input('search', '')).trim() || undefined
-    const idCformacion = request.input('idCformacion')
-      ? parsePositiveInt(request.input('idCformacion'), 0)
-      : undefined
     const estado = parseOptionalBoolean(request.input('estado'))
     const scope = await resolveScope(auth.getUserOrFail())
 
@@ -42,7 +39,6 @@ export default class BodegasController {
       page,
       perPage,
       search,
-      idCformacion,
       estado,
     })
 

@@ -8,9 +8,6 @@ export default class UsoPresupuestal extends BaseModel {
   @column({ isPrimary: true, columnName: 'id_uso_presupuestal' })
   declare id: number
 
-  @column({ columnName: 'id_cformacion' })
-  declare idCformacion: number
-
   @column()
   declare nombre: string
 

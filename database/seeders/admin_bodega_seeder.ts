@@ -19,12 +19,35 @@ const DEMO_USER = {
   idCformacion: 1,
 }
 
-const SIN_BODEGA = new Set(['bodega.crear', 'bodega.eliminar'])
+/**
+ * The platform admin owns the shared catalogs and the bodegas. The person in
+ * charge of a warehouse uses them, and creates items, elementos and stands.
+ */
+export const ADMIN_BODEGA_EXCLUDED_PERMISSIONS = new Set([
+  'bodega.crear',
+  'bodega.eliminar',
+  'categoria.crear',
+  'categoria.editar',
+  'categoria.eliminar',
+  'subcategoria.crear',
+  'subcategoria.editar',
+  'clasificacion_elemento.crear',
+  'clasificacion_elemento.editar',
+  'clasificacion_elemento.eliminar',
+  'unidad_medida.crear',
+  'unidad_medida.editar',
+  'unidad_medida.eliminar',
+  'codigo_estandar.crear',
+  'codigo_estandar.editar',
+  'codigo_estandar.eliminar',
+  'uso_presupuestal.crear',
+  'uso_presupuestal.editar',
+  'uso_presupuestal.eliminar',
+])
 
 /**
- * Admin bodega: every inventory permission except creating or deleting a
- * bodega. The general admin creates the bodega and assigns it on the user.
- * The demo account keeps a single bodega of its center.
+ * Admin bodega: inventory of the bodega the administrator assigned, without the
+ * shared catalogs. The demo account keeps a single bodega of its center.
  *
  * Safe to run again. The permission list is reset to this set. A demo account
  * that already has exactly one bodega is left alone.
@@ -55,7 +78,7 @@ export default class extends BaseSeeder {
     const codes = buildPermissionCatalog()
       .filter((definition) => definition.module === 'Inventario')
       .map((definition) => definition.code)
-      .filter((code) => !SIN_BODEGA.has(code))
+      .filter((code) => !ADMIN_BODEGA_EXCLUDED_PERMISSIONS.has(code))
 
     const roles = new RoleService()
     await roles.assignModules(perfil.id, [inventario.id])

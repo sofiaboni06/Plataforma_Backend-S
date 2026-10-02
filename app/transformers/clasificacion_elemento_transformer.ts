@@ -5,7 +5,6 @@ export default class ClasificacionElementoTransformer extends BaseTransformer<Cl
   toObject() {
     return {
       id: this.resource.id,
-      idCformacion: this.resource.idCformacion,
       nombre: this.resource.nombre,
       caracter: this.resource.caracter,
       estado: this.resource.estado,

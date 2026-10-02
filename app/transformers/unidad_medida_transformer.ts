@@ -5,7 +5,6 @@ export default class UnidadMedidaTransformer extends BaseTransformer<UnidadMedid
   toObject() {
     return {
       id: this.resource.id,
-      idCformacion: this.resource.idCformacion,
       nombre: this.resource.nombre,
       abreviatura: this.resource.abreviatura,
       estado: this.resource.estado,

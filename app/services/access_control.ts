@@ -4,9 +4,9 @@ import User from '#models/usuario'
 import { buildPermissionCatalog, type PermissionCode } from '#data/permission_catalog'
 
 /**
- * The dump ships a profile literally named "Administrador" and the platform
- * treats it as the super user: it skips permission checks and sees every
- * training center, which is what lets it assign bodegas across centers.
+ * The dump ships a profile literally named "Administrador". It skips permission
+ * checks and administers users across the network, but it does not read another
+ * center's inventory: that data stays in the center that owns it.
  */
 export const ADMIN_PROFILE_NAME = 'Administrador'
 
@@ -93,36 +93,33 @@ export function effectivePermissionCodes(scope: AccessScope): string[] {
  * without loading ids into memory.
  */
 export function standIdsQuery(scope: AccessScope) {
-  return db
+  const query = db
     .from('stand')
     .select('stand.id_stand')
     .join('sub_bodega', 'sub_bodega.id_sub_bodega', 'stand.id_sub_bodega')
     .join('bodega', 'bodega.id_bodega', 'sub_bodega.id_bodega')
     .where('bodega.id_cformacion', scope.idCformacion)
-    .whereIn('sub_bodega.id_bodega', scope.bodegaIds)
-}
 
-export function categoriaIdsQuery(scope: AccessScope) {
-  return db.from('categoria').select('id_categoria').where('id_cformacion', scope.idCformacion)
+  if (!scope.isAdmin) {
+    query.whereIn('sub_bodega.id_bodega', scope.bodegaIds)
+  }
+
+  return query
 }
 
 /**
- * Items hang from a subcategory, which hangs from a category of the user's
- * training center.
+ * Categorías, subcategorías, clasificaciones, unidades, usos presupuestales y
+ * códigos UNSPSC son de la plataforma: el administrador los crea y todos los
+ * centros ven la misma lista.
  */
-export function subcategoriaIdsQuery(scope: AccessScope) {
-  return db
-    .from('subcategoria')
-    .select('id_subcategoria')
-    .whereIn('id_categoria', categoriaIdsQuery(scope))
+export function assertPlatformCatalog(scope: AccessScope) {
+  if (!scope.isAdmin) {
+    throw forbidden('Ese catálogo lo administra la plataforma y es el mismo para todos los centros')
+  }
 }
 
 export async function assertBodegaInScope(scope: AccessScope, idBodega: number) {
-  if (scope.isAdmin) {
-    return
-  }
-
-  if (!scope.bodegaIds.includes(idBodega)) {
+  if (!scope.isAdmin && !scope.bodegaIds.includes(idBodega)) {
     throw forbidden('Esa bodega no está asignada a tu usuario')
   }
 
@@ -138,19 +135,7 @@ export async function assertBodegaInScope(scope: AccessScope, idBodega: number) 
 }
 
 export async function assertStandInScope(scope: AccessScope, idStand: number) {
-  if (scope.isAdmin) {
-    return
-  }
-
-  const stand = await db
-    .from('stand')
-    .select('stand.id_stand')
-    .join('sub_bodega', 'sub_bodega.id_sub_bodega', 'stand.id_sub_bodega')
-    .join('bodega', 'bodega.id_bodega', 'sub_bodega.id_bodega')
-    .where('stand.id_stand', idStand)
-    .where('bodega.id_cformacion', scope.idCformacion)
-    .whereIn('sub_bodega.id_bodega', scope.bodegaIds)
-    .first()
+  const stand = await standIdsQuery(scope).where('stand.id_stand', idStand).first()
 
   if (!stand) {
     throw forbidden('Ese stand no pertenece a una bodega de tu centro de formación')
@@ -158,73 +143,44 @@ export async function assertStandInScope(scope: AccessScope, idStand: number) {
 }
 
 export async function assertSubBodegaInScope(scope: AccessScope, idSubBodega: number) {
-  if (scope.isAdmin) {
-    return
-  }
-
-  const subBodega = await db
+  const query = db
     .from('sub_bodega')
     .select('sub_bodega.id_sub_bodega')
     .join('bodega', 'bodega.id_bodega', 'sub_bodega.id_bodega')
     .where('sub_bodega.id_sub_bodega', idSubBodega)
     .where('bodega.id_cformacion', scope.idCformacion)
-    .whereIn('sub_bodega.id_bodega', scope.bodegaIds)
-    .first()
+
+  if (!scope.isAdmin) {
+    query.whereIn('sub_bodega.id_bodega', scope.bodegaIds)
+  }
+
+  const subBodega = await query.first()
 
   if (!subBodega) {
     throw forbidden('Esa sub-bodega no pertenece a una bodega de tu centro de formación')
   }
 }
 
-export async function assertCategoriaInScope(scope: AccessScope, idCategoria: number) {
-  if (scope.isAdmin) {
-    return
-  }
-
+export async function assertCategoriaInScope(_scope: AccessScope, idCategoria: number) {
   const categoria = await db
     .from('categoria')
     .select('id_categoria')
     .where('id_categoria', idCategoria)
-    .where('id_cformacion', scope.idCformacion)
     .first()
 
   if (!categoria) {
-    throw forbidden('Esa categoría no pertenece a tu centro de formación')
+    throw forbidden('Esa categoría no existe')
   }
 }
 
-/**
- * Catalog rows (clasificación, unidad, UNSPSC, uso presupuestal) belong to one
- * training center. A non-admin always stays in their own center. An admin may
- * name another center; otherwise the center of their account is used.
- */
-export function centerIdFor(scope: AccessScope, requested?: number) {
-  if (!scope.isAdmin) {
-    return scope.idCformacion
-  }
-
-  return requested ?? scope.idCformacion
-}
-
-export function assertOwnedByCenter(scope: AccessScope, idCformacion: number, message: string) {
-  if (!scope.isAdmin && idCformacion !== scope.idCformacion) {
-    throw forbidden(message)
-  }
-}
-
-export async function assertSubcategoriaInScope(scope: AccessScope, idSubcategoria: number) {
-  if (scope.isAdmin) {
-    return
-  }
-
+export async function assertSubcategoriaInScope(_scope: AccessScope, idSubcategoria: number) {
   const subcategoria = await db
     .from('subcategoria')
     .select('id_subcategoria')
     .where('id_subcategoria', idSubcategoria)
-    .whereIn('id_categoria', categoriaIdsQuery(scope))
     .first()
 
   if (!subcategoria) {
-    throw forbidden('Esa subcategoría no pertenece a tu centro de formación')
+    throw forbidden('Esa subcategoría no existe')
   }
 }

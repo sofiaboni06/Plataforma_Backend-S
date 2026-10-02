@@ -12,6 +12,9 @@ export default class Item extends BaseModel {
   @column({ columnName: 'id_subcategoria' })
   declare idSubcategoria: number
 
+  @column({ columnName: 'id_cformacion' })
+  declare idCformacion: number
+
   @column()
   declare nombre: string
 

@@ -1,202 +1,178 @@
+import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
-
-import SolicitudEquipo from '#models/solicitud_equipo'
 import Elemento from '#models/elemento'
+import Obra from '#models/obra'
+import SolicitudEquipo, { type EstadoElementoEquipo } from '#models/solicitud_equipo'
 
+type CrearSolicitudEquipo = {
+  codigoSolicitud: string
+  idObra: number
+  idElemento: number
+  cantidad: number
+  ficha?: string
+  observacion?: string
+}
+
+function fail(message: string, status: number, code: string): never {
+  throw new Exception(message, { status, code })
+}
 
 export default class SolicitudEquipoService {
   /**
-   * Registrar pedido.
-   *
-   * IMPORTANTE:
-   * Aquí NO se modifica el stock del elemento.
+   * El pedido queda pendiente. El stock del elemento se descuenta al entregar.
    */
-  async create(
-    payload: {
-      codigoSolicitud: string
-      idObra: number
-      idElemento: number
-      cantidad: number
-      ficha?: string
-      observacion?: string
-    },
-    idUsuario: number
-  ) {
-    const elemento = await Elemento
-      .query()
-      .where('id', payload.idElemento)
+  async create(payload: CrearSolicitudEquipo, idUsuario: number) {
+    const elemento = await Elemento.query()
+      .where('id_elemento', payload.idElemento)
       .preload('clasificacion')
       .first()
 
     if (!elemento) {
-      throw new Error('El elemento indicado no existe')
+      fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
     }
 
-    if (!elemento.clasificacion) {
-      throw new Error('El elemento no tiene clasificación')
-    }
-
-    if (elemento.clasificacion.caracter !== 'devolutivo') {
-      throw new Error(
-        'Solo se pueden solicitar herramientas o equipos de carácter devolutivo'
+    if (!elemento.clasificacion || elemento.clasificacion.caracter !== 'devolutivo') {
+      fail(
+        'Solo se pueden solicitar herramientas o equipos de carácter devolutivo',
+        422,
+        'E_CARACTER_INVALIDO'
       )
     }
 
-    const obraExists = await db
-      .from('obra')
-      .where('id_obra', payload.idObra)
-      .first()
+    if (!elemento.estado) {
+      fail('El elemento indicado no está activo', 422, 'E_ELEMENTO_INACTIVO')
+    }
 
-    if (!obraExists) {
-      throw new Error('La obra indicada no existe')
+    const obra = await Obra.query().where('id_obra', payload.idObra).first()
+
+    if (!obra) {
+      fail('La obra indicada no existe', 404, 'E_NOT_FOUND')
+    }
+
+    if (!obra.estado) {
+      fail('La obra indicada no está activa', 422, 'E_OBRA_INACTIVA')
     }
 
     const solicitud = await SolicitudEquipo.create({
       codigoSolicitud: payload.codigoSolicitud,
       idObra: payload.idObra,
       idElemento: payload.idElemento,
-      idUsuario: idUsuario,
+      idUsuario,
       cantidad: payload.cantidad,
       ficha: payload.ficha ?? null,
       estado: 'pendiente',
       estadoElemento: null,
       observacion: payload.observacion ?? null,
       fecha: DateTime.now(),
+      idUsuarioEntrega: null,
+      fechaEntrega: null,
+      fechaDevolucion: null,
     })
 
-    await solicitud.load('elemento')
-    await solicitud.load('obra')
-    await solicitud.load('usuario')
-
-    return solicitud
+    return this.show(solicitud.id)
   }
 
-  /**
-   * Listar solicitudes.
-   */
   async index() {
-    return SolicitudEquipo
-      .query()
+    return SolicitudEquipo.query()
       .preload('elemento')
       .preload('obra')
       .preload('usuario')
+      .preload('usuarioEntrega')
       .orderBy('fecha', 'desc')
   }
 
-  /**
-   * Consultar una solicitud.
-   */
   async show(id: number) {
-    const solicitud = await SolicitudEquipo
-      .query()
-      .where('idSolicitudEquipo', id)
+    const solicitud = await SolicitudEquipo.query()
+      .where('id_solicitud_equipo', id)
       .preload('elemento')
       .preload('obra')
       .preload('usuario')
+      .preload('usuarioEntrega')
       .first()
 
     if (!solicitud) {
-      throw new Error('La solicitud indicada no existe')
+      fail('La solicitud indicada no existe', 404, 'E_NOT_FOUND')
     }
 
     return solicitud
   }
+
   async entregar(id: number, idUsuarioEntrega: number) {
-  const trx = await db.transaction()
-
-  try {
-    const solicitud = await SolicitudEquipo
-      .query({ client: trx })
-      .where('idSolicitudEquipo', id)
-      .forUpdate()
-      .first()
-
-    if (!solicitud) {
-      throw new Error('La solicitud indicada no existe')
-    }
-
-    if (solicitud.estado !== 'pendiente') {
-      throw new Error(
-        'Solo se puede entregar una solicitud que esté pendiente'
-      )
-    }
-
-    const elemento = await Elemento
-      .query({ client: trx })
-      .where('id', solicitud.idElemento)
-      .forUpdate()
-      .first()
-
-    if (!elemento) {
-      throw new Error('El elemento indicado no existe')
-    }
-
-    if (elemento.cantidad < solicitud.cantidad) {
-      throw new Error(
-        'No hay suficiente cantidad disponible para entregar la solicitud'
-      )
-    }
-
-    elemento.cantidad -= solicitud.cantidad
-
-    await elemento
-      .useTransaction(trx)
-      .save()
-
-    solicitud.estado = 'entregado'
-    solicitud.idUsuarioEntrega = idUsuarioEntrega
-    solicitud.fechaEntrega = DateTime.now()
-
-    await solicitud
-      .useTransaction(trx)
-      .save()
-
-    await trx.commit()
-
-    await solicitud.load('elemento')
-    await solicitud.load('obra')
-    await solicitud.load('usuario')
-
-    return solicitud
-  } catch (error) {
-    await trx.rollback()
-    throw error
-  }
-}
-
-  async devolver(
-    id: number,
-    estadoElemento: 'bueno' | 'danado' | 'perdido' | 'en_reparacion',
-    observacion?: string
-  ) {
     const trx = await db.transaction()
 
     try {
-      const solicitud = await SolicitudEquipo
-        .query({ client: trx })
-        .where('idSolicitudEquipo', id)
+      const solicitud = await SolicitudEquipo.query({ client: trx })
+        .where('id_solicitud_equipo', id)
         .forUpdate()
         .first()
 
       if (!solicitud) {
-        throw new Error('La solicitud indicada no existe')
+        fail('La solicitud indicada no existe', 404, 'E_NOT_FOUND')
       }
 
-      if (solicitud.estado !== 'entregado') {
-        throw new Error(
-          'Solo se puede devolver una solicitud que esté entregada'
-        )
+      if (solicitud.estado !== 'pendiente') {
+        fail('Solo se puede entregar una solicitud que esté pendiente', 422, 'E_ESTADO_INVALIDO')
       }
 
-      const elemento = await Elemento
-        .query({ client: trx })
-        .where('id', solicitud.idElemento)
+      const elemento = await Elemento.query({ client: trx })
+        .where('id_elemento', solicitud.idElemento)
         .forUpdate()
         .first()
 
       if (!elemento) {
-        throw new Error('El elemento indicado no existe')
+        fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
+      }
+
+      if (Number(elemento.cantidad) < solicitud.cantidad) {
+        fail(
+          'No hay suficiente cantidad disponible para entregar la solicitud',
+          422,
+          'E_STOCK_INSUFICIENTE'
+        )
+      }
+
+      elemento.cantidad = Number(elemento.cantidad) - solicitud.cantidad
+      await elemento.useTransaction(trx).save()
+
+      solicitud.estado = 'entregado'
+      solicitud.idUsuarioEntrega = idUsuarioEntrega
+      solicitud.fechaEntrega = DateTime.now()
+      await solicitud.useTransaction(trx).save()
+
+      await trx.commit()
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+
+    return this.show(id)
+  }
+
+  async devolver(id: number, estadoElemento: EstadoElementoEquipo, observacion?: string) {
+    const trx = await db.transaction()
+
+    try {
+      const solicitud = await SolicitudEquipo.query({ client: trx })
+        .where('id_solicitud_equipo', id)
+        .forUpdate()
+        .first()
+
+      if (!solicitud) {
+        fail('La solicitud indicada no existe', 404, 'E_NOT_FOUND')
+      }
+
+      if (solicitud.estado !== 'entregado') {
+        fail('Solo se puede devolver una solicitud que esté entregada', 422, 'E_ESTADO_INVALIDO')
+      }
+
+      const elemento = await Elemento.query({ client: trx })
+        .where('id_elemento', solicitud.idElemento)
+        .forUpdate()
+        .first()
+
+      if (!elemento) {
+        fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
       }
 
       solicitud.estado = 'devuelto'
@@ -205,27 +181,18 @@ export default class SolicitudEquipoService {
       solicitud.observacion = observacion?.trim() || null
 
       if (estadoElemento === 'bueno') {
-        elemento.cantidad += solicitud.cantidad
-
-        await elemento
-          .useTransaction(trx)
-          .save()
+        elemento.cantidad = Number(elemento.cantidad) + solicitud.cantidad
+        await elemento.useTransaction(trx).save()
       }
 
-      await solicitud
-        .useTransaction(trx)
-        .save()
+      await solicitud.useTransaction(trx).save()
 
       await trx.commit()
-
-      await solicitud.load('elemento')
-      await solicitud.load('obra')
-      await solicitud.load('usuario')
-
-      return solicitud
     } catch (error) {
       await trx.rollback()
       throw error
     }
+
+    return this.show(id)
   }
 }

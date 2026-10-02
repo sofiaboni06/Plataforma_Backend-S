@@ -8,9 +8,6 @@ export default class Categoria extends BaseModel {
   @column({ isPrimary: true, columnName: 'id_categoria' })
   declare id: number
 
-  @column({ columnName: 'id_cformacion' })
-  declare idCformacion: number
-
   @column()
   declare nombre: string
 

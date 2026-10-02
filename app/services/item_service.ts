@@ -5,7 +5,7 @@ import Subcategoria from '#models/subcategoria'
 import {
   assertCan,
   assertSubcategoriaInScope,
-  subcategoriaIdsQuery,
+  forbidden,
   type AccessScope,
 } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
@@ -31,10 +31,7 @@ export default class ItemService {
     const query = Item.query()
       .preload('subcategoria', (subcategoria) => subcategoria.preload('categoria'))
       .orderBy('id_item', 'asc')
-
-    if (!scope.isAdmin) {
-      query.whereIn('id_subcategoria', subcategoriaIdsQuery(scope))
-    }
+      .where('id_cformacion', scope.idCformacion)
 
     if (options.idSubcategoria) {
       await assertSubcategoriaInScope(scope, options.idSubcategoria)
@@ -59,7 +56,7 @@ export default class ItemService {
 
   async show(scope: AccessScope, id: number) {
     const item = await this.query().where('id_item', id).firstOrFail()
-    await assertSubcategoriaInScope(scope, item.idSubcategoria)
+    this.assertDelCentro(scope, item)
 
     return item
   }
@@ -79,6 +76,7 @@ export default class ItemService {
     try {
       const item = await Item.create({
         idSubcategoria: payload.idSubcategoria,
+        idCformacion: scope.idCformacion,
         nombre: payload.nombre,
         descripcion: payload.descripcion ?? null,
         estado: payload.estado ?? true,
@@ -92,7 +90,7 @@ export default class ItemService {
 
   async update(scope: AccessScope, id: number, payload: ItemPayload) {
     const item = await Item.findOrFail(id)
-    await assertSubcategoriaInScope(scope, item.idSubcategoria)
+    this.assertDelCentro(scope, item)
 
     if (payload.idSubcategoria !== undefined && payload.idSubcategoria !== item.idSubcategoria) {
       await assertSubcategoriaInScope(scope, payload.idSubcategoria)
@@ -132,7 +130,7 @@ export default class ItemService {
    */
   async remove(scope: AccessScope, id: number) {
     const item = await Item.findOrFail(id)
-    await assertSubcategoriaInScope(scope, item.idSubcategoria)
+    this.assertDelCentro(scope, item)
 
     if (item.estado === false) {
       throw new Exception('El item ya está deshabilitado', {
@@ -152,6 +150,12 @@ export default class ItemService {
     }
 
     return { message: 'Item deshabilitado correctamente' }
+  }
+
+  private assertDelCentro(scope: AccessScope, item: Item) {
+    if (item.idCformacion !== scope.idCformacion) {
+      throw forbidden('Ese item no pertenece a tu centro de formación')
+    }
   }
 
   private query() {

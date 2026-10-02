@@ -1,25 +1,17 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import UnidadMedida from '#models/unidad_medida'
-import {
-  assertCan,
-  assertOwnedByCenter,
-  centerIdFor,
-  type AccessScope,
-} from '#services/access_control'
+import { assertCan, assertPlatformCatalog, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type UnidadMedidaPayload = {
-  idCformacion?: number
   nombre: string
   abreviatura: string
   estado?: boolean
 }
 
 export default class UnidadMedidaService {
-  async index(scope: AccessScope, options: { estado?: boolean; idCformacion?: number } = {}) {
-    const query = UnidadMedida.query()
-      .where('id_cformacion', centerIdFor(scope, options.idCformacion))
-      .orderBy('nombre', 'asc')
+  async index(_scope: AccessScope, options: { estado?: boolean } = {}) {
+    const query = UnidadMedida.query().orderBy('nombre', 'asc')
 
     const estado = options.estado ?? true
     if (estado) {
@@ -31,21 +23,15 @@ export default class UnidadMedidaService {
     return query
   }
 
-  async show(scope: AccessScope, id: number) {
-    const unidad = await UnidadMedida.findOrFail(id)
-    assertOwnedByCenter(
-      scope,
-      unidad.idCformacion,
-      'Esa unidad de medida no pertenece a tu centro de formación'
-    )
-
-    return unidad
+  async show(_scope: AccessScope, id: number) {
+    return UnidadMedida.findOrFail(id)
   }
 
   async store(scope: AccessScope, payload: UnidadMedidaPayload) {
+    assertPlatformCatalog(scope)
+
     try {
       return await UnidadMedida.create({
-        idCformacion: centerIdFor(scope, payload.idCformacion),
         nombre: payload.nombre,
         abreviatura: payload.abreviatura,
         estado: payload.estado ?? true,
@@ -56,6 +42,7 @@ export default class UnidadMedidaService {
   }
 
   async update(scope: AccessScope, id: number, payload: Partial<UnidadMedidaPayload>) {
+    assertPlatformCatalog(scope)
     const unidad = await this.show(scope, id)
 
     if (payload.estado !== undefined && payload.estado !== unidad.estado) {
@@ -82,6 +69,7 @@ export default class UnidadMedidaService {
    * units, treating a null estado from the original dump as active.
    */
   async remove(scope: AccessScope, id: number) {
+    assertPlatformCatalog(scope)
     const unidad = await this.show(scope, id)
 
     if (unidad.estado === false) {

@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { resolveScope } from '#services/access_control'
 import CodigoEstandarService from '#services/codigo_estandar_service'
-import { parseOptionalPositiveInt } from '#services/query_params'
 import CodigoEstandarTransformer from '#transformers/codigo_estandar_transformer'
 import {
   createCodigoEstandarValidator,
@@ -9,11 +8,9 @@ import {
 } from '#validators/codigo_estandar'
 
 export default class CodigosEstandarController {
-  async index({ auth, request, serialize }: HttpContext) {
+  async index({ auth, serialize }: HttpContext) {
     const scope = await resolveScope(auth.getUserOrFail())
-    const codigos = await new CodigoEstandarService().index(scope, {
-      idCformacion: parseOptionalPositiveInt(request.input('idCformacion')),
-    })
+    const codigos = await new CodigoEstandarService().index(scope)
 
     return serialize(CodigoEstandarTransformer.transform(codigos))
   }

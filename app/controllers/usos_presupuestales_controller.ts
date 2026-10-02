@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { resolveScope } from '#services/access_control'
-import { parseOptionalBoolean, parseOptionalPositiveInt } from '#services/query_params'
+import { parseOptionalBoolean } from '#services/query_params'
 import UsoPresupuestalService from '#services/uso_presupuestal_service'
 import UsoPresupuestalTransformer from '#transformers/uso_presupuestal_transformer'
 import {
@@ -13,7 +13,6 @@ export default class UsosPresupuestalesController {
     const scope = await resolveScope(auth.getUserOrFail())
     const usos = await new UsoPresupuestalService().index(scope, {
       estado: parseOptionalBoolean(request.input('estado')),
-      idCformacion: parseOptionalPositiveInt(request.input('idCformacion')),
     })
 
     return serialize(UsoPresupuestalTransformer.transform(usos))

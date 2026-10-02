@@ -18,7 +18,6 @@ export default class BodegaService {
       page: number
       perPage: number
       search?: string
-      idCformacion?: number
       estado?: boolean
     }
   ) {
@@ -31,12 +30,10 @@ export default class BodegaService {
       })
       .orderBy('id_bodega', 'asc')
 
-    if (scope.isAdmin) {
-      if (options.idCformacion) {
-        query.where('id_cformacion', options.idCformacion)
-      }
-    } else {
-      query.where('id_cformacion', scope.idCformacion).whereIn('id_bodega', scope.bodegaIds)
+    query.where('id_cformacion', scope.idCformacion)
+
+    if (!scope.isAdmin) {
+      query.whereIn('id_bodega', scope.bodegaIds)
     }
 
     if (options.search) {
@@ -53,24 +50,15 @@ export default class BodegaService {
   async show(scope: AccessScope, id: number) {
     await assertBodegaInScope(scope, id)
 
-    return Bodega.query()
-      .where('id_bodega', id)
-      .preload('trainingCenter')
-      .preload('subBodegas', (subBodegasQuery) => {
-        subBodegasQuery
-          .orderBy('id_sub_bodega', 'asc')
-          .preload('stands', (standsQuery) => standsQuery.orderBy('id_stand', 'asc'))
-      })
-      .firstOrFail()
+    return this.find(id)
   }
 
   async create(
     scope: AccessScope,
-    payload: Pick<BodegaPayload, 'estado'> & { nombre: string; idCformacion?: number }
+    payload: Pick<BodegaPayload, 'estado' | 'idCformacion'> & { nombre: string }
   ) {
-    const idCformacion = scope.isAdmin
-      ? (payload.idCformacion ?? scope.idCformacion)
-      : scope.idCformacion
+    const idCformacion =
+      scope.isAdmin && payload.idCformacion ? payload.idCformacion : scope.idCformacion
 
     try {
       const bodega = await Bodega.create({
@@ -83,7 +71,7 @@ export default class BodegaService {
         await this.asignarAlCreador(scope, bodega.id)
       }
 
-      return this.show(scope, bodega.id)
+      return this.find(bodega.id)
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudo crear la bodega')
     }
@@ -96,9 +84,6 @@ export default class BodegaService {
     bodega.merge({
       ...(payload.nombre !== undefined ? { nombre: payload.nombre } : {}),
       ...(payload.estado !== undefined ? { estado: payload.estado } : {}),
-      ...(payload.idCformacion !== undefined && scope.isAdmin
-        ? { idCformacion: payload.idCformacion }
-        : {}),
     })
 
     try {
@@ -131,6 +116,18 @@ export default class BodegaService {
     }
 
     return { message: 'Bodega eliminada correctamente' }
+  }
+
+  private find(id: number) {
+    return Bodega.query()
+      .where('id_bodega', id)
+      .preload('trainingCenter')
+      .preload('subBodegas', (subBodegasQuery) => {
+        subBodegasQuery
+          .orderBy('id_sub_bodega', 'asc')
+          .preload('stands', (standsQuery) => standsQuery.orderBy('id_stand', 'asc'))
+      })
+      .firstOrFail()
   }
 
   /**

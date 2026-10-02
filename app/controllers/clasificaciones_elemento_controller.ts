@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { resolveScope } from '#services/access_control'
 import ClasificacionElementoService from '#services/clasificacion_elemento_service'
-import { parseOptionalBoolean, parseOptionalPositiveInt } from '#services/query_params'
+import { parseOptionalBoolean } from '#services/query_params'
 import ClasificacionElementoTransformer from '#transformers/clasificacion_elemento_transformer'
 import {
   createClasificacionElementoValidator,
@@ -13,7 +13,6 @@ export default class ClasificacionesElementoController {
     const scope = await resolveScope(auth.getUserOrFail())
     const clasificaciones = await new ClasificacionElementoService().index(scope, {
       estado: parseOptionalBoolean(request.input('estado')),
-      idCformacion: parseOptionalPositiveInt(request.input('idCformacion')),
     })
 
     return serialize(ClasificacionElementoTransformer.transform(clasificaciones))

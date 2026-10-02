@@ -1,44 +1,31 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import type { CaracterElemento } from '#data/clasificaciones_elemento'
 import ClasificacionElemento from '#models/clasificacion_elemento'
-import {
-  assertCan,
-  assertOwnedByCenter,
-  centerIdFor,
-  type AccessScope,
-} from '#services/access_control'
+import { assertCan, assertPlatformCatalog, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type ClasificacionPayload = {
-  idCformacion?: number
   nombre: string
   caracter: CaracterElemento
   estado?: boolean
 }
 
 export default class ClasificacionElementoService {
-  async index(scope: AccessScope, options: { estado?: boolean; idCformacion?: number } = {}) {
+  async index(_scope: AccessScope, options: { estado?: boolean } = {}) {
     return ClasificacionElemento.query()
-      .where('id_cformacion', centerIdFor(scope, options.idCformacion))
       .where('estado', options.estado ?? true)
       .orderBy('nombre', 'asc')
   }
 
-  async show(scope: AccessScope, id: number) {
-    const clasificacion = await ClasificacionElemento.findOrFail(id)
-    assertOwnedByCenter(
-      scope,
-      clasificacion.idCformacion,
-      'Esa clasificación no pertenece a tu centro de formación'
-    )
-
-    return clasificacion
+  async show(_scope: AccessScope, id: number) {
+    return ClasificacionElemento.findOrFail(id)
   }
 
   async store(scope: AccessScope, payload: ClasificacionPayload) {
+    assertPlatformCatalog(scope)
+
     try {
       return await ClasificacionElemento.create({
-        idCformacion: centerIdFor(scope, payload.idCformacion),
         nombre: payload.nombre,
         caracter: payload.caracter,
         estado: payload.estado ?? true,
@@ -49,6 +36,7 @@ export default class ClasificacionElementoService {
   }
 
   async update(scope: AccessScope, id: number, payload: Partial<ClasificacionPayload>) {
+    assertPlatformCatalog(scope)
     const clasificacion = await this.show(scope, id)
 
     if (payload.estado !== undefined && payload.estado !== clasificacion.estado) {
@@ -75,6 +63,7 @@ export default class ClasificacionElementoService {
    * stock rows. The select only lists active classifications.
    */
   async remove(scope: AccessScope, id: number) {
+    assertPlatformCatalog(scope)
     const clasificacion = await this.show(scope, id)
 
     if (clasificacion.estado === false) {

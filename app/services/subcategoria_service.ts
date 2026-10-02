@@ -1,21 +1,15 @@
 import Subcategoria from '#models/subcategoria'
 import {
   assertCategoriaInScope,
+  assertPlatformCatalog,
   assertSubcategoriaInScope,
-  subcategoriaIdsQuery,
   type AccessScope,
 } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 export default class SubcategoriaService {
-  async index(scope: AccessScope) {
-    const query = Subcategoria.query().orderBy('id_subcategoria', 'asc')
-
-    if (!scope.isAdmin) {
-      query.whereIn('id_subcategoria', subcategoriaIdsQuery(scope))
-    }
-
-    return query
+  async index(_scope: AccessScope) {
+    return Subcategoria.query().orderBy('id_subcategoria', 'asc')
   }
 
   async show(scope: AccessScope, id: number) {
@@ -32,6 +26,7 @@ export default class SubcategoriaService {
       estado?: boolean
     }
   ) {
+    assertPlatformCatalog(scope)
     await assertCategoriaInScope(scope, payload.idCategoria)
 
     try {
@@ -54,6 +49,7 @@ export default class SubcategoriaService {
       estado?: boolean
     }
   ) {
+    assertPlatformCatalog(scope)
     await assertSubcategoriaInScope(scope, id)
 
     if (payload.idCategoria !== undefined) {

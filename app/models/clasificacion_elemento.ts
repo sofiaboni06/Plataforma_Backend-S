@@ -9,9 +9,6 @@ export default class ClasificacionElemento extends BaseModel {
   @column({ isPrimary: true, columnName: 'id_clasificacion_elemento' })
   declare id: number
 
-  @column({ columnName: 'id_cformacion' })
-  declare idCformacion: number
-
   @column()
   declare nombre: string
 

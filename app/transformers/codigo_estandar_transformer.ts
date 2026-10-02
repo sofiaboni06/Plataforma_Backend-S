@@ -5,7 +5,6 @@ export default class CodigoEstandarTransformer extends BaseTransformer<CodigoEst
   toObject() {
     return {
       id: this.resource.id,
-      idCformacion: this.resource.idCformacion,
       codigo: this.resource.codigo,
       nombre: this.resource.nombre,
     }

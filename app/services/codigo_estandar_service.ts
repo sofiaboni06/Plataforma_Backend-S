@@ -1,37 +1,28 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
 import CodigoEstandar from '#models/codigo_estandar'
-import { assertOwnedByCenter, centerIdFor, type AccessScope } from '#services/access_control'
+import { assertPlatformCatalog, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type CodigoEstandarPayload = {
-  idCformacion?: number
   codigo: string
   nombre: string
 }
 
 export default class CodigoEstandarService {
-  async index(scope: AccessScope, options: { idCformacion?: number } = {}) {
-    return CodigoEstandar.query()
-      .where('id_cformacion', centerIdFor(scope, options.idCformacion))
-      .orderBy('codigo', 'asc')
+  async index(_scope: AccessScope) {
+    return CodigoEstandar.query().orderBy('codigo', 'asc')
   }
 
-  async show(scope: AccessScope, id: number) {
-    const codigo = await CodigoEstandar.findOrFail(id)
-    assertOwnedByCenter(
-      scope,
-      codigo.idCformacion,
-      'Ese código UNSPSC no pertenece a tu centro de formación'
-    )
-
-    return codigo
+  async show(_scope: AccessScope, id: number) {
+    return CodigoEstandar.findOrFail(id)
   }
 
   async store(scope: AccessScope, payload: CodigoEstandarPayload) {
+    assertPlatformCatalog(scope)
+
     try {
       return await CodigoEstandar.create({
-        idCformacion: centerIdFor(scope, payload.idCformacion),
         codigo: payload.codigo,
         nombre: payload.nombre,
       })
@@ -41,6 +32,7 @@ export default class CodigoEstandarService {
   }
 
   async update(scope: AccessScope, id: number, payload: Partial<CodigoEstandarPayload>) {
+    assertPlatformCatalog(scope)
     const codigo = await this.show(scope, id)
 
     codigo.merge({
@@ -61,6 +53,7 @@ export default class CodigoEstandarService {
    * Hard delete. The row goes away only when no elemento still points at it.
    */
   async remove(scope: AccessScope, id: number) {
+    assertPlatformCatalog(scope)
     const codigo = await this.show(scope, id)
     const rows = await db
       .from('elemento')
