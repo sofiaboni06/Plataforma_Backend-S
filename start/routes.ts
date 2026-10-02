@@ -307,6 +307,22 @@ router
       .use(middleware.auth())
       .use(middleware.account())
 
+    router
+      .group(() => {
+        router.get('/', [controllers.Obras, 'index']).use(middleware.permission('obra.ver'))
+        router.post('/', [controllers.Obras, 'store']).use(middleware.permission('obra.crear'))
+        router.get(':id', [controllers.Obras, 'show']).use(middleware.permission('obra.ver'))
+        router
+          .patch(':id', [controllers.Obras, 'update'])
+          .use(middleware.permission('obra.editar'))
+        router
+          .delete(':id', [controllers.Obras, 'destroy'])
+          .use(middleware.permission('obra.eliminar'))
+      })
+      .prefix('obras')
+      .as('obras')
+      .use(middleware.auth())
+      .use(middleware.account())
   router
   .group(() => {
     router.get('/', [SolicitudEquipoController, 'index'])

@@ -955,6 +955,9 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['destroy']>>>
     }
   }
+  'obras.obras.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/obras'
   'solicitudesEquipo.solicitud_equipo.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/solicitudes-equipo'
@@ -963,6 +966,25 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['index']>>>
+    }
+  }
+  'obras.obras.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/obras'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/obra').createObraValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/obra').createObraValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'obras.obras.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/obras/:id'
       response: unknown
       errorResponse: unknown
     }
@@ -987,6 +1009,25 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['show']>>>
+    }
+  }
+  'obras.obras.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/obras/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/obra').updateObraValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/obra').updateObraValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'obras.obras.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/obras/:id'
       response: unknown
       errorResponse: unknown
     }
@@ -1047,6 +1088,8 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['destroy']>>>
       response: unknown
       errorResponse: unknown
     }

@@ -14,6 +14,7 @@ import type CodigoEstandarTransformer from '#transformers/codigo_estandar_transf
 import type ElementoTransformer from '#transformers/elemento_transformer'
 import type ItemTransformer from '#transformers/item_transformer'
 import type ModuleTransformer from '#transformers/module_transformer'
+import type ObraTransformer from '#transformers/obra_transformer'
 import type RoleTransformer from '#transformers/role_transformer'
 import type StandTransformer from '#transformers/stand_transformer'
 import type SubBodegaTransformer from '#transformers/sub_bodega_transformer'
@@ -58,6 +59,10 @@ export namespace Data {
   export type Module = InferData<ModuleTransformer>
   export namespace Module {
     export type Variants = InferVariants<ModuleTransformer>
+  }
+  export type Obra = InferData<ObraTransformer>
+  export namespace Obra {
+    export type Variants = InferVariants<ObraTransformer>
   }
   export type Role = InferData<RoleTransformer>
   export namespace Role {
