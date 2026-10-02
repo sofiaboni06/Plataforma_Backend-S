@@ -97,3 +97,35 @@ Subcategoría y sub-bodega no se mezclan. La subcategoría clasifica el producto
 Categorías e items **no se borran de la base**: `DELETE` baja `estado`. La subcategoría se apaga con `estado: false`, sin `DELETE`. Bodegas, sub-bodegas y stands sí se borran de verdad, pero solo si están vacíos (409 si no). La bodega pertenece a un centro de formación. El Administrador la crea y se la asigna al usuario en Usuarios. Quien no es administrador solo ve esas bodegas. Si otro perfil con permiso de crear bodega crea una, queda asignada a él. Admin bodega no trae `bodega.crear` ni `bodega.eliminar`. Elementos todavía no tienen `DELETE`. Un elemento nuevo no puede quedar con cantidad menor a 10. Recuperar contraseña (`/auth/recover`) sigue siendo la tarea aparte; los tests están en skip.
 
 Contrato para el frontend: [readme-frontend.md](./readme-frontend.md).
+
+## Obras (paso 1 de entrega de materiales)
+
+Solo el CRUD de la tabla `obra`. La obra es el centro del flujo de entrega: más adelante
+`solicitud_material` y `solicitud_equipo` cuelgan de ella, pero en este paso **no se escribe**
+en esas tablas ni se toca el stock de ningún elemento.
+
+- Al crearla se guarda `id_cformacion` del **usuario logueado**, no el de la bodega. Solo un
+  Administrador puede mandar `idCformacion` en el body para crearla en otro centro.
+- Columnas que se llenan: `nombre`, `lugar`, `id_cformacion` y `estado`.
+- "Apagar" es un soft delete (`DELETE` pone `estado = false`). La obra sigue en la base y deja de
+  salir en el listado normal; con `?estado=false` salen las apagadas.
+- No se repite el nombre dentro de un mismo centro (índice `uq_obra_centro_nombre`): responde 409.
+- Una obra de otro centro no aparece en el listado, y por id responde 403.
+
+| Método | Ruta | Permiso | Body / query |
+| --- | --- | --- | --- |
+| GET | `/api/v1/obras` | `obra.ver` | `?estado=true\|false`, `?idCformacion=` (solo admin) |
+| POST | `/api/v1/obras` | `obra.crear` | `{ nombre, lugar?, estado?, idCformacion? }` |
+| GET | `/api/v1/obras/:id` | `obra.ver` | |
+| PATCH | `/api/v1/obras/:id` | `obra.editar` | `{ nombre?, lugar?, estado? }` (cambiar `estado` pide `obra.eliminar`) |
+| DELETE | `/api/v1/obras/:id` | `obra.eliminar` | apaga la obra |
+
+Respuesta: `{ "data": { "id", "idCformacion", "nombre", "lugar", "estado" } }`.
+
+Los permisos `obra.*` están en `app/data/permission_catalog.ts` (módulo Inventario). Después de
+actualizar corre `node ace db:seed` para que existan en la tabla `permiso`; el perfil Admin
+bodega los recibe solo.
+
+Archivos: `obra.ts` (modelo), `validators/obra.ts`, `obra_service.ts`, `obra_transformer.ts`,
+`obras_controller.ts`, `tests/functional/obras.spec.ts`.
+

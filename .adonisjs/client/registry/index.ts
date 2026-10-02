@@ -480,6 +480,36 @@ const routes = {
     tokens: [{"old":"/api/v1/unidades-medida/:id","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"unidades-medida","end":""},{"old":"/api/v1/unidades-medida/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['unidadesMedida.unidades_medida.destroy']['types'],
   },
+  'obras.obras.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/obras',
+    tokens: [{"old":"/api/v1/obras","type":0,"val":"api","end":""},{"old":"/api/v1/obras","type":0,"val":"v1","end":""},{"old":"/api/v1/obras","type":0,"val":"obras","end":""}],
+    types: placeholder as Registry['obras.obras.index']['types'],
+  },
+  'obras.obras.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/obras',
+    tokens: [{"old":"/api/v1/obras","type":0,"val":"api","end":""},{"old":"/api/v1/obras","type":0,"val":"v1","end":""},{"old":"/api/v1/obras","type":0,"val":"obras","end":""}],
+    types: placeholder as Registry['obras.obras.store']['types'],
+  },
+  'obras.obras.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/obras/:id',
+    tokens: [{"old":"/api/v1/obras/:id","type":0,"val":"api","end":""},{"old":"/api/v1/obras/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/obras/:id","type":0,"val":"obras","end":""},{"old":"/api/v1/obras/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['obras.obras.show']['types'],
+  },
+  'obras.obras.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/obras/:id',
+    tokens: [{"old":"/api/v1/obras/:id","type":0,"val":"api","end":""},{"old":"/api/v1/obras/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/obras/:id","type":0,"val":"obras","end":""},{"old":"/api/v1/obras/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['obras.obras.update']['types'],
+  },
+  'obras.obras.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/obras/:id',
+    tokens: [{"old":"/api/v1/obras/:id","type":0,"val":"api","end":""},{"old":"/api/v1/obras/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/obras/:id","type":0,"val":"obras","end":""},{"old":"/api/v1/obras/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['obras.obras.destroy']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

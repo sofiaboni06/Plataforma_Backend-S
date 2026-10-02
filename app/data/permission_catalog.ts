@@ -68,6 +68,11 @@ export const PERMISSION_RESOURCES = {
     label: 'Usos presupuestales',
     actions: ['ver', 'crear', 'editar', 'eliminar'],
   },
+  obra: {
+    module: 'Inventario',
+    label: 'Obras',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
 } as const
 
 type PermissionResources = typeof PERMISSION_RESOURCES

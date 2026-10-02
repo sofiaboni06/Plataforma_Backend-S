@@ -149,4 +149,13 @@ export interface ApiDefinition {
       destroy: typeof routes['unidadesMedida.unidades_medida.destroy']
     }
   }
+  obras: {
+    obras: {
+      index: typeof routes['obras.obras.index']
+      store: typeof routes['obras.obras.store']
+      show: typeof routes['obras.obras.show']
+      update: typeof routes['obras.obras.update']
+      destroy: typeof routes['obras.obras.destroy']
+    }
+  }
 }

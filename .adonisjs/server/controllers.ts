@@ -13,6 +13,7 @@ export const controllers = {
   Items: () => import('#controllers/items_controller'),
   Modules: () => import('#controllers/modules_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
+  Obras: () => import('#controllers/obras_controller'),
   Permissions: () => import('#controllers/permissions_controller'),
   Profile: () => import('#controllers/profile_controller'),
   Roles: () => import('#controllers/roles_controller'),
