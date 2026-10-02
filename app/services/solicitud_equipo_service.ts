@@ -164,4 +164,68 @@ export default class SolicitudEquipoService {
     throw error
   }
 }
+
+  async devolver(
+    id: number,
+    estadoElemento: 'bueno' | 'danado' | 'perdido' | 'en_reparacion',
+    observacion?: string
+  ) {
+    const trx = await db.transaction()
+
+    try {
+      const solicitud = await SolicitudEquipo
+        .query({ client: trx })
+        .where('idSolicitudEquipo', id)
+        .forUpdate()
+        .first()
+
+      if (!solicitud) {
+        throw new Error('La solicitud indicada no existe')
+      }
+
+      if (solicitud.estado !== 'entregado') {
+        throw new Error(
+          'Solo se puede devolver una solicitud que esté entregada'
+        )
+      }
+
+      const elemento = await Elemento
+        .query({ client: trx })
+        .where('id', solicitud.idElemento)
+        .forUpdate()
+        .first()
+
+      if (!elemento) {
+        throw new Error('El elemento indicado no existe')
+      }
+
+      solicitud.estado = 'devuelto'
+      solicitud.estadoElemento = estadoElemento
+      solicitud.fechaDevolucion = DateTime.now()
+      solicitud.observacion = observacion?.trim() || null
+
+      if (estadoElemento === 'bueno') {
+        elemento.cantidad += solicitud.cantidad
+
+        await elemento
+          .useTransaction(trx)
+          .save()
+      }
+
+      await solicitud
+        .useTransaction(trx)
+        .save()
+
+      await trx.commit()
+
+      await solicitud.load('elemento')
+      await solicitud.load('obra')
+      await solicitud.load('usuario')
+
+      return solicitud
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+  }
 }

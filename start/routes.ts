@@ -313,6 +313,7 @@ router
     router.post('/', [SolicitudEquipoController, 'store'])
     router.get(':id', [SolicitudEquipoController, 'show'])
     router.patch(':id/entregar', [SolicitudEquipoController, 'entregar' as any])
+    router.patch(':id/devolver', [SolicitudEquipoController, 'devolver'])
   })
   .prefix('solicitudes-equipo')
   .as('solicitudesEquipo')
