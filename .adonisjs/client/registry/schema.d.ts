@@ -958,6 +958,9 @@ export interface Registry {
   'obras.obras.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/obras'
+  'solicitudesEquipo.solicitud_equipo.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-equipo'
     types: {
       body: {}
       paramsTuple: []
@@ -982,6 +985,25 @@ export interface Registry {
   'obras.obras.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/obras/:id'
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes-equipo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-equipo/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1006,6 +1028,61 @@ export interface Registry {
   'obras.obras.destroy': {
     methods: ["DELETE"]
     pattern: '/api/v1/obras/:id'
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.entregar': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/solicitudes-equipo/:id/entregar'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesMaterial.solicitud_material.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-material'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesMaterial.solicitud_material.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes-material'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesMaterial.solicitud_material.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-material/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesMaterial.solicitud_material.entregar': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/solicitudes-material/:id/entregar'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1013,6 +1090,8 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['destroy']>>>
+      response: unknown
+      errorResponse: unknown
     }
   }
 }

@@ -156,6 +156,20 @@ export interface ApiDefinition {
       show: typeof routes['obras.obras.show']
       update: typeof routes['obras.obras.update']
       destroy: typeof routes['obras.obras.destroy']
+  solicitudesEquipo: {
+    solicitudEquipo: {
+      index: typeof routes['solicitudesEquipo.solicitud_equipo.index']
+      store: typeof routes['solicitudesEquipo.solicitud_equipo.store']
+      show: typeof routes['solicitudesEquipo.solicitud_equipo.show']
+      entregar: typeof routes['solicitudesEquipo.solicitud_equipo.entregar']
+    }
+  }
+  solicitudesMaterial: {
+    solicitudMaterial: {
+      index: typeof routes['solicitudesMaterial.solicitud_material.index']
+      store: typeof routes['solicitudesMaterial.solicitud_material.store']
+      show: typeof routes['solicitudesMaterial.solicitud_material.show']
+      entregar: typeof routes['solicitudesMaterial.solicitud_material.entregar']
     }
   }
 }
