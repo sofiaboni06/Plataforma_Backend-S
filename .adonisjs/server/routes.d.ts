@@ -83,6 +83,14 @@ export type ScannedRoutes = {
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
+    'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
+    'solicitudesEquipo.solicitud_equipo.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesEquipo.solicitud_equipo.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesMaterial.solicitud_material.index': { paramsTuple?: []; params?: {} }
+    'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
+    'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'account.profile.show': { paramsTuple?: []; params?: {} }
@@ -118,6 +126,10 @@ export type ScannedRoutes = {
     'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
+    'solicitudesEquipo.solicitud_equipo.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesMaterial.solicitud_material.index': { paramsTuple?: []; params?: {} }
+    'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'account.profile.show': { paramsTuple?: []; params?: {} }
@@ -153,6 +165,10 @@ export type ScannedRoutes = {
     'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
+    'solicitudesEquipo.solicitud_equipo.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesMaterial.solicitud_material.index': { paramsTuple?: []; params?: {} }
+    'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
@@ -173,6 +189,8 @@ export type ScannedRoutes = {
     'usosPresupuestales.usos_presupuestales.store': { paramsTuple?: []; params?: {} }
     'codigosEstandar.codigos_estandar.store': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.store': { paramsTuple?: []; params?: {} }
+    'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
+    'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'account.profile.update': { paramsTuple?: []; params?: {} }
@@ -190,6 +208,8 @@ export type ScannedRoutes = {
     'usosPresupuestales.usos_presupuestales.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'codigosEstandar.codigos_estandar.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesEquipo.solicitud_equipo.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

@@ -480,6 +480,54 @@ const routes = {
     tokens: [{"old":"/api/v1/unidades-medida/:id","type":0,"val":"api","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/unidades-medida/:id","type":0,"val":"unidades-medida","end":""},{"old":"/api/v1/unidades-medida/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['unidadesMedida.unidades_medida.destroy']['types'],
   },
+  'solicitudesEquipo.solicitud_equipo.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes-equipo',
+    tokens: [{"old":"/api/v1/solicitudes-equipo","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo","type":0,"val":"solicitudes-equipo","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.index']['types'],
+  },
+  'solicitudesEquipo.solicitud_equipo.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/solicitudes-equipo',
+    tokens: [{"old":"/api/v1/solicitudes-equipo","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo","type":0,"val":"solicitudes-equipo","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.store']['types'],
+  },
+  'solicitudesEquipo.solicitud_equipo.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes-equipo/:id',
+    tokens: [{"old":"/api/v1/solicitudes-equipo/:id","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo/:id","type":0,"val":"solicitudes-equipo","end":""},{"old":"/api/v1/solicitudes-equipo/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.show']['types'],
+  },
+  'solicitudesEquipo.solicitud_equipo.entregar': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/solicitudes-equipo/:id/entregar',
+    tokens: [{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"solicitudes-equipo","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"entregar","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.entregar']['types'],
+  },
+  'solicitudesMaterial.solicitud_material.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes-material',
+    tokens: [{"old":"/api/v1/solicitudes-material","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material","type":0,"val":"solicitudes-material","end":""}],
+    types: placeholder as Registry['solicitudesMaterial.solicitud_material.index']['types'],
+  },
+  'solicitudesMaterial.solicitud_material.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/solicitudes-material',
+    tokens: [{"old":"/api/v1/solicitudes-material","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material","type":0,"val":"solicitudes-material","end":""}],
+    types: placeholder as Registry['solicitudesMaterial.solicitud_material.store']['types'],
+  },
+  'solicitudesMaterial.solicitud_material.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes-material/:id',
+    tokens: [{"old":"/api/v1/solicitudes-material/:id","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material/:id","type":0,"val":"solicitudes-material","end":""},{"old":"/api/v1/solicitudes-material/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['solicitudesMaterial.solicitud_material.show']['types'],
+  },
+  'solicitudesMaterial.solicitud_material.entregar': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/solicitudes-material/:id/entregar',
+    tokens: [{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"solicitudes-material","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"entregar","end":""}],
+    types: placeholder as Registry['solicitudesMaterial.solicitud_material.entregar']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

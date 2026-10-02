@@ -2,6 +2,8 @@ import '#config/fotos'
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import SolicitudEquipoController from '#controllers/solicitud_equipo_controller'
+import SolicitudMaterialController from '#controllers/solicitud_material_controller'
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -304,5 +306,29 @@ router
       .as('unidadesMedida')
       .use(middleware.auth())
       .use(middleware.account())
+
+  router
+  .group(() => {
+    router.get('/', [SolicitudEquipoController, 'index'])
+    router.post('/', [SolicitudEquipoController, 'store'])
+    router.get(':id', [SolicitudEquipoController, 'show'])
+    router.patch(':id/entregar', [SolicitudEquipoController, 'entregar' as any])
+  })
+  .prefix('solicitudes-equipo')
+  .as('solicitudesEquipo')
+  .use(middleware.auth())
+  .use(middleware.account())
+
+  router
+  .group(() => {
+    router.get('/', [SolicitudMaterialController, 'index'])
+    router.post('/', [SolicitudMaterialController, 'store'])
+    router.get(':id', [SolicitudMaterialController, 'show'])
+    router.patch(':id/entregar', [SolicitudMaterialController, 'entregar'])
+  })
+  .prefix('solicitudes-material')
+  .as('solicitudesMaterial')
+  .use(middleware.auth())
+  .use(middleware.account())
   })
   .prefix('/api/v1')

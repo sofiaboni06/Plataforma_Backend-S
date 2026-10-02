@@ -5,6 +5,7 @@
 
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
+import type ActividadTransformer from '#transformers/actividad_transformer'
 import type AdminUserTransformer from '#transformers/admin_user_transformer'
 import type BodegaTransformer from '#transformers/bodega_transformer'
 import type CategoriaTransformer from '#transformers/categoria_transformer'
@@ -22,6 +23,10 @@ import type UserTransformer from '#transformers/user_transformer'
 import type UsoPresupuestalTransformer from '#transformers/uso_presupuestal_transformer'
 
 export namespace Data {
+  export type Actividad = InferData<ActividadTransformer>
+  export namespace Actividad {
+    export type Variants = InferVariants<ActividadTransformer>
+  }
   export type AdminUser = InferData<AdminUserTransformer>
   export namespace AdminUser {
     export type Variants = InferVariants<AdminUserTransformer>

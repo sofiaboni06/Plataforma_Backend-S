@@ -955,4 +955,100 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['destroy']>>>
     }
   }
+  'solicitudesEquipo.solicitud_equipo.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-equipo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes-equipo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-equipo/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.entregar': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/solicitudes-equipo/:id/entregar'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesMaterial.solicitud_material.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-material'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesMaterial.solicitud_material.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes-material'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesMaterial.solicitud_material.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-material/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesMaterial.solicitud_material.entregar': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/solicitudes-material/:id/entregar'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
 }

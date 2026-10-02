@@ -5,6 +5,7 @@
 
 export const controllers = {
   AccessTokens: () => import('#controllers/access_tokens_controller'),
+  Actividades: () => import('#controllers/actividades_controller'),
   Bodega: () => import('#controllers/bodega_controller'),
   Categorias: () => import('#controllers/categorias_controller'),
   ClasificacionesElemento: () => import('#controllers/clasificaciones_elemento_controller'),
@@ -16,10 +17,12 @@ export const controllers = {
   Permissions: () => import('#controllers/permissions_controller'),
   Profile: () => import('#controllers/profile_controller'),
   Roles: () => import('#controllers/roles_controller'),
+  SolicitudEquipo: () => import('#controllers/solicitud_equipo_controller'),
   Stand: () => import('#controllers/stand_controller'),
   SubBodegas: () => import('#controllers/sub_bodegas_controller'),
   Subcategorias: () => import('#controllers/subcategorias_controller'),
   UnidadesMedida: () => import('#controllers/unidades_medida_controller'),
   Users: () => import('#controllers/users_controller'),
   UsosPresupuestales: () => import('#controllers/usos_presupuestales_controller'),
+  SolicitudMaterial: () => import('#controllers/solicitud_material_controller'),
 }
