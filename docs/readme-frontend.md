@@ -16,6 +16,7 @@ Cuentas del dump, contraseña `123456`:
 | `juan@correo.com` | Almacenista |
 | `maria@correo.com` | Funcionario |
 | `adminbodega@correo.com` | Admin bodega (la crea `db:seed`) |
+| `instructor@correo.com` | Instructor (la crea `db:seed`) |
 
 Hay dos personas distintas. No armes la misma pantalla para las dos.
 
@@ -25,7 +26,9 @@ Hay dos personas distintas. No armes la misma pantalla para las dos.
 - Mantiene los catálogos estándar. Son **una sola lista para todos los centros**. Si crea una fila, Valle y Cauca la ven. No se manda `idCformacion` y la respuesta ya no lo trae.
 - Usuarios, perfiles y permisos.
 
-**Encargado del centro** (`adminbodega@correo.com`, `isAdmin: false`). Trabaja su centro y las bodegas que le asignaron. Crea ítems, elementos y stands. Los catálogos estándar los usa en selects. Su perfil no trae `bodega.crear` ni `bodega.eliminar`, así que no crea bodegas ni sub-bodegas. La sub-bodega la crea el administrador, y solo dentro de una bodega de su propio centro: `GET` o `POST` sobre la bodega de otro centro responde 403.
+**Encargado del centro** (`adminbodega@correo.com`, `isAdmin: false`). Trabaja su centro y las bodegas que le asignaron. Crea ítems, elementos y stands. Los catálogos estándar los usa en selects. Su perfil no trae `bodega.crear` ni `bodega.eliminar`, así que no crea bodegas ni sub-bodegas. La sub-bodega la crea el administrador, y solo dentro de una bodega de su propio centro: `GET` o `POST` sobre la bodega de otro centro responde 403. Crea las obras del centro y entrega las solicitudes pendientes. No pide materiales ni devuelve equipos.
+
+**Instructor** (`instructor@correo.com`, `isAdmin: false`). Pide desde cualquier lado, sin estar en la bodega. Ve las obras y el kardex del centro (`cantidad` y `disponible`). Tres acciones: pedir material de consumo, pedir herramienta o equipo, y devolver el equipo con la novedad (`estadoElemento`). No entrega y no crea obras.
 
 ### Pantallas
 

@@ -20,6 +20,7 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       idStand: this.resource.idStand,
       nombre: this.resource.nombre,
       cantidad: this.resource.cantidad,
+      disponible: Number(this.resource.$extras.disponible ?? this.resource.cantidad),
       cantidadMinima: this.resource.cantidadMinima,
       gramaje: this.resource.gramaje,
       idClasificacion: this.resource.idClasificacion,

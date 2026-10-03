@@ -23,7 +23,7 @@ const DEMO_USER = {
  * The platform admin owns the shared catalogs and the bodegas. The person in
  * charge of a warehouse uses them, and creates items, elementos and stands.
  */
-export const ADMIN_BODEGA_EXCLUDED_PERMISSIONS = new Set([
+export const ADMIN_BODEGA_EXCLUDED_PERMISSIONS = new Set<string>([
   'bodega.crear',
   'bodega.eliminar',
   'categoria.crear',
@@ -43,6 +43,9 @@ export const ADMIN_BODEGA_EXCLUDED_PERMISSIONS = new Set([
   'uso_presupuestal.crear',
   'uso_presupuestal.editar',
   'uso_presupuestal.eliminar',
+  'solicitud_material.crear',
+  'solicitud_equipo.crear',
+  'solicitud_equipo.devolver',
 ])
 
 /**

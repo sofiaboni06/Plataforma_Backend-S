@@ -323,29 +323,47 @@ router
       .as('obras')
       .use(middleware.auth())
       .use(middleware.account())
-  router
-  .group(() => {
-    router.get('/', [SolicitudEquipoController, 'index'])
-    router.post('/', [SolicitudEquipoController, 'store'])
-    router.get(':id', [SolicitudEquipoController, 'show'])
-    router.patch(':id/entregar', [SolicitudEquipoController, 'entregar'])
-    router.patch(':id/devolver', [SolicitudEquipoController, 'devolver'])
-  })
-  .prefix('solicitudes-equipo')
-  .as('solicitudesEquipo')
-  .use(middleware.auth())
-  .use(middleware.account())
+    router
+      .group(() => {
+        router
+          .get('/', [SolicitudEquipoController, 'index'])
+          .use(middleware.permission('solicitud_equipo.ver'))
+        router
+          .post('/', [SolicitudEquipoController, 'store'])
+          .use(middleware.permission('solicitud_equipo.crear'))
+        router
+          .get(':id', [SolicitudEquipoController, 'show'])
+          .use(middleware.permission('solicitud_equipo.ver'))
+        router
+          .patch(':id/entregar', [SolicitudEquipoController, 'entregar'])
+          .use(middleware.permission('solicitud_equipo.entregar'))
+        router
+          .patch(':id/devolver', [SolicitudEquipoController, 'devolver'])
+          .use(middleware.permission('solicitud_equipo.devolver'))
+      })
+      .prefix('solicitudes-equipo')
+      .as('solicitudesEquipo')
+      .use(middleware.auth())
+      .use(middleware.account())
 
-  router
-  .group(() => {
-    router.get('/', [SolicitudMaterialController, 'index'])
-    router.post('/', [SolicitudMaterialController, 'store'])
-    router.get(':id', [SolicitudMaterialController, 'show'])
-    router.patch(':id/entregar', [SolicitudMaterialController, 'entregar'])
-  })
-  .prefix('solicitudes-material')
-  .as('solicitudesMaterial')
-  .use(middleware.auth())
-  .use(middleware.account())
+    router
+      .group(() => {
+        router
+          .get('/', [SolicitudMaterialController, 'index'])
+          .use(middleware.permission('solicitud_material.ver'))
+        router
+          .post('/', [SolicitudMaterialController, 'store'])
+          .use(middleware.permission('solicitud_material.crear'))
+        router
+          .get(':id', [SolicitudMaterialController, 'show'])
+          .use(middleware.permission('solicitud_material.ver'))
+        router
+          .patch(':id/entregar', [SolicitudMaterialController, 'entregar'])
+          .use(middleware.permission('solicitud_material.entregar'))
+      })
+      .prefix('solicitudes-material')
+      .as('solicitudesMaterial')
+      .use(middleware.auth())
+      .use(middleware.account())
   })
   .prefix('/api/v1')

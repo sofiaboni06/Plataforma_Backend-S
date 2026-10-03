@@ -90,7 +90,7 @@ El login y `GET /account/profile` devuelven `permissions` (lista de códigos), `
 para que el front oculte botones sin adivinar. Al Administrador le llega el catálogo completo.
 
 Cuentas dump, password `123456`: Carlos Administrador, Juan Almacenista, María Funcionario.
-`db:seed` agrega `adminbodega@correo.com` (Admin bodega): inventario de la bodega que tiene asignada. No crea ni borra bodegas.
+`db:seed` agrega `adminbodega@correo.com` (Admin bodega) e `instructor@correo.com` (Instructor). Admin bodega lleva el inventario de la bodega que tiene asignada y entrega lo pendiente. El instructor pide y devuelve. Ninguno de los dos es administrador. Contraseña de ambas: `123456`.
 
 Subcategoría y sub-bodega no se mezclan. La subcategoría clasifica el producto (`categoria` → `subcategoria` → item → elemento) y tiene CRUD en `/subcategorias`. La sub-bodega es la ubicación (`bodega` → `sub-bodega` → stand → elemento) y se crea, edita y borra con los permisos de bodega. El elemento copia nombre y subcategoría del item, y queda en el stand.
 
@@ -98,18 +98,17 @@ Categorías e items **no se borran de la base**: `DELETE` baja `estado`. La subc
 
 Contrato para el frontend: [readme-frontend.md](./readme-frontend.md).
 
-## Obras (paso 1 de entrega de materiales)
+## Obras
 
-Solo el CRUD de la tabla `obra`. La obra es el centro del flujo de entrega: más adelante
-`solicitud_material` y `solicitud_equipo` cuelgan de ella, pero en este paso **no se escribe**
-en esas tablas ni se toca el stock de ningún elemento.
+La obra es el proyecto del centro de formación, no de la bodega. Al crearla se guarda
+`id_cformacion` del usuario logueado. Solo un administrador puede mandar `idCformacion` para
+crearla en otro centro. Admin bodega hace el CRUD. El instructor solo la consulta para
+colgar ahí la solicitud.
 
-- Al crearla se guarda `id_cformacion` del **usuario logueado**, no el de la bodega. Solo un
-  Administrador puede mandar `idCformacion` en el body para crearla en otro centro.
-- Columnas que se llenan: `nombre`, `lugar`, `id_cformacion` y `estado`.
-- "Apagar" es un soft delete (`DELETE` pone `estado = false`). La obra sigue en la base y deja de
-  salir en el listado normal; con `?estado=false` salen las apagadas.
-- No se repite el nombre dentro de un mismo centro (índice `uq_obra_centro_nombre`): responde 409.
+- Columnas: `nombre`, `lugar`, `id_cformacion` y `estado`.
+- `DELETE` apaga la obra (`estado = false`). Sigue en la base para que las solicitudes no queden
+  huérfanas. El listado normal esconde las apagadas; `?estado=false` las muestra.
+- No se repite el nombre dentro de un mismo centro (`uq_obra_centro_nombre`): responde 409.
 - Una obra de otro centro no aparece en el listado, y por id responde 403.
 
 | Método | Ruta | Permiso | Body / query |
@@ -122,10 +121,46 @@ en esas tablas ni se toca el stock de ningún elemento.
 
 Respuesta: `{ "data": { "id", "idCformacion", "nombre", "lugar", "estado" } }`.
 
-Los permisos `obra.*` están en `app/data/permission_catalog.ts` (módulo Inventario). Después de
-actualizar corre `node ace db:seed` para que existan en la tabla `permiso`; el perfil Admin
-bodega los recibe solo.
+## Entrega de materiales
 
-Archivos: `obra.ts` (modelo), `validators/obra.ts`, `obra_service.ts`, `obra_transformer.ts`,
-`obras_controller.ts`, `tests/functional/obras.spec.ts`.
+Dos procesos, dos tablas. La devolución no es otra tabla: es el estado de `solicitud_equipo`.
+El elemento trae `cantidad` (lo que hay en estante) y `disponible` (esa cantidad menos lo que
+ya está pedido y sigue `pendiente`).
+
+**Instructor** (`instructor@correo.com`), desde cualquier lado:
+
+1. `POST /solicitudes-material` para un elemento de carácter `consumo`, asociado a una obra.
+2. `POST /solicitudes-equipo` para un elemento de carácter `devolutivo`, asociado a una obra.
+3. `PATCH /solicitudes-equipo/:id/devolver` cuando el equipo ya fue entregado. Body:
+   `{ estadoElemento: "bueno" \| "danado" \| "perdido" \| "en_reparacion", observacion? }`.
+   Si vuelve `bueno`, la cantidad regresa al inventario. En los otros estados queda descontada.
+
+**Admin bodega**:
+
+1. CRUD de obras.
+2. `GET /solicitudes-material?estado=pendiente` y `PATCH /solicitudes-material/:id/entregar`.
+3. `GET /solicitudes-equipo?estado=pendiente` y `PATCH /solicitudes-equipo/:id/entregar`.
+
+La solicitud nace `pendiente` y no mueve el inventario. Si no alcanza, responde 422
+`E_SIN_STOCK` con cuántos hay disponibles, contando también los pedidos pendientes. La
+entrega descuenta `cantidad`. El instructor no puede entregar. Admin bodega no puede pedir
+ni devolver.
+
+| Método | Ruta | Permiso |
+| --- | --- | --- |
+| GET | `/api/v1/solicitudes-material` | `solicitud_material.ver` |
+| POST | `/api/v1/solicitudes-material` | `solicitud_material.crear` |
+| GET | `/api/v1/solicitudes-material/:id` | `solicitud_material.ver` |
+| PATCH | `/api/v1/solicitudes-material/:id/entregar` | `solicitud_material.entregar` |
+| GET | `/api/v1/solicitudes-equipo` | `solicitud_equipo.ver` |
+| POST | `/api/v1/solicitudes-equipo` | `solicitud_equipo.crear` |
+| GET | `/api/v1/solicitudes-equipo/:id` | `solicitud_equipo.ver` |
+| PATCH | `/api/v1/solicitudes-equipo/:id/entregar` | `solicitud_equipo.entregar` |
+| PATCH | `/api/v1/solicitudes-equipo/:id/devolver` | `solicitud_equipo.devolver` |
+
+Body de alta, en las dos: `{ codigoSolicitud, idObra, idElemento, cantidad, ficha?, observacion? }`.
+Estados de material: `pendiente`, `entregado`. Estados de equipo: `pendiente`, `entregado`, `devuelto`.
+
+Archivos: `obra_service.ts`, `solicitud_material_service.ts`, `solicitud_equipo_service.ts`,
+`disponibilidad_service.ts`, `tests/functional/obras.spec.ts`, `tests/functional/flujo_entrega.spec.ts`.
 

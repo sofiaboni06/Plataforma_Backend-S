@@ -77,6 +77,36 @@ export function forbidden(message: string) {
 }
 
 /**
+ * A non-admin always stays in their own training center. An administrator may
+ * target another center when the request says so.
+ */
+export function centerIdFor(scope: AccessScope, requested?: number) {
+  if (!scope.isAdmin) {
+    return scope.idCformacion
+  }
+
+  return requested ?? scope.idCformacion
+}
+
+export function assertOwnedByCenter(scope: AccessScope, idCformacion: number, message: string) {
+  if (!scope.isAdmin && idCformacion !== scope.idCformacion) {
+    throw forbidden(message)
+  }
+}
+
+/**
+ * The instructor asks for stock from anywhere in the center. Warehouse staff
+ * only see the bodegas assigned to them.
+ */
+function veKardexDelCentro(scope: AccessScope) {
+  return (
+    scope.isAdmin ||
+    can(scope, 'solicitud_material.crear') ||
+    can(scope, 'solicitud_equipo.crear')
+  )
+}
+
+/**
  * Codes the frontend uses to show or hide buttons. An admin skips the checks at
  * runtime, so it gets the whole catalog instead of an empty list.
  */
@@ -100,7 +130,7 @@ export function standIdsQuery(scope: AccessScope) {
     .join('bodega', 'bodega.id_bodega', 'sub_bodega.id_bodega')
     .where('bodega.id_cformacion', scope.idCformacion)
 
-  if (!scope.isAdmin) {
+  if (!veKardexDelCentro(scope)) {
     query.whereIn('sub_bodega.id_bodega', scope.bodegaIds)
   }
 

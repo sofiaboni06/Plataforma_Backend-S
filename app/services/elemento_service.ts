@@ -3,6 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import Elemento from '#models/elemento'
 import Item from '#models/item'
 import { assertStandInScope, standIdsQuery, type AccessScope } from '#services/access_control'
+import DisponibilidadService from '#services/disponibilidad_service'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type ElementoPayload = {
@@ -28,7 +29,12 @@ type UpdateElementoPayload = Partial<ElementoPayload>
 
 export default class ElementoService {
   async list(scope: AccessScope) {
-    return this.query().whereIn('id_stand', standIdsQuery(scope)).orderBy('id_elemento', 'asc')
+    const rows = await this.query()
+      .whereIn('id_stand', standIdsQuery(scope))
+      .orderBy('id_elemento', 'asc')
+    await this.marcarDisponible(rows)
+
+    return rows
   }
 
   async create(scope: AccessScope, payload: ElementoPayload) {
@@ -67,6 +73,7 @@ export default class ElementoService {
   async findById(scope: AccessScope, id: number) {
     const elemento = await this.query().where('id_elemento', id).firstOrFail()
     await assertStandInScope(scope, elemento.idStand)
+    await this.marcarDisponible([elemento])
 
     return elemento
   }
@@ -197,6 +204,15 @@ export default class ElementoService {
     }
 
     return item
+  }
+
+  private async marcarDisponible(rows: Elemento[]) {
+    const comprometido = await new DisponibilidadService().comprometido(rows.map((row) => row.id))
+
+    for (const elemento of rows) {
+      const reservado = comprometido.get(elemento.id) ?? 0
+      elemento.$extras.disponible = Math.max(0, Number(elemento.cantidad) - reservado)
+    }
   }
 
   private query() {
