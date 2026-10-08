@@ -17,6 +17,7 @@ export const controllers = {
   NewAccount: () => import('#controllers/new_account_controller'),
   Notificaciones: () => import('#controllers/notificaciones_controller'),
   Obras: () => import('#controllers/obras_controller'),
+  PasswordRecovery: () => import('#controllers/password_recovery_controller'),
   Permissions: () => import('#controllers/permissions_controller'),
   Profile: () => import('#controllers/profile_controller'),
   Roles: () => import('#controllers/roles_controller'),

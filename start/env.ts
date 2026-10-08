@@ -44,4 +44,13 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   FOTOS_DIR: Env.schema.string.optional(),
+
+  // Recovery email
+  MAIL_HOST: Env.schema.string.optional(),
+  MAIL_PORT: Env.schema.number.optional(),
+  MAIL_SECURE: Env.schema.boolean.optional(),
+  MAIL_USERNAME: Env.schema.string.optional(),
+  MAIL_PASSWORD: Env.schema.string.optional(),
+  MAIL_FROM: Env.schema.string.optional(),
+  MAIL_FROM_NAME: Env.schema.string.optional(),
 })
