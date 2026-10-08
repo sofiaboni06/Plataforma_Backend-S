@@ -576,11 +576,29 @@ const routes = {
     tokens: [{"old":"/api/v1/solicitudes/solicitantes/:documento","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes/solicitantes/:documento","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes/solicitantes/:documento","type":0,"val":"solicitudes","end":""},{"old":"/api/v1/solicitudes/solicitantes/:documento","type":0,"val":"solicitantes","end":""},{"old":"/api/v1/solicitudes/solicitantes/:documento","type":1,"val":"documento","end":""}],
     types: placeholder as Registry['solicitudes.solicitudes.solicitante']['types'],
   },
+  'solicitudes.solicitudes.prestamos': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes/prestamos',
+    tokens: [{"old":"/api/v1/solicitudes/prestamos","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes/prestamos","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes/prestamos","type":0,"val":"solicitudes","end":""},{"old":"/api/v1/solicitudes/prestamos","type":0,"val":"prestamos","end":""}],
+    types: placeholder as Registry['solicitudes.solicitudes.prestamos']['types'],
+  },
   'solicitudes.solicitudes.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/solicitudes/:codigo',
     tokens: [{"old":"/api/v1/solicitudes/:codigo","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes/:codigo","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes/:codigo","type":0,"val":"solicitudes","end":""},{"old":"/api/v1/solicitudes/:codigo","type":1,"val":"codigo","end":""}],
     types: placeholder as Registry['solicitudes.solicitudes.show']['types'],
+  },
+  'solicitudes.solicitudes.entregar': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/solicitudes/:codigo/entregar',
+    tokens: [{"old":"/api/v1/solicitudes/:codigo/entregar","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes/:codigo/entregar","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes/:codigo/entregar","type":0,"val":"solicitudes","end":""},{"old":"/api/v1/solicitudes/:codigo/entregar","type":1,"val":"codigo","end":""},{"old":"/api/v1/solicitudes/:codigo/entregar","type":0,"val":"entregar","end":""}],
+    types: placeholder as Registry['solicitudes.solicitudes.entregar']['types'],
+  },
+  'solicitudes.solicitudes.plazo': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/solicitudes/:codigo/plazo',
+    tokens: [{"old":"/api/v1/solicitudes/:codigo/plazo","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes/:codigo/plazo","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes/:codigo/plazo","type":0,"val":"solicitudes","end":""},{"old":"/api/v1/solicitudes/:codigo/plazo","type":1,"val":"codigo","end":""},{"old":"/api/v1/solicitudes/:codigo/plazo","type":0,"val":"plazo","end":""}],
+    types: placeholder as Registry['solicitudes.solicitudes.plazo']['types'],
   },
   'entregas.entregas.index': {
     methods: ["GET","HEAD"],

@@ -48,7 +48,7 @@ test.group('Fotografía de elemento', () => {
         idSubcategoria: subcategoria.id,
       })
     itemRes.assertStatus(200)
-    const item = itemRes.body().data as { id: number }
+    const item = itemRes.body().data as { id: number; nombre: string }
 
     const bodegas = await client.get('/api/v1/bodegas').bearerToken(token)
     bodegas.assertStatus(200)
@@ -71,16 +71,25 @@ test.group('Fotografía de elemento', () => {
     unidades.assertStatus(200)
     const unidad = (unidades.body().data as { id: number }[])[0]
 
+    const clasificaciones = await client.get('/api/v1/clasificaciones-elemento').bearerToken(token)
+    clasificaciones.assertStatus(200)
+    const herramienta = (clasificaciones.body().data as { id: number; nombre: string }[]).find(
+      (row) => row.nombre === 'HERRAMIENTA'
+    )!
+
     const creado = await client
       .post('/api/v1/inventario/elementos')
       .bearerToken(token)
       .json({
         idItem: item.id,
+        nombre: item.nombre,
         idStand: stand.id,
         cantidad: 10,
         estado: true,
         idUnidadMedida: unidad.id,
         codigo: `FOTO-${suffix}`,
+        idClasificacion: herramienta.id,
+        caracter: 'devolutivo',
         urlFotografia: 'https://ejemplo.test/foto.jpg',
       })
     creado.assertStatus(200)

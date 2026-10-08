@@ -5,6 +5,7 @@ import {
   elementoJson,
   entregaJson,
   fechaIso,
+  fechasDe,
   persona,
 } from '#transformers/solicitud_transformer'
 
@@ -31,6 +32,7 @@ export default class SolicitudMaterialTransformer extends BaseTransformer<Solici
       estado: this.resource.estado,
       fecha: fechaIso(this.resource.fecha),
       fechaEntrega: fechaIso(this.resource.fechaEntrega),
+      ...fechasDe(this.resource, 'material'),
       observacion: this.resource.observacion,
       obra: obra
         ? {

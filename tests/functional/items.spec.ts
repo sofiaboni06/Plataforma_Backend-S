@@ -97,11 +97,50 @@ test.group('Items y elementos', () => {
     const unidad = (unidades.body().data as { id: number }[])[0]
     assert.exists(unidad)
 
+    const clasificaciones = await client.get('/api/v1/clasificaciones-elemento').bearerToken(token)
+    clasificaciones.assertStatus(200)
+    const consumo = (clasificaciones.body().data as { id: number; nombre: string }[]).find(
+      (itemClasificacion) => itemClasificacion.nombre === 'MATERIAL DE CONSUMO'
+    )
+    assert.exists(consumo)
+
+    // Clasificación y tipo son obligatorios al crear.
+    const sinTipo = await client
+      .post('/api/v1/inventario/elementos')
+      .bearerToken(token)
+      .json({
+        idItem: item.id,
+        nombre: item.nombre,
+        idStand: stand.id,
+        cantidad: 10,
+        estado: true,
+        idUnidadMedida: unidad.id,
+        codigo: `VIN-TECHO-${suffix}`,
+        idClasificacion: consumo!.id,
+      })
+    sinTipo.assertStatus(422)
+
+    const sinClasificacion = await client
+      .post('/api/v1/inventario/elementos')
+      .bearerToken(token)
+      .json({
+        idItem: item.id,
+        nombre: item.nombre,
+        idStand: stand.id,
+        cantidad: 10,
+        estado: true,
+        idUnidadMedida: unidad.id,
+        codigo: `VIN-TECHO-${suffix}`,
+        caracter: 'consumo',
+      })
+    sinClasificacion.assertStatus(422)
+
     const corto = await client
       .post('/api/v1/inventario/elementos')
       .bearerToken(token)
       .json({
         idItem: item.id,
+        nombre: item.nombre,
         idStand: stand.id,
         cantidad: 9,
         gramaje: 1.5,
@@ -116,6 +155,7 @@ test.group('Items y elementos', () => {
       .bearerToken(token)
       .json({
         idItem: item.id,
+        nombre: item.nombre,
         idStand: stand.id,
         cantidad: 10,
         gramaje: 1.5,
@@ -124,6 +164,8 @@ test.group('Items y elementos', () => {
         codigo: `VIN-TECHO-${suffix}`,
         marca: 'Pintuco',
         color: 'Rojo',
+        idClasificacion: consumo!.id,
+        caracter: 'consumo',
       })
     stock.assertStatus(200)
 
@@ -134,6 +176,7 @@ test.group('Items y elementos', () => {
       gramaje: number
       idItem: number
       idClasificacion: number | null
+      caracter: string | null
       clasificacion: { id: number; nombre: string } | null
       cantidadMinima: number
       idUsoPresupuestal: number | null
@@ -169,14 +212,23 @@ test.group('Items y elementos', () => {
     assert.equal(elemento.stand.subBodega.idBodega, bodega.id)
     assert.equal(elemento.stand.subBodega.bodega.id, bodega.id)
     assert.isNull(elemento.valorConAumento)
-    assert.isNull(elemento.idClasificacion)
+    assert.equal(elemento.idClasificacion, consumo!.id)
+    assert.equal(elemento.caracter, 'consumo')
 
-    const clasificaciones = await client.get('/api/v1/clasificaciones-elemento').bearerToken(token)
-    clasificaciones.assertStatus(200)
-    const consumo = (clasificaciones.body().data as { id: number; nombre: string }[]).find(
-      (itemClasificacion) => itemClasificacion.nombre === 'CONSUMO'
-    )
-    assert.exists(consumo)
+    // Se pueden cambiar, no quitar: un null se ignora y quedan como estaban.
+    const quitar = await client
+      .patch(`/api/v1/inventario/elementos/${elemento.id}`)
+      .bearerToken(token)
+      .json({ idClasificacion: null, caracter: null })
+    quitar.assertStatus(200)
+    const sinQuitar = quitar.body().data as { idClasificacion: number; caracter: string }
+    assert.equal(sinQuitar.idClasificacion, consumo!.id)
+    assert.equal(sinQuitar.caracter, 'consumo')
+    const tipoInvalido = await client
+      .patch(`/api/v1/inventario/elementos/${elemento.id}`)
+      .bearerToken(token)
+      .json({ caracter: 'prestado' })
+    tipoInvalido.assertStatus(422)
 
     const ficha = await client
       .patch(`/api/v1/inventario/elementos/${elemento.id}`)
@@ -196,7 +248,7 @@ test.group('Items y elementos', () => {
       valorConAumento: number
     }
     assert.equal(conQuince.idClasificacion, consumo!.id)
-    assert.equal(conQuince.clasificacion.nombre, 'CONSUMO')
+    assert.equal(conQuince.clasificacion.nombre, 'MATERIAL DE CONSUMO')
     assert.equal(conQuince.valorUnitarioPromedio, 1000)
     assert.equal(conQuince.porcentajeAumento, 15)
     assert.equal(conQuince.valorConAumento, 11500)

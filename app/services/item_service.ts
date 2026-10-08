@@ -114,9 +114,10 @@ export default class ItemService {
       rethrowDatabaseError(error, 'No se pudo actualizar el item')
     }
 
-    if (payload.nombre !== undefined || payload.idSubcategoria !== undefined) {
+    // Los elementos siguen la subcategoría del ítem, pero su nombre es propio:
+    // renombrar el ítem no les cambia el nombre.
+    if (payload.idSubcategoria !== undefined) {
       await db.from('elemento').where('id_item', item.id).update({
-        nombre: item.nombre,
         id_subcategoria: item.idSubcategoria,
       })
     }

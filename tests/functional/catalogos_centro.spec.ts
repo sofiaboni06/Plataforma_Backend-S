@@ -33,10 +33,14 @@ test.group('Catálogos estándar de la plataforma', () => {
     assert.include(idsAdmin, creada.body().data.id)
     assert.include(idsCentro, creada.body().data.id)
     assert.isTrue(
-      (delAdmin.body().data as { nombre: string }[]).some((row) => row.nombre === 'CONSUMO')
+      (delAdmin.body().data as { nombre: string }[]).some(
+        (row) => row.nombre === 'MATERIAL DE CONSUMO'
+      )
     )
     assert.isTrue(
-      (delCentro.body().data as { nombre: string }[]).some((row) => row.nombre === 'CONSUMO')
+      (delCentro.body().data as { nombre: string }[]).some(
+        (row) => row.nombre === 'MATERIAL DE CONSUMO'
+      )
     )
 
     const noPuede = await client

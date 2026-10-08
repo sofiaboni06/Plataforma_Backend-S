@@ -1,5 +1,6 @@
 import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import type { CaracterElemento } from '#data/clasificaciones_elemento'
 import Alerta from '#models/alerta'
 import ClasificacionElemento from '#models/clasificacion_elemento'
 import CodigoEstandar from '#models/codigo_estandar'
@@ -57,6 +58,23 @@ export default class Elemento extends BaseModel {
 
   @column({ columnName: 'id_clasificacion_elemento' })
   declare idClasificacion: number | null
+
+  /**
+   * Consumo (se pide como material) o devolutivo (se pide como equipo). Es del
+   * elemento, no de la clasificación. NULL solo en elementos viejos sin tipo,
+   * que no se pueden pedir hasta que bodega lo asigne.
+   */
+  @column()
+  declare caracter: CaracterElemento | null
+
+  /**
+   * El tipo con el que se pide. Si el elemento todavía no tiene el suyo (viejo,
+   * o la base sin la migración 1790553600017), usa el de su clasificación.
+   * Para ese respaldo hay que precargar `clasificacion`.
+   */
+  caracterEfectivo(): CaracterElemento | null {
+    return this.caracter ?? this.clasificacion?.caracter ?? null
+  }
 
   @column({
     columnName: 'valor_unitario_promedio',

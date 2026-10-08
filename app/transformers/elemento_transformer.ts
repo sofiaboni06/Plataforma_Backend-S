@@ -3,8 +3,9 @@ import { BaseTransformer } from '@adonisjs/core/transformers'
 
 /**
  * Quien solo pide necesita el elemento para armar la solicitud: nombre,
- * clasificación y unidad. No ve existencias, mínimos, valor ni en qué stand
- * está: eso es kardex de bodega.
+ * clasificación, unidad y cuánto hay disponible para pedir (la existencia menos
+ * lo que otras solicitudes esperan). No ve la existencia, mínimos, valor ni en
+ * qué stand está: eso es kardex de bodega.
  */
 export default class ElementoTransformer extends BaseTransformer<Elemento> {
   constructor(
@@ -31,10 +32,12 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       idSubcategoria: this.resource.idSubcategoria,
       idStand: this.resource.idStand,
       nombre: this.resource.nombre,
+      disponible: Number(this.resource.$extras.disponible ?? this.resource.cantidad),
+      // Decide si se pide como material (consumo) o como equipo (devolutivo).
+      caracter: this.resource.caracterEfectivo(),
       ...(this.conExistencias
         ? {
             cantidad: this.resource.cantidad,
-            disponible: Number(this.resource.$extras.disponible ?? this.resource.cantidad),
             cantidadMinima: this.resource.cantidadMinima,
             valorUnitarioPromedio: this.resource.valorUnitarioPromedio,
             porcentajeAumento: this.resource.porcentajeAumento,

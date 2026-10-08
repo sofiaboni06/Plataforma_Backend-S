@@ -1,11 +1,24 @@
 import vine from '@vinejs/vine'
 
+/** Día de calendario `YYYY-MM-DD`; el servicio revisa que exista y el orden. */
+const dia = () =>
+  vine
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+
 const solicitud = {
   codigoSolicitud: vine.string().trim().minLength(1).maxLength(50),
   idObra: vine.number().positive().withoutDecimals(),
   tipo: vine.enum(['consumo', 'devolutivo'] as const),
   ficha: vine.string().trim().maxLength(50).optional(),
   observacion: vine.string().trim().optional(),
+  /** Equipo: inicio del préstamo. Consumo: inicio de la actividad. */
+  fechaInicio: dia().optional(),
+  /** Solo equipo: hasta cuándo lo pide. */
+  fechaDevolucionPropuesta: dia().optional(),
+  /** Solo consumo: para cuándo lo necesita entregado. */
+  fechaEntregaRequerida: dia().optional(),
   elementos: vine
     .array(
       vine.object({
@@ -36,5 +49,14 @@ export const entregarSolicitudValidator = vine.compile(
   vine.object({
     cantidad: vine.number().positive().withoutDecimals().optional(),
     observacion: vine.string().trim().maxLength(500).optional(),
+    /** Solo equipo: bodega confirma o ajusta el plazo al entregar. */
+    fechaDevolucionLimite: dia().optional(),
+  })
+)
+
+/** Bodega corre el plazo de devolución de un pedido de equipo. */
+export const plazoSolicitudValidator = vine.compile(
+  vine.object({
+    fechaDevolucionLimite: dia(),
   })
 )

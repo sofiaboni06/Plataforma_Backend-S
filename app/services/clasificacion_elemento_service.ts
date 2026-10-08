@@ -10,6 +10,14 @@ type ClasificacionPayload = {
   estado?: boolean
 }
 
+/**
+ * Dos nombres son el mismo si solo cambian mayúsculas, tildes o espacios:
+ * "Material de consumo", "MATERIAL  DE CONSUMO" y "material de cónsumo".
+ */
+export function nombreComparable(nombre: string) {
+  return nombre.normalize('NFD').replace(/\p{M}/gu, '').replace(/\s+/g, ' ').trim().toLowerCase()
+}
+
 export default class ClasificacionElementoService {
   async index(_scope: AccessScope, options: { estado?: boolean } = {}) {
     return ClasificacionElemento.query()
@@ -23,6 +31,7 @@ export default class ClasificacionElementoService {
 
   async store(scope: AccessScope, payload: ClasificacionPayload) {
     assertPlatformCatalog(scope)
+    await this.assertNombreLibre(payload.nombre)
 
     try {
       return await ClasificacionElemento.create({
@@ -43,6 +52,10 @@ export default class ClasificacionElementoService {
       assertCan(scope, 'clasificacion_elemento.eliminar')
     }
 
+    if (payload.nombre !== undefined) {
+      await this.assertNombreLibre(payload.nombre, clasificacion.id)
+    }
+
     clasificacion.merge({
       ...(payload.nombre !== undefined ? { nombre: payload.nombre } : {}),
       ...(payload.caracter !== undefined ? { caracter: payload.caracter } : {}),
@@ -56,6 +69,29 @@ export default class ClasificacionElementoService {
     }
 
     return clasificacion
+  }
+
+  /**
+   * Sin migraciones ni índices nuevos: se compara contra todas las
+   * clasificaciones (activas o no; son pocas). Al editar se excluye la propia.
+   */
+  private async assertNombreLibre(nombre: string, excluirId?: number) {
+    const buscado = nombreComparable(nombre)
+    const filas = await ClasificacionElemento.query().select(
+      'id_clasificacion_elemento',
+      'nombre',
+      'estado'
+    )
+    const igual = filas.find(
+      (row) => row.id !== excluirId && nombreComparable(row.nombre) === buscado
+    )
+
+    if (igual) {
+      throw new Exception('Ya existe una clasificación con ese nombre', {
+        status: 422,
+        code: 'E_CLASIFICACION_DUPLICADA',
+      })
+    }
   }
 
   /**

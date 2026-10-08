@@ -1,5 +1,6 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import ElementoService from '#services/elemento_service'
+import { solicitudes } from '#services/notificacion_service'
 import FotoElementoService from '#services/foto_elemento_service'
 import ElementoTransformer from '#transformers/elemento_transformer'
 import { onlyRequests, resolveScope } from '#services/access_control'
@@ -30,11 +31,28 @@ export default class ElementosController {
     return serialize(ElementoTransformer.transform(elemento, !onlyRequests(scope)))
   }
 
-  async update({ params, request, auth, serialize }: HttpContext) {
+  /**
+   * `solicitudesPendientes` trae las solicitudes que la nueva existencia puede
+   * servir. Vacío si la cantidad no subió o no hay nadie esperando.
+   */
+  async update({ params, request, auth, response, serialize }: HttpContext) {
     const payload = await request.validateUsing(updateElementoValidator)
     const scope = await resolveScope(auth.getUserOrFail())
-    const actualizado = await new ElementoService().update(scope, Number(params.id), payload)
-    return serialize(ElementoTransformer.transform(actualizado))
+    const { elemento, solicitudesPendientes } = await new ElementoService().update(
+      scope,
+      Number(params.id),
+      payload
+    )
+    const data = await serialize.withoutWrapping(ElementoTransformer.transform(elemento))
+
+    return response.ok({
+      ...(solicitudesPendientes.length
+        ? {
+            message: `Agregaste nuevas unidades de ${elemento.nombre} que tienen solicitudes pendientes. Tienes ${solicitudes(solicitudesPendientes.length)} por actualizar y entregar.`,
+          }
+        : {}),
+      data: { ...data, solicitudesPendientes },
+    })
   }
 
   async showFoto({ params, auth, response }: HttpContext) {

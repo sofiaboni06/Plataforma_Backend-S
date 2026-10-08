@@ -11,7 +11,10 @@ import {
   standIdsQuery,
   type AccessScope,
 } from '#services/access_control'
-import DisponibilidadService from '#services/disponibilidad_service'
+import DisponibilidadService, {
+  pendientesQuePuedeEntregar,
+  type SolicitudPendiente,
+} from '#services/disponibilidad_service'
 import EntregaService, {
   type LineaDevolucion,
   type OpcionesEntrega,
@@ -44,16 +47,44 @@ function fail(message: string, status: number, code: string): never {
   throw new Exception(message, { status, code })
 }
 
+/**
+ * Acepta un estado o varios separados por coma (`pendiente,parcial`): bodega
+ * ve juntas las que no tienen nada entregado y las que quedaron a medias.
+ */
 function estadoFiltro(value: unknown) {
   if (value === undefined || value === null || value === '') {
     return undefined
   }
 
-  if (typeof value === 'string' && ESTADOS.includes(value as (typeof ESTADOS)[number])) {
-    return value as (typeof ESTADOS)[number]
+  const valores = (Array.isArray(value) ? value : String(value).split(',')).map((row) =>
+    typeof row === 'string' ? row.trim() : row
+  )
+
+  if (valores.length && valores.every((row) => ESTADOS.includes(row as (typeof ESTADOS)[number]))) {
+    return valores as (typeof ESTADOS)[number][]
   }
 
   fail('El estado indicado no es válido', 422, 'E_VALIDATION_ERROR')
+}
+
+/**
+ * `afuera=true` deja solo las filas con equipo afuera (entregado menos
+ * devuelto), sean `entregado` o `parcial`: lo que bodega puede recibir.
+ */
+function afueraFiltro(value: unknown) {
+  if (value === undefined || value === null || value === '') {
+    return false
+  }
+
+  if (value === true || value === 'true' || value === '1') {
+    return true
+  }
+
+  if (value === false || value === 'false' || value === '0') {
+    return false
+  }
+
+  fail('El filtro de equipo afuera no es válido', 422, 'E_VALIDATION_ERROR')
 }
 
 export default class SolicitudEquipoService {
@@ -82,7 +113,7 @@ export default class SolicitudEquipoService {
         fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
       }
 
-      if (!elemento.clasificacion || elemento.clasificacion.caracter !== 'devolutivo') {
+      if (elemento.caracterEfectivo() !== 'devolutivo') {
         fail(
           'Solo se pueden solicitar herramientas o equipos de carácter devolutivo',
           422,
@@ -140,12 +171,17 @@ export default class SolicitudEquipoService {
     return this.show(scope, solicitudId)
   }
 
-  async index(scope: AccessScope, estado?: unknown) {
+  async index(scope: AccessScope, estado?: unknown, afuera?: unknown) {
     const filtro = estadoFiltro(estado)
+    const soloAfuera = afueraFiltro(afuera)
     const query = this.conRelaciones(this.visibles(scope)).orderBy('fecha', 'desc')
 
     if (filtro) {
-      query.where('estado', filtro)
+      query.whereIn('estado', filtro)
+    }
+
+    if (soloAfuera) {
+      query.whereColumn('cantidad_entregada', '>', 'cantidad_devuelta')
     }
 
     return query
@@ -203,6 +239,8 @@ export default class SolicitudEquipoService {
         fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
       }
 
+      // Antes de entregar: si ya había salido algo, esta entrega completa una parcial.
+      const entregadaAntes = solicitud.cantidadEntregada
       const resultado = await this.entregas.entregar(
         trx,
         scope,
@@ -214,10 +252,12 @@ export default class SolicitudEquipoService {
       avisos = [
         ...(await this.notificaciones.entregaEquipo(trx, {
           idSolicitud: solicitud.id,
+          codigoSolicitud: solicitud.codigoSolicitud,
           idDestinatario: solicitud.idUsuario,
           idQuienEntrega: scope.idUsuario,
           cantidad: resultado.entregada,
           pendiente: resultado.pendiente,
+          entregadaAntes,
           elemento: elemento.nombre,
         })),
         ...(await this.notificaciones.aplicarStock(elemento, true, trx)),
@@ -236,10 +276,17 @@ export default class SolicitudEquipoService {
   /**
    * Se puede devolver por partes y mientras la fila siga `parcial`: lo que
    * cuenta es lo que está afuera (entregado menos devuelto).
+   *
+   * Lo que vuelve en buen estado regresa al estante. Si ese elemento tiene
+   * solicitudes esperando, bodega recibe un solo aviso y la respuesta las trae.
+   * La misma fila entra si todavía le falta por entregar: recibir unas
+   * unidades no cancela lo que el instructor sigue esperando, y entregárselas
+   * es decisión de bodega.
    */
   async devolver(scope: AccessScope, id: number, input: DevolverEquipo) {
     const trx = await db.transaction()
     let avisos: Awaited<ReturnType<NotificacionService['devolucionEquipo']>> = []
+    let pendientes: SolicitudPendiente[] = []
 
     try {
       const solicitud = await SolicitudEquipo.query({ client: trx })
@@ -268,6 +315,11 @@ export default class SolicitudEquipoService {
       const lineas = this.lineasDevolucion(solicitud, input)
       const resultado = await this.entregas.devolver(trx, scope, solicitud, elemento, lineas)
 
+      // Solo si el stock subió: lo dañado o perdido no vuelve al estante.
+      if (resultado.buenas > 0) {
+        pendientes = await this.disponibilidad.pendientesDe(elemento.id, trx)
+      }
+
       avisos = [
         ...(await this.notificaciones.devolucionEquipo(trx, {
           idSolicitud: solicitud.id,
@@ -278,6 +330,17 @@ export default class SolicitudEquipoService {
           afuera: resultado.afuera,
         })),
         ...(await this.notificaciones.aplicarStock(elemento, true, trx)),
+        ...(pendientes.length
+          ? await this.notificaciones.stockParaPendientes(trx, {
+              idElemento: elemento.id,
+              elemento: elemento.nombre,
+              idQuienAgrega: scope.idUsuario,
+              agregadas: resultado.buenas,
+              cantidad: Number(elemento.cantidad),
+              filas: pendientes,
+              origen: 'devolucion',
+            })
+          : []),
       ]
 
       await trx.commit()
@@ -287,7 +350,11 @@ export default class SolicitudEquipoService {
     }
 
     this.notificaciones.emitir(avisos)
-    return this.show(scope, id)
+
+    return {
+      solicitud: await this.show(scope, id),
+      solicitudesPendientes: pendientesQuePuedeEntregar(scope, pendientes),
+    }
   }
 
   visibles(scope: AccessScope) {

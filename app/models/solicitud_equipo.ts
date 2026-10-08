@@ -6,6 +6,7 @@ import Elemento from '#models/elemento'
 import Entrega from '#models/entrega'
 import Obra from '#models/obra'
 import User from '#models/usuario'
+import { fechaDia, type FechaDia } from '#services/plazo'
 
 export type EstadoSolicitudEquipo = 'pendiente' | 'parcial' | 'entregado' | 'devuelto'
 export type EstadoElementoEquipo = 'bueno' | 'danado' | 'perdido' | 'en_reparacion'
@@ -62,6 +63,18 @@ export default class SolicitudEquipo extends BaseModel {
 
   @column.dateTime({ columnName: 'fecha_devolucion' })
   declare fechaDevolucion: DateTime | null
+
+  /** Desde cuándo lo necesita (inicio del préstamo). `YYYY-MM-DD`. */
+  @column({ columnName: 'fecha_inicio', consume: fechaDia })
+  declare fechaInicio: FechaDia | null
+
+  /** Hasta cuándo lo pide el instructor. */
+  @column({ columnName: 'fecha_devolucion_propuesta', consume: fechaDia })
+  declare fechaDevolucionPropuesta: FechaDia | null
+
+  /** La que bodega confirma o ajusta al entregar: desde ese día se avisa si sigue afuera. */
+  @column({ columnName: 'fecha_devolucion_limite', consume: fechaDia })
+  declare fechaDevolucionLimite: FechaDia | null
 
   @column()
   declare observacion: string | null

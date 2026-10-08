@@ -126,7 +126,7 @@ test.group('Notificaciones', () => {
     const clasificaciones = await client.get('/api/v1/clasificaciones-elemento').bearerToken(admin)
     clasificaciones.assertStatus(200)
     const clases = clasificaciones.body().data as { id: number; nombre: string }[]
-    const consumo = clases.find((row) => row.nombre === 'CONSUMO')
+    const consumo = clases.find((row) => row.nombre === 'MATERIAL DE CONSUMO')
     const herramienta = clases.find((row) => row.nombre === 'HERRAMIENTA')
     assert.exists(consumo)
     assert.exists(herramienta)
@@ -136,6 +136,7 @@ test.group('Notificaciones', () => {
       .bearerToken(admin)
       .json({
         idItem: itemMaterial.body().data.id,
+        nombre: `Cemento ${suffix}`,
         idStand: standId,
         cantidad: 12,
         cantidadMinima: 10,
@@ -143,6 +144,7 @@ test.group('Notificaciones', () => {
         idUnidadMedida: unidadId,
         codigo: `AV-MAT-${suffix}`,
         idClasificacion: consumo!.id,
+        caracter: 'consumo',
       })
     material.assertStatus(200)
     const materialId = material.body().data.id as number
@@ -152,6 +154,7 @@ test.group('Notificaciones', () => {
       .bearerToken(admin)
       .json({
         idItem: itemEquipo.body().data.id,
+        nombre: `Taladro aviso ${suffix}`,
         idStand: standId,
         cantidad: 20,
         cantidadMinima: 10,
@@ -159,6 +162,7 @@ test.group('Notificaciones', () => {
         idUnidadMedida: unidadId,
         codigo: `AV-EQ-${suffix}`,
         idClasificacion: herramienta!.id,
+        caracter: 'devolutivo',
       })
     equipo.assertStatus(200)
     const equipoId = equipo.body().data.id as number

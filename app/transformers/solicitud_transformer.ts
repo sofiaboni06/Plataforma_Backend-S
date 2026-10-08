@@ -6,6 +6,7 @@ import type Entrega from '#models/entrega'
 import type SolicitudEquipo from '#models/solicitud_equipo'
 import type SolicitudMaterial from '#models/solicitud_material'
 import type User from '#models/usuario'
+import { estadoPlazo, hoy, type EstadoPlazo } from '#services/plazo'
 import type { Factura } from '#services/solicitud_service'
 
 export function fechaIso(value: DateTime | null) {
@@ -78,10 +79,55 @@ export function cantidadesDe(
   }
 }
 
+const GRAVEDAD_PLAZO: Record<EstadoPlazo, number> = {
+  sin_fecha: 0,
+  al_dia: 1,
+  vence_hoy: 2,
+  vencido: 3,
+}
+
+/**
+ * Fechas del pedido en una fila. Equipo: préstamo (inicio, devolución
+ * propuesta, límite que confirmó bodega) y cómo va el plazo si hay algo
+ * afuera. Consumo: inicio y para cuándo lo necesita.
+ */
+export function fechasDe(
+  row: SolicitudMaterial | SolicitudEquipo,
+  tipo: 'material' | 'equipo',
+  dia: string = hoy()
+) {
+  if (tipo === 'equipo') {
+    const equipo = row as SolicitudEquipo
+
+    return {
+      fechaInicio: equipo.fechaInicio ?? null,
+      fechaDevolucionPropuesta: equipo.fechaDevolucionPropuesta ?? null,
+      fechaDevolucionLimite: equipo.fechaDevolucionLimite ?? null,
+      fechaEntregaRequerida: null,
+      plazo: estadoPlazo(
+        equipo.fechaDevolucionLimite ?? null,
+        equipo.cantidadEntregada - equipo.cantidadDevuelta,
+        dia
+      ),
+    }
+  }
+
+  const material = row as SolicitudMaterial
+
+  return {
+    fechaInicio: material.fechaInicio ?? null,
+    fechaDevolucionPropuesta: null,
+    fechaDevolucionLimite: null,
+    fechaEntregaRequerida: material.fechaEntregaRequerida ?? null,
+    plazo: null,
+  }
+}
+
 function fila(
   row: SolicitudMaterial | SolicitudEquipo,
   tipo: 'material' | 'equipo',
-  conExistencias: boolean
+  conExistencias: boolean,
+  dia: string
 ) {
   const equipo = tipo === 'equipo' ? (row as SolicitudEquipo) : null
 
@@ -96,6 +142,7 @@ function fila(
     observacion: row.observacion,
     fechaEntrega: fechaIso(row.fechaEntrega),
     fechaDevolucion: equipo ? fechaIso(equipo.fechaDevolucion) : null,
+    ...fechasDe(row, tipo, dia),
     usuarioEntrega: persona(row.usuarioEntrega),
     entregas: (row.entregas ?? []).map(entregaJson),
     devoluciones: (equipo?.devoluciones ?? []).map(devolucionJson),
@@ -119,10 +166,24 @@ export default class SolicitudTransformer extends BaseTransformer<Factura> {
     const primera = [...materiales, ...equipos].sort(
       (a, b) => a.fecha.toMillis() - b.fecha.toMillis()
     )[0]
+    const dia = hoy()
     const detalle = [
-      ...materiales.map((row) => fila(row, 'material', this.conExistencias)),
-      ...equipos.map((row) => fila(row, 'equipo', this.conExistencias)),
+      ...materiales.map((row) => fila(row, 'material', this.conExistencias, dia)),
+      ...equipos.map((row) => fila(row, 'equipo', this.conExistencias, dia)),
     ]
+    // El plazo del pedido es el más apretado entre lo que sigue afuera.
+    const conPlazo = detalle.filter((row) => row.plazo !== null)
+    const peor = conPlazo.reduce<(typeof detalle)[number] | null>(
+      (actual, row) =>
+        actual === null ||
+        GRAVEDAD_PLAZO[row.plazo!] > GRAVEDAD_PLAZO[actual.plazo!] ||
+        (row.plazo === actual.plazo &&
+          (row.fechaDevolucionLimite ?? '9999') < (actual.fechaDevolucionLimite ?? '9999'))
+          ? row
+          : actual,
+      null
+    )
+    const referencia = detalle.find((row) => row.fechaInicio || row.fechaDevolucionPropuesta)
     const obra = primera.obra
     const suma = (valor: (row: (typeof detalle)[number]) => number | null) =>
       detalle.reduce((total, row) => total + (valor(row) ?? 0), 0)
@@ -145,6 +206,15 @@ export default class SolicitudTransformer extends BaseTransformer<Factura> {
       usuario: persona(primera.usuario),
       registradaEnBodega: primera.idUsuarioRegistra !== null,
       registradaPor: persona(primera.usuarioRegistra),
+      fechaInicio: referencia?.fechaInicio ?? null,
+      fechaDevolucionPropuesta: referencia?.fechaDevolucionPropuesta ?? null,
+      fechaDevolucionLimite:
+        peor?.fechaDevolucionLimite ??
+        detalle.find((row) => row.fechaDevolucionLimite)?.fechaDevolucionLimite ??
+        null,
+      fechaEntregaRequerida:
+        detalle.find((row) => row.fechaEntregaRequerida)?.fechaEntregaRequerida ?? null,
+      plazo: peor?.plazo ?? null,
       totales: {
         lineas: detalle.length,
         pendientes: detalle.filter((row) => row.estado === 'pendiente').length,

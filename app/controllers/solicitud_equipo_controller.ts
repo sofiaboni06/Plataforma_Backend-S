@@ -27,7 +27,11 @@ export default class SolicitudEquipoController {
 
   async index({ auth, request, serialize }: HttpContext) {
     const scope = await resolveScope(auth.getUserOrFail())
-    const solicitudes = await this.service.index(scope, request.input('estado'))
+    const solicitudes = await this.service.index(
+      scope,
+      request.input('estado'),
+      request.input('afuera')
+    )
     return serialize(SolicitudEquipoTransformer.transform(solicitudes, !onlyRequests(scope)))
   }
 
@@ -67,15 +71,21 @@ export default class SolicitudEquipoController {
   async devolver({ auth, params, request, response, serialize }: HttpContext) {
     const payload = await request.validateUsing(devolverSolicitudEquipoValidator)
     const scope = await resolveScope(auth.getUserOrFail())
-    const solicitud = await this.service.devolver(scope, solicitudId(params.id), payload)
+    const { solicitud, solicitudesPendientes } = await this.service.devolver(
+      scope,
+      solicitudId(params.id),
+      payload
+    )
     const afuera = solicitud.cantidadEntregada - solicitud.cantidadDevuelta
+    const data = await serialize.withoutWrapping(SolicitudEquipoTransformer.transform(solicitud))
 
+    // `solicitudesPendientes`: lo que el equipo que volvió bueno puede servir.
     return response.ok({
       message:
         afuera > 0
           ? `Devolución registrada; quedan ${afuera} afuera`
           : 'Equipo devuelto correctamente',
-      data: await serialize.withoutWrapping(SolicitudEquipoTransformer.transform(solicitud)),
+      data: { ...data, solicitudesPendientes },
     })
   }
 }

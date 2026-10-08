@@ -67,28 +67,35 @@ test.group('Solicitud con varios elementos', () => {
     clasificaciones.assertStatus(200)
     const clases = clasificaciones.body().data as { id: number; nombre: string }[]
     const herramienta = clases.find((row) => row.nombre === 'HERRAMIENTA')!
-    const consumo = clases.find((row) => row.nombre === 'CONSUMO')!
+    const consumo = clases.find((row) => row.nombre === 'MATERIAL DE CONSUMO')!
 
-    const elemento = async (nombre: string, codigo: string, idClasificacion: number) => {
+    const elemento = async (
+      nombre: string,
+      codigo: string,
+      idClasificacion: number,
+      caracter: 'consumo' | 'devolutivo'
+    ) => {
       const response = await client
         .post('/api/v1/inventario/elementos')
         .bearerToken(admin)
         .json({
           idItem: await item(nombre),
+          nombre: `${nombre} ${suffix}`,
           idStand,
           cantidad: 20,
           estado: true,
           idUnidadMedida,
           codigo: `${codigo}-${suffix}`,
           idClasificacion,
+          caracter,
         })
       response.assertStatus(200)
       return response.body().data.id as number
     }
 
-    const equipoId = await elemento('Pulidora', 'FAC-EQ', herramienta.id)
-    const lijaId = await elemento('Lija', 'FAC-LIJ', consumo.id)
-    const cintaId = await elemento('Cinta', 'FAC-CIN', consumo.id)
+    const equipoId = await elemento('Pulidora', 'FAC-EQ', herramienta.id, 'devolutivo')
+    const lijaId = await elemento('Lija', 'FAC-LIJ', consumo.id, 'consumo')
+    const cintaId = await elemento('Cinta', 'FAC-CIN', consumo.id, 'consumo')
 
     const obra = await client
       .post('/api/v1/obras')
@@ -183,9 +190,7 @@ test.group('Solicitud con varios elementos', () => {
     })
     mismoCodigo.assertStatus(409)
 
-    const reservado = await client
-      .get(`/api/v1/inventario/elementos/${lijaId}`)
-      .bearerToken(bodega)
+    const reservado = await client.get(`/api/v1/inventario/elementos/${lijaId}`).bearerToken(bodega)
     reservado.assertStatus(200)
     assert.equal(Number(reservado.body().data.disponible), 15)
 
@@ -195,15 +200,17 @@ test.group('Solicitud con varios elementos', () => {
     sinExistencias.assertStatus(200)
     assert.equal(sinExistencias.body().data.nombre, `Lija ${suffix}`)
     assert.notProperty(sinExistencias.body().data, 'cantidad')
-    assert.notProperty(sinExistencias.body().data, 'disponible')
     assert.notProperty(sinExistencias.body().data, 'cantidadMinima')
+    assert.notProperty(sinExistencias.body().data, 'valorUnitarioPromedio')
     assert.isNull(sinExistencias.body().data.stand)
+    // Ve lo mismo que bodega como disponible: la existencia menos lo reservado.
+    assert.equal(sinExistencias.body().data.disponible, 15)
 
     const listaInstructor = await client.get('/api/v1/inventario/elementos').bearerToken(instructor)
     listaInstructor.assertStatus(200)
     assert.isTrue(
       (listaInstructor.body().data as Record<string, unknown>[]).every(
-        (row) => !('cantidad' in row) && !('disponible' in row) && row.stand === null
+        (row) => !('cantidad' in row) && typeof row.disponible === 'number' && row.stand === null
       )
     )
 
@@ -235,10 +242,11 @@ test.group('Solicitud con varios elementos', () => {
       .qs({ perPage: 100 })
     avisos.assertStatus(200)
     const deEsta = (avisos.body().data as { tipo: string; titulo: string }[]).filter((row) =>
-      row.titulo.endsWith(codigo)
+      row.titulo.includes(codigo)
     )
     assert.equal(deEsta.length, 1)
     assert.equal(deEsta[0].tipo, 'solicitud_material')
+    assert.equal(deEsta[0].titulo, `Nueva solicitud ${codigo} de Camilo Instructor: 2 elementos`)
 
     const vistaBodega = await client
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)

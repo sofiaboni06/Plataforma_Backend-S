@@ -30,13 +30,21 @@ function fail(message: string, status: number, code: string): never {
   throw new Exception(message, { status, code })
 }
 
+/**
+ * Acepta un estado o varios separados por coma (`pendiente,parcial`): bodega
+ * ve juntas las que no tienen nada entregado y las que quedaron a medias.
+ */
 function estadoFiltro(value: unknown) {
   if (value === undefined || value === null || value === '') {
     return undefined
   }
 
-  if (typeof value === 'string' && ESTADOS.includes(value as (typeof ESTADOS)[number])) {
-    return value as (typeof ESTADOS)[number]
+  const valores = (Array.isArray(value) ? value : String(value).split(',')).map((row) =>
+    typeof row === 'string' ? row.trim() : row
+  )
+
+  if (valores.length && valores.every((row) => ESTADOS.includes(row as (typeof ESTADOS)[number]))) {
+    return valores as (typeof ESTADOS)[number][]
   }
 
   fail('El estado indicado no es válido', 422, 'E_VALIDATION_ERROR')
@@ -67,7 +75,7 @@ export default class SolicitudMaterialService {
         fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
       }
 
-      if (!elemento.clasificacion || elemento.clasificacion.caracter !== 'consumo') {
+      if (elemento.caracterEfectivo() !== 'consumo') {
         fail('Solo se pueden solicitar materiales de carácter consumo', 422, 'E_CARACTER_INVALIDO')
       }
 
@@ -123,7 +131,7 @@ export default class SolicitudMaterialService {
     const query = this.conRelaciones(this.visibles(scope)).orderBy('fecha', 'desc')
 
     if (filtro) {
-      query.where('estado', filtro)
+      query.whereIn('estado', filtro)
     }
 
     return query
@@ -181,6 +189,8 @@ export default class SolicitudMaterialService {
         fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
       }
 
+      // Antes de entregar: si ya había salido algo, esta entrega completa una parcial.
+      const entregadaAntes = solicitud.cantidadEntregada
       const resultado = await this.entregas.entregar(
         trx,
         scope,
@@ -192,10 +202,12 @@ export default class SolicitudMaterialService {
       avisos = [
         ...(await this.notificaciones.entregaMaterial(trx, {
           idSolicitud: solicitud.id,
+          codigoSolicitud: solicitud.codigoSolicitud,
           idDestinatario: solicitud.idUsuario,
           idQuienEntrega: scope.idUsuario,
           cantidad: resultado.entregada,
           pendiente: resultado.pendiente,
+          entregadaAntes,
           elemento: elemento.nombre,
         })),
         ...(await this.notificaciones.aplicarStock(elemento, true, trx)),

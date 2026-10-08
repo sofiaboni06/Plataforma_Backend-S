@@ -99,7 +99,10 @@ export type ScannedRoutes = {
     'solicitudes.solicitudes.store': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.registrar_en_bodega': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.solicitante': { paramsTuple: [ParamValue]; params: {'documento': ParamValue} }
+    'solicitudes.solicitudes.prestamos': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.show': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
+    'solicitudes.solicitudes.entregar': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
+    'solicitudes.solicitudes.plazo': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
     'entregas.entregas.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
@@ -152,6 +155,7 @@ export type ScannedRoutes = {
     'obras.obras.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudes.solicitudes.index': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.solicitante': { paramsTuple: [ParamValue]; params: {'documento': ParamValue} }
+    'solicitudes.solicitudes.prestamos': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.show': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
     'entregas.entregas.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
@@ -200,6 +204,7 @@ export type ScannedRoutes = {
     'obras.obras.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudes.solicitudes.index': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.solicitante': { paramsTuple: [ParamValue]; params: {'documento': ParamValue} }
+    'solicitudes.solicitudes.prestamos': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.show': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
     'entregas.entregas.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
@@ -253,6 +258,8 @@ export type ScannedRoutes = {
     'codigosEstandar.codigos_estandar.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudes.solicitudes.entregar': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
+    'solicitudes.solicitudes.plazo': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
     'solicitudesEquipo.solicitud_equipo.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesEquipo.solicitud_equipo.devolver': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

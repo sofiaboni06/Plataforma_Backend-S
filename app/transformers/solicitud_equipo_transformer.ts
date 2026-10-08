@@ -6,6 +6,7 @@ import {
   elementoJson,
   entregaJson,
   fechaIso,
+  fechasDe,
   persona,
 } from '#transformers/solicitud_transformer'
 
@@ -34,6 +35,7 @@ export default class SolicitudEquipoTransformer extends BaseTransformer<Solicitu
       fecha: fechaIso(this.resource.fecha),
       fechaEntrega: fechaIso(this.resource.fechaEntrega),
       fechaDevolucion: fechaIso(this.resource.fechaDevolucion),
+      ...fechasDe(this.resource, 'equipo'),
       observacion: this.resource.observacion,
       obra: obra
         ? {

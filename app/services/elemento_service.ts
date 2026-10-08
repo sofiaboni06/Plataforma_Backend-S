@@ -2,12 +2,18 @@ import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
 import Elemento from '#models/elemento'
 import Item from '#models/item'
+import type Notificacion from '#models/notificacion'
 import { assertStandInScope, standIdsQuery, type AccessScope } from '#services/access_control'
-import DisponibilidadService from '#services/disponibilidad_service'
+import DisponibilidadService, {
+  pendientesQuePuedeEntregar,
+  type SolicitudPendiente,
+} from '#services/disponibilidad_service'
 import NotificacionService from '#services/notificacion_service'
 import { rethrowDatabaseError } from '#services/database_error'
+import type { CaracterElemento } from '#data/clasificaciones_elemento'
 
 type ElementoPayload = {
+  nombre: string
   idItem: number
   idStand: number
   cantidad: number
@@ -20,6 +26,7 @@ type ElementoPayload = {
   marca?: string | null
   color?: string | null
   idClasificacion?: number | null
+  caracter?: CaracterElemento
   valorUnitarioPromedio?: number | null
   porcentajeAumento?: number | null
   idCodigoEstandar?: number | null
@@ -48,7 +55,8 @@ export default class ElementoService {
         idItem: item.id,
         idSubcategoria: item.idSubcategoria,
         idStand: payload.idStand,
-        nombre: item.nombre,
+        // El nombre lo escribe bodega; no se copia del ítem.
+        nombre: payload.nombre,
         cantidad: payload.cantidad,
         cantidadMinima: payload.cantidadMinima ?? 10,
         gramaje: payload.gramaje ?? null,
@@ -59,6 +67,7 @@ export default class ElementoService {
         marca: payload.marca ?? null,
         color: payload.color ?? null,
         idClasificacion: payload.idClasificacion ?? null,
+        caracter: payload.caracter ?? null,
         valorUnitarioPromedio: payload.valorUnitarioPromedio ?? null,
         porcentajeAumento: payload.porcentajeAumento ?? null,
         idCodigoEstandar: payload.idCodigoEstandar ?? null,
@@ -81,9 +90,14 @@ export default class ElementoService {
     return elemento
   }
 
+  /**
+   * Si la cantidad sube y hay solicitudes esperando unidades de este elemento,
+   * avisa a bodega y devuelve esas filas para que la pantalla lo muestre.
+   */
   async update(scope: AccessScope, id: number, payload: UpdateElementoPayload) {
     const elemento = await Elemento.findOrFail(id)
     await assertStandInScope(scope, elemento.idStand)
+    const cantidadAntes = Number(elemento.cantidad)
 
     if (payload.idStand !== undefined) {
       await assertStandInScope(scope, payload.idStand)
@@ -100,9 +114,9 @@ export default class ElementoService {
         ? {
             idItem: item.id,
             idSubcategoria: item.idSubcategoria,
-            nombre: item.nombre,
           }
         : {}),
+      ...(payload.nombre !== undefined && { nombre: payload.nombre }),
       ...(payload.idStand !== undefined && { idStand: payload.idStand }),
       ...(payload.cantidad !== undefined && { cantidad: payload.cantidad }),
       ...(payload.cantidadMinima !== undefined && { cantidadMinima: payload.cantidadMinima }),
@@ -114,6 +128,7 @@ export default class ElementoService {
       ...(payload.marca !== undefined && { marca: payload.marca }),
       ...(payload.color !== undefined && { color: payload.color }),
       ...(payload.idClasificacion !== undefined && { idClasificacion: payload.idClasificacion }),
+      ...(payload.caracter !== undefined && { caracter: payload.caracter }),
       ...(payload.valorUnitarioPromedio !== undefined && {
         valorUnitarioPromedio: payload.valorUnitarioPromedio,
       }),
@@ -138,7 +153,49 @@ export default class ElementoService {
       await new NotificacionService().aplicarStock(elemento, true)
     }
 
-    return this.findById(scope, id)
+    const agregadas = Number(elemento.cantidad) - cantidadAntes
+    const solicitudesPendientes =
+      payload.cantidad !== undefined && agregadas > 0
+        ? await this.avisarPendientes(scope, elemento, agregadas)
+        : []
+
+    return { elemento: await this.findById(scope, id), solicitudesPendientes }
+  }
+
+  /**
+   * Entró stock de un elemento con solicitudes esperando: un solo aviso a los
+   * encargados de esa bodega. En la respuesta solo van las filas del tipo que
+   * quien guardó puede entregar.
+   */
+  private async avisarPendientes(scope: AccessScope, elemento: Elemento, agregadas: number) {
+    const notificaciones = new NotificacionService()
+    const trx = await db.transaction()
+    let filas: SolicitudPendiente[] = []
+    let avisos: Notificacion[] = []
+
+    try {
+      filas = await new DisponibilidadService().pendientesDe(elemento.id, trx)
+
+      if (filas.length) {
+        avisos = await notificaciones.stockParaPendientes(trx, {
+          idElemento: elemento.id,
+          elemento: elemento.nombre,
+          idQuienAgrega: scope.idUsuario,
+          agregadas,
+          cantidad: Number(elemento.cantidad),
+          filas,
+        })
+      }
+
+      await trx.commit()
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+
+    notificaciones.emitir(avisos)
+
+    return pendientesQuePuedeEntregar(scope, filas)
   }
 
   /**

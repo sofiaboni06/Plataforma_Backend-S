@@ -76,7 +76,7 @@ test.group('Flujo obra, equipo y material', () => {
     clasificaciones.assertStatus(200)
     const clases = clasificaciones.body().data as { id: number; nombre: string; caracter: string }[]
     const herramienta = clases.find((row) => row.nombre === 'HERRAMIENTA')
-    const consumo = clases.find((row) => row.nombre === 'CONSUMO')
+    const consumo = clases.find((row) => row.nombre === 'MATERIAL DE CONSUMO')
     assert.exists(herramienta)
     assert.equal(herramienta!.caracter, 'devolutivo')
     assert.exists(consumo)
@@ -87,12 +87,14 @@ test.group('Flujo obra, equipo y material', () => {
       .bearerToken(admin)
       .json({
         idItem: itemHerramienta.body().data.id,
+        nombre: `Taladro ${suffix}`,
         idStand: standId,
         cantidad: 20,
         estado: true,
         idUnidadMedida: unidadId,
         codigo: `EQ-${suffix}`,
         idClasificacion: herramienta!.id,
+        caracter: 'devolutivo',
       })
     equipo.assertStatus(200)
     const equipoId = equipo.body().data.id as number
@@ -102,12 +104,14 @@ test.group('Flujo obra, equipo y material', () => {
       .bearerToken(admin)
       .json({
         idItem: itemMaterial.body().data.id,
+        nombre: `Tornillo ${suffix}`,
         idStand: standId,
         cantidad: 20,
         estado: true,
         idUnidadMedida: unidadId,
         codigo: `MAT-${suffix}`,
         idClasificacion: consumo!.id,
+        caracter: 'consumo',
       })
     material.assertStatus(200)
     const materialId = material.body().data.id as number
@@ -128,7 +132,10 @@ test.group('Flujo obra, equipo y material', () => {
     const visto = await client.get(`/api/v1/inventario/elementos/${materialId}`).bearerToken(instructor)
     visto.assertStatus(200)
     assert.notProperty(visto.body().data, 'cantidad')
-    assert.notProperty(visto.body().data, 'disponible')
+    assert.notProperty(visto.body().data, 'cantidadMinima')
+    assert.isNull(visto.body().data.stand)
+    // Solo ve cuánto puede pedir, no la existencia.
+    assert.equal(visto.body().data.disponible, 20)
 
     const enBodega = await client.get(`/api/v1/inventario/elementos/${materialId}`).bearerToken(bodega)
     enBodega.assertStatus(200)

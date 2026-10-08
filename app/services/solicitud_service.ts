@@ -2,6 +2,7 @@ import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import { DateTime } from 'luxon'
+import { fechaValida, hoy, noAntesDe, type FechaDia } from '#services/plazo'
 import Elemento from '#models/elemento'
 import Entrega from '#models/entrega'
 import Obra from '#models/obra'
@@ -15,6 +16,7 @@ import {
   can,
   forbidden,
   resolveScope,
+  standIdsQuery,
   type AccessScope,
 } from '#services/access_control'
 import DisponibilidadService from '#services/disponibilidad_service'
@@ -31,6 +33,12 @@ type CrearSolicitud = {
   tipo: TipoSolicitud
   ficha?: string
   observacion?: string
+  /** Equipo: inicio del préstamo. Consumo: inicio de la actividad. */
+  fechaInicio?: FechaDia
+  /** Solo equipo: hasta cuándo lo pide el instructor. */
+  fechaDevolucionPropuesta?: FechaDia
+  /** Solo consumo: para cuándo lo necesita entregado. */
+  fechaEntregaRequerida?: FechaDia
   elementos: { idElemento: number; cantidad: number; observacion?: string }[]
 }
 
@@ -39,6 +47,8 @@ type RegistrarEnBodega = CrearSolicitud & { numeroDocumento: string }
 type FilaCreada = FilaEntrega & { elemento: Elemento; idStand: number }
 
 const ESTADOS = ['pendiente', 'parcial', 'entregado', 'cerrado'] as const
+
+const PRESTAMOS = ['afuera', 'vencidos', 'devueltos', 'todos'] as const
 
 export type EstadoFactura = (typeof ESTADOS)[number]
 
@@ -114,6 +124,7 @@ export default class SolicitudService {
       scope,
       payload.tipo === 'consumo' ? 'solicitud_material.crear' : 'solicitud_equipo.crear'
     )
+    this.validarFechas(payload)
 
     const trx = await db.transaction()
     let avisos: Awaited<ReturnType<NotificacionService['pedidoVarios']>> = []
@@ -155,6 +166,7 @@ export default class SolicitudService {
     const consumo = payload.tipo === 'consumo'
 
     assertCan(scope, consumo ? 'solicitud_material.entregar' : 'solicitud_equipo.entregar')
+    this.validarFechas(payload)
 
     const { usuario, puedeConsumo, puedeDevolutivo } = await this.solicitante(
       scope,
@@ -257,6 +269,203 @@ export default class SolicitudService {
     const facturas = await this.facturas(scope)
 
     return filtro ? facturas.filter((row) => row.estado === filtro) : facturas
+  }
+
+  /**
+   * "Entregar todo lo disponible" de una solicitud: bodega saca, fila por fila,
+   * lo que haya en el estante de lo que falta. Las filas sin existencia quedan
+   * como estaban; si ninguna tiene, no se entrega nada. Solo cuenta lo que esa
+   * persona atiende (sus stands). El instructor recibe un solo aviso.
+   */
+  async entregarTodo(
+    scope: AccessScope,
+    codigoSolicitud: string,
+    opciones: { observacion?: string; fechaDevolucionLimite?: FechaDia } = {}
+  ) {
+    const material = can(scope, 'solicitud_material.entregar')
+    const equipo = can(scope, 'solicitud_equipo.entregar')
+
+    if (!material && !equipo) {
+      throw forbidden('No tienes permiso para realizar esta acción')
+    }
+
+    // 404 si no la ve, igual que el detalle.
+    const factura = await this.show(scope, codigoSolicitud)
+    const limite = this.limiteAlEntregar(factura, opciones.fechaDevolucionLimite)
+
+    const porEntregar = (tabla: 'solicitud_material' | 'solicitud_equipo') =>
+      db
+        .from(tabla)
+        .select(`id_${tabla}`)
+        .where('codigo_solicitud', codigoSolicitud)
+        .whereIn('estado', ['pendiente', 'parcial'])
+        .whereIn(
+          'id_obra',
+          db.from('obra').select('id_obra').where('id_cformacion', scope.idCformacion)
+        )
+        .whereIn(
+          'id_elemento',
+          db.from('elemento').select('id_elemento').whereIn('id_stand', standIdsQuery(scope))
+        )
+
+    const trx = await db.transaction()
+    let avisos: Awaited<ReturnType<NotificacionService['entregaVarias']>> = []
+
+    try {
+      const materiales = material
+        ? await SolicitudMaterial.query({ client: trx })
+            .whereIn('id_solicitud_material', porEntregar('solicitud_material'))
+            .orderBy('id_solicitud_material', 'asc')
+            .forUpdate()
+        : []
+      const equipos = equipo
+        ? await SolicitudEquipo.query({ client: trx })
+            .whereIn('id_solicitud_equipo', porEntregar('solicitud_equipo'))
+            .orderBy('id_solicitud_equipo', 'asc')
+            .forUpdate()
+        : []
+      const filas: FilaEntrega[] = [
+        ...materiales.map((row) => ({ tipo: 'material' as const, row })),
+        ...equipos.map((row) => ({ tipo: 'equipo' as const, row })),
+      ]
+
+      if (!filas.length) {
+        fail('Esa solicitud no tiene nada por entregar', 422, 'E_ESTADO_INVALIDO')
+      }
+
+      const elementos = await Elemento.query({ client: trx })
+        .whereIn(
+          'id_elemento',
+          filas.map((fila) => fila.row.idElemento)
+        )
+        .orderBy('id_elemento', 'asc')
+        .forUpdate()
+      const porId = new Map(elementos.map((row) => [row.id, row]))
+      const lineas = []
+
+      for (const fila of filas) {
+        const elemento = porId.get(fila.row.idElemento)
+
+        if (!elemento) {
+          fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
+        }
+
+        const entregadaAntes = fila.row.cantidadEntregada
+        const resultado = await this.entregas.entregar(trx, scope, fila, elemento, {
+          observacion: opciones.observacion,
+          exigirExistencia: false,
+          fechaDevolucionLimite: limite,
+        })
+
+        lineas.push({ fila, elemento, entregadaAntes, ...resultado })
+      }
+
+      const entregadas = lineas.filter((row) => row.entregada > 0)
+
+      if (!entregadas.length) {
+        fail(
+          'No hay existencia para entregar ninguno de los elementos pendientes',
+          422,
+          'E_SIN_STOCK'
+        )
+      }
+
+      for (const row of entregadas) {
+        avisos.push(...(await this.notificaciones.aplicarStock(row.elemento, true, trx)))
+      }
+
+      const [primera] = entregadas
+      const aviso = {
+        idSolicitud: primera.fila.row.id,
+        codigoSolicitud,
+        idDestinatario: primera.fila.row.idUsuario,
+        idQuienEntrega: scope.idUsuario,
+        cantidad: primera.entregada,
+        pendiente: primera.pendiente,
+        entregadaAntes: primera.entregadaAntes,
+        elemento: primera.elemento.nombre,
+      }
+
+      // Una sola fila: el mismo aviso que si la hubiera entregado sola.
+      if (entregadas.length === 1) {
+        avisos.push(
+          ...(primera.fila.tipo === 'material'
+            ? await this.notificaciones.entregaMaterial(trx, aviso)
+            : await this.notificaciones.entregaEquipo(trx, aviso))
+        )
+      } else {
+        avisos.push(
+          ...(await this.notificaciones.entregaVarias(trx, {
+            codigoSolicitud,
+            tipo: primera.fila.tipo,
+            idDestinatario: primera.fila.row.idUsuario,
+            idQuienEntrega: scope.idUsuario,
+            entregadas: entregadas.map((row) => ({
+              idSolicitud: row.fila.row.id,
+              elemento: row.elemento.nombre,
+              cantidad: row.entregada,
+              entregadaAntes: row.entregadaAntes,
+            })),
+            pendientes: lineas
+              .filter((row) => row.pendiente > 0)
+              .map((row) => ({ elemento: row.elemento.nombre, pendiente: row.pendiente })),
+          }))
+        )
+      }
+
+      await trx.commit()
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+
+    this.notificaciones.emitir(avisos)
+    return this.show(scope, codigoSolicitud)
+  }
+
+  /**
+   * "Entregas y devoluciones" de bodega: los pedidos de equipo que ya
+   * salieron (algo o todo), con quién los tiene y cómo va el plazo.
+   * `afuera` (por defecto): con algo sin devolver. `vencidos`: con plazo
+   * vencido o que vence hoy. `devueltos`: todo lo entregado ya volvió.
+   */
+  async prestamos(scope: AccessScope, filtro?: unknown) {
+    if (!can(scope, 'solicitud_equipo.entregar') && !can(scope, 'solicitud_equipo.devolver')) {
+      throw forbidden('No tienes permiso para realizar esta acción')
+    }
+
+    const vista = filtro === undefined || filtro === null || filtro === '' ? 'afuera' : filtro
+
+    if (!(PRESTAMOS as readonly unknown[]).includes(vista)) {
+      fail('El filtro indicado no es válido', 422, 'E_VALIDATION_ERROR')
+    }
+
+    const dia = hoy()
+    const facturas = await this.facturas(scope)
+    const prestados = facturas
+      .filter((row) => row.equipos.some((fila) => fila.cantidadEntregada > 0))
+      .map((row) => ({ ...row, materiales: [] }))
+    const afuera = (row: SolicitudEquipo) => row.cantidadEntregada - row.cantidadDevuelta
+
+    return prestados.filter((factura) => {
+      const filas = factura.equipos
+
+      switch (vista as (typeof PRESTAMOS)[number]) {
+        case 'afuera':
+          return filas.some((row) => afuera(row) > 0)
+        case 'vencidos':
+          return filas.some(
+            (row) =>
+              afuera(row) > 0 &&
+              row.fechaDevolucionLimite !== null &&
+              row.fechaDevolucionLimite <= dia
+          )
+        case 'devueltos':
+          return filas.every((row) => afuera(row) <= 0)
+        default:
+          return true
+      }
+    })
   }
 
   async show(scope: AccessScope, codigoSolicitud: string) {
@@ -373,11 +582,12 @@ export default class SolicitudService {
         fail(`El elemento de la fila ${index + 1} no existe`, 404, 'E_NOT_FOUND')
       }
 
-      const caracter = elemento.clasificacion?.caracter
+      // El tipo es del elemento; si no lo tiene, el de su clasificación.
+      const caracter = elemento.caracterEfectivo()
 
       if (caracter !== 'consumo' && caracter !== 'devolutivo') {
         fail(
-          `${elemento.nombre}: no tiene clasificación de consumo o devolutivo`,
+          `${elemento.nombre}: no tiene tipo (consumo o devolutivo); bodega debe asignarlo`,
           422,
           'E_CARACTER_INVALIDO'
         )
@@ -401,6 +611,7 @@ export default class SolicitudService {
         `${elemento.nombre}: el elemento no pertenece a tu centro de formación`
       )
 
+      const fechas = this.fechasDe(payload)
       const datos = {
         codigoSolicitud: payload.codigoSolicitud,
         idObra: obra.id,
@@ -418,11 +629,18 @@ export default class SolicitudService {
       }
 
       if (consumo) {
-        const row = await SolicitudMaterial.create(datos, { client: trx })
+        const row = await SolicitudMaterial.create({ ...datos, ...fechas }, { client: trx })
         filas.push({ tipo: 'material', row, elemento, idStand: lugar.idStand })
       } else {
         const row = await SolicitudEquipo.create(
-          { ...datos, cantidadDevuelta: 0, estadoElemento: null, fechaDevolucion: null },
+          {
+            ...datos,
+            ...fechas,
+            cantidadDevuelta: 0,
+            estadoElemento: null,
+            fechaDevolucion: null,
+            fechaDevolucionLimite: null,
+          },
           { client: trx }
         )
         filas.push({ tipo: 'equipo', row, elemento, idStand: lugar.idStand })
@@ -479,6 +697,130 @@ export default class SolicitudService {
     return [...grupos.values()]
       .map((row) => ({ ...row, estado: estadoDe(row.materiales, row.equipos) }))
       .sort((a, b) => fechaDe(b) - fechaDe(a))
+  }
+
+  /**
+   * Las fechas son del pedido, no de cada fila, así que van iguales en todas.
+   * Cada tipo solo acepta las suyas: el consumo no tiene plazo de devolución y
+   * el equipo no tiene fecha de entrega requerida.
+   */
+  private validarFechas(payload: CrearSolicitud) {
+    const dia = hoy()
+    const inicio = payload.fechaInicio
+      ? fechaValida(payload.fechaInicio, 'La fecha de inicio')
+      : null
+    const devolucion = payload.fechaDevolucionPropuesta
+      ? fechaValida(payload.fechaDevolucionPropuesta, 'La fecha de devolución')
+      : null
+    const requerida = payload.fechaEntregaRequerida
+      ? fechaValida(payload.fechaEntregaRequerida, 'La fecha para cuándo lo necesitas')
+      : null
+
+    if (payload.tipo === 'consumo' && devolucion) {
+      fail(
+        'El material de consumo no se devuelve; usa la fecha para cuándo lo necesitas',
+        422,
+        'E_FECHA_INVALIDA'
+      )
+    }
+
+    if (payload.tipo === 'devolutivo' && requerida) {
+      fail(
+        'El equipo devolutivo no tiene fecha de entrega requerida; usa la fecha de devolución',
+        422,
+        'E_FECHA_INVALIDA'
+      )
+    }
+
+    if (inicio) {
+      noAntesDe(inicio, dia, 'La fecha de inicio no puede ser anterior a hoy')
+    }
+
+    if (requerida) {
+      noAntesDe(
+        requerida,
+        inicio ?? dia,
+        'La fecha para cuándo lo necesitas no puede ser anterior al inicio'
+      )
+    }
+
+    if (devolucion) {
+      noAntesDe(devolucion, inicio ?? dia, 'La fecha de devolución no puede ser anterior al inicio')
+    }
+  }
+
+  private fechasDe(payload: CrearSolicitud) {
+    if (payload.tipo === 'consumo') {
+      return {
+        fechaInicio: payload.fechaInicio ?? null,
+        fechaEntregaRequerida: payload.fechaEntregaRequerida ?? null,
+      }
+    }
+
+    return {
+      fechaInicio: payload.fechaInicio ?? null,
+      fechaDevolucionPropuesta: payload.fechaDevolucionPropuesta ?? null,
+    }
+  }
+
+  /**
+   * Al entregar un pedido de equipo, bodega confirma el plazo. Si no manda
+   * fecha y el pedido tampoco la traía, se queda sin fecha (y sin aviso).
+   */
+  private limiteAlEntregar(factura: Factura, fecha: FechaDia | undefined) {
+    if (!factura.equipos.length) {
+      if (fecha) {
+        fail('El material de consumo no tiene plazo de devolución', 422, 'E_FECHA_INVALIDA')
+      }
+
+      return undefined
+    }
+
+    const dia = hoy()
+    const propuesta = factura.equipos[0].fechaDevolucionPropuesta
+    const limite = fecha ? fechaValida(fecha, 'La fecha límite de devolución') : propuesta
+
+    if (limite) {
+      noAntesDe(limite, dia, 'La fecha límite de devolución no puede ser anterior a hoy')
+    }
+
+    return limite ?? undefined
+  }
+
+  /**
+   * Bodega corre el plazo de un pedido de equipo que sigue con unidades afuera.
+   * Cambia todas las filas de ese código y el aviso del día siguiente ya usa
+   * la fecha nueva.
+   */
+  async ajustarPlazo(scope: AccessScope, codigoSolicitud: string, fechaDevolucionLimite: FechaDia) {
+    assertCan(scope, 'solicitud_equipo.entregar')
+
+    const factura = await this.show(scope, codigoSolicitud)
+
+    if (!factura.equipos.length) {
+      fail('Esa solicitud no es de equipo devolutivo', 422, 'E_TIPO_DISTINTO')
+    }
+
+    const fecha = fechaValida(fechaDevolucionLimite, 'La fecha límite de devolución')
+
+    if (!factura.equipos.some((row) => row.cantidadEntregada > row.cantidadDevuelta)) {
+      fail('Esa solicitud no tiene equipo afuera', 422, 'E_ESTADO_INVALIDO')
+    }
+
+    noAntesDe(fecha, hoy(), 'La fecha límite de devolución no puede ser anterior a hoy')
+
+    const actualizado = await SolicitudEquipo.query()
+      .whereIn(
+        'id_solicitud_equipo',
+        factura.equipos.map((row) => row.id)
+      )
+      .update({ fecha_devolucion_limite: fecha })
+
+    if (!Number(actualizado)) {
+      fail('La solicitud indicada no existe', 404, 'E_NOT_FOUND')
+    }
+
+    return this.show(scope, codigoSolicitud)
   }
 
   /**

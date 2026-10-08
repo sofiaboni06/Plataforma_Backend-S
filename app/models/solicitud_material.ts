@@ -5,6 +5,7 @@ import Elemento from '#models/elemento'
 import Entrega from '#models/entrega'
 import Obra from '#models/obra'
 import User from '#models/usuario'
+import { fechaDia, type FechaDia } from '#services/plazo'
 
 export type EstadoSolicitudMaterial = 'pendiente' | 'parcial' | 'entregado'
 
@@ -47,6 +48,14 @@ export default class SolicitudMaterial extends BaseModel {
 
   @column.dateTime({ columnName: 'fecha_entrega' })
   declare fechaEntrega: DateTime | null
+
+  /** Cuándo empieza la actividad en la que se usa. `YYYY-MM-DD`. */
+  @column({ columnName: 'fecha_inicio', consume: fechaDia })
+  declare fechaInicio: FechaDia | null
+
+  /** Para cuándo lo necesita entregado (el consumo no se devuelve). */
+  @column({ columnName: 'fecha_entrega_requerida', consume: fechaDia })
+  declare fechaEntregaRequerida: FechaDia | null
 
   @column()
   declare estado: EstadoSolicitudMaterial

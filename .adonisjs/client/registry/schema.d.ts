@@ -1147,9 +1147,45 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'solicitudes.solicitudes.prestamos': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes/prestamos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'solicitudes.solicitudes.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/solicitudes/:codigo'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { codigo: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudes.solicitudes.entregar': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/solicitudes/:codigo/entregar'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { codigo: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudes.solicitudes.plazo': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/solicitudes/:codigo/plazo'
     types: {
       body: {}
       paramsTuple: [ParamValue]

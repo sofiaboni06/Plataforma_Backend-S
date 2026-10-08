@@ -10,6 +10,7 @@ import type SolicitudMaterial from '#models/solicitud_material'
 import type { EstadoSolicitudMaterial } from '#models/solicitud_material'
 import type { AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
+import { fechaValida, hoy, noAntesDe, type FechaDia } from '#services/plazo'
 
 export type FilaEntrega =
   { tipo: 'material'; row: SolicitudMaterial } | { tipo: 'equipo'; row: SolicitudEquipo }
@@ -20,6 +21,11 @@ export type OpcionesEntrega = {
   observacion?: string
   /** En el mostrador una fila sin existencia queda pendiente sin fallar. */
   exigirExistencia: boolean
+  /**
+   * Solo equipo: el plazo que bodega confirma al entregar. Sin valor queda el
+   * que ya tenía la fila o, si no, el que propuso el instructor.
+   */
+  fechaDevolucionLimite?: FechaDia
 }
 
 export type LineaDevolucion = {
@@ -97,6 +103,18 @@ export default class EntregaService {
       fail(`Solo faltan ${faltante} por entregar`, 422, 'E_CANTIDAD_INVALIDA')
     }
 
+    if (opciones.fechaDevolucionLimite !== undefined) {
+      if (fila.tipo !== 'equipo') {
+        fail('El material de consumo no tiene plazo de devolución', 422, 'E_FECHA_INVALIDA')
+      }
+
+      noAntesDe(
+        fechaValida(opciones.fechaDevolucionLimite, 'La fecha límite de devolución'),
+        hoy(),
+        'La fecha límite de devolución no puede ser anterior a hoy'
+      )
+    }
+
     const enEstante = Math.max(0, Number(elemento.cantidad))
     const sale = Math.min(opciones.cantidad ?? faltante, faltante, enEstante)
 
@@ -121,6 +139,11 @@ export default class EntregaService {
         await fila.row.useTransaction(trx).save()
       } else {
         fila.row.estado = estadoEquipo(fila.row)
+        fila.row.fechaDevolucionLimite =
+          opciones.fechaDevolucionLimite ??
+          fila.row.fechaDevolucionLimite ??
+          fila.row.fechaDevolucionPropuesta ??
+          null
         await fila.row.useTransaction(trx).save()
       }
 
@@ -200,6 +223,6 @@ export default class EntregaService {
       rethrowDatabaseError(error, 'No se pudo registrar la devolución')
     }
 
-    return { devuelta: total, afuera: afuera - total }
+    return { devuelta: total, afuera: afuera - total, buenas }
   }
 }

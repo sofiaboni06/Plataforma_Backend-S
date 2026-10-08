@@ -177,7 +177,10 @@ export interface ApiDefinition {
       store: typeof routes['solicitudes.solicitudes.store']
       registrarEnBodega: typeof routes['solicitudes.solicitudes.registrar_en_bodega']
       solicitante: typeof routes['solicitudes.solicitudes.solicitante']
+      prestamos: typeof routes['solicitudes.solicitudes.prestamos']
       show: typeof routes['solicitudes.solicitudes.show']
+      entregar: typeof routes['solicitudes.solicitudes.entregar']
+      plazo: typeof routes['solicitudes.solicitudes.plazo']
     }
   }
   entregas: {

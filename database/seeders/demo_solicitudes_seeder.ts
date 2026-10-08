@@ -379,6 +379,7 @@ export default class extends BaseSeeder {
       color: null,
       gramaje: null,
       idClasificacion: clasificacion.id,
+      caracter: clasificacion.caracter,
       valorUnitarioPromedio: null,
       porcentajeAumento: null,
       idCodigoEstandar: null,
