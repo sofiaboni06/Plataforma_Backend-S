@@ -6,6 +6,24 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'event_stream': {
+    methods: ["GET","HEAD"],
+    pattern: '/__transmit/events',
+    tokens: [{"old":"/__transmit/events","type":0,"val":"__transmit","end":""},{"old":"/__transmit/events","type":0,"val":"events","end":""}],
+    types: placeholder as Registry['event_stream']['types'],
+  },
+  'subscribe': {
+    methods: ["POST"],
+    pattern: '/__transmit/subscribe',
+    tokens: [{"old":"/__transmit/subscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/subscribe","type":0,"val":"subscribe","end":""}],
+    types: placeholder as Registry['subscribe']['types'],
+  },
+  'unsubscribe': {
+    methods: ["POST"],
+    pattern: '/__transmit/unsubscribe',
+    tokens: [{"old":"/__transmit/unsubscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/unsubscribe","type":0,"val":"unsubscribe","end":""}],
+    types: placeholder as Registry['unsubscribe']['types'],
+  },
   'auth.new_account.store': {
     methods: ["POST"],
     pattern: '/api/v1/auth/signup',
@@ -35,6 +53,24 @@ const routes = {
     pattern: '/api/v1/account/password',
     tokens: [{"old":"/api/v1/account/password","type":0,"val":"api","end":""},{"old":"/api/v1/account/password","type":0,"val":"v1","end":""},{"old":"/api/v1/account/password","type":0,"val":"account","end":""},{"old":"/api/v1/account/password","type":0,"val":"password","end":""}],
     types: placeholder as Registry['account.profile.change_password']['types'],
+  },
+  'account.notificaciones.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/account/notifications',
+    tokens: [{"old":"/api/v1/account/notifications","type":0,"val":"api","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"v1","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"account","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"notifications","end":""}],
+    types: placeholder as Registry['account.notificaciones.index']['types'],
+  },
+  'account.notificaciones.update_all': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/account/notifications',
+    tokens: [{"old":"/api/v1/account/notifications","type":0,"val":"api","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"v1","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"account","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"notifications","end":""}],
+    types: placeholder as Registry['account.notificaciones.update_all']['types'],
+  },
+  'account.notificaciones.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/account/notifications/:id',
+    tokens: [{"old":"/api/v1/account/notifications/:id","type":0,"val":"api","end":""},{"old":"/api/v1/account/notifications/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/account/notifications/:id","type":0,"val":"account","end":""},{"old":"/api/v1/account/notifications/:id","type":0,"val":"notifications","end":""},{"old":"/api/v1/account/notifications/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['account.notificaciones.update']['types'],
   },
   'account.access_tokens.destroy': {
     methods: ["POST"],
@@ -239,6 +275,12 @@ const routes = {
     pattern: '/api/v1/inventario/elementos/:id',
     tokens: [{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/elementos/:id","type":0,"val":"elementos","end":""},{"old":"/api/v1/inventario/elementos/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['elementos.elementos.update']['types'],
+  },
+  'alertas.alertas.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/inventario/alertas',
+    tokens: [{"old":"/api/v1/inventario/alertas","type":0,"val":"api","end":""},{"old":"/api/v1/inventario/alertas","type":0,"val":"v1","end":""},{"old":"/api/v1/inventario/alertas","type":0,"val":"inventario","end":""},{"old":"/api/v1/inventario/alertas","type":0,"val":"alertas","end":""}],
+    types: placeholder as Registry['alertas.alertas.index']['types'],
   },
   'items.items.index': {
     methods: ["GET","HEAD"],
@@ -509,6 +551,43 @@ const routes = {
     pattern: '/api/v1/obras/:id',
     tokens: [{"old":"/api/v1/obras/:id","type":0,"val":"api","end":""},{"old":"/api/v1/obras/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/obras/:id","type":0,"val":"obras","end":""},{"old":"/api/v1/obras/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['obras.obras.destroy']['types'],
+  },
+  'solicitudes.solicitudes.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes',
+    tokens: [{"old":"/api/v1/solicitudes","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes","type":0,"val":"solicitudes","end":""}],
+    types: placeholder as Registry['solicitudes.solicitudes.index']['types'],
+  },
+  'solicitudes.solicitudes.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/solicitudes',
+    tokens: [{"old":"/api/v1/solicitudes","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes","type":0,"val":"solicitudes","end":""}],
+    types: placeholder as Registry['solicitudes.solicitudes.store']['types'],
+  },
+  'solicitudes.solicitudes.registrar_en_bodega': {
+    methods: ["POST"],
+    pattern: '/api/v1/solicitudes/bodega',
+    tokens: [{"old":"/api/v1/solicitudes/bodega","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes/bodega","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes/bodega","type":0,"val":"solicitudes","end":""},{"old":"/api/v1/solicitudes/bodega","type":0,"val":"bodega","end":""}],
+    types: placeholder as Registry['solicitudes.solicitudes.registrar_en_bodega']['types'],
+  },
+  'solicitudes.solicitudes.solicitante': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes/solicitantes/:documento',
+    tokens: [{"old":"/api/v1/solicitudes/solicitantes/:documento","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes/solicitantes/:documento","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes/solicitantes/:documento","type":0,"val":"solicitudes","end":""},{"old":"/api/v1/solicitudes/solicitantes/:documento","type":0,"val":"solicitantes","end":""},{"old":"/api/v1/solicitudes/solicitantes/:documento","type":1,"val":"documento","end":""}],
+    types: placeholder as Registry['solicitudes.solicitudes.solicitante']['types'],
+  },
+  'solicitudes.solicitudes.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes/:codigo',
+    tokens: [{"old":"/api/v1/solicitudes/:codigo","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes/:codigo","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes/:codigo","type":0,"val":"solicitudes","end":""},{"old":"/api/v1/solicitudes/:codigo","type":1,"val":"codigo","end":""}],
+    types: placeholder as Registry['solicitudes.solicitudes.show']['types'],
+  },
+  'entregas.entregas.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/entregas',
+    tokens: [{"old":"/api/v1/entregas","type":0,"val":"api","end":""},{"old":"/api/v1/entregas","type":0,"val":"v1","end":""},{"old":"/api/v1/entregas","type":0,"val":"entregas","end":""}],
+    types: placeholder as Registry['entregas.entregas.index']['types'],
+  },
   'solicitudesEquipo.solicitud_equipo.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/solicitudes-equipo',
@@ -532,6 +611,12 @@ const routes = {
     pattern: '/api/v1/solicitudes-equipo/:id/entregar',
     tokens: [{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"solicitudes-equipo","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-equipo/:id/entregar","type":0,"val":"entregar","end":""}],
     types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.entregar']['types'],
+  },
+  'solicitudesEquipo.solicitud_equipo.devolver': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/solicitudes-equipo/:id/devolver',
+    tokens: [{"old":"/api/v1/solicitudes-equipo/:id/devolver","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-equipo/:id/devolver","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-equipo/:id/devolver","type":0,"val":"solicitudes-equipo","end":""},{"old":"/api/v1/solicitudes-equipo/:id/devolver","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-equipo/:id/devolver","type":0,"val":"devolver","end":""}],
+    types: placeholder as Registry['solicitudesEquipo.solicitud_equipo.devolver']['types'],
   },
   'solicitudesMaterial.solicitud_material.index': {
     methods: ["GET","HEAD"],

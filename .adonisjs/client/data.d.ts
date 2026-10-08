@@ -6,16 +6,22 @@
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type AdminUserTransformer from '#transformers/admin_user_transformer'
+import type AlertaTransformer from '#transformers/alerta_transformer'
 import type BodegaTransformer from '#transformers/bodega_transformer'
 import type CategoriaTransformer from '#transformers/categoria_transformer'
 import type ClasificacionElementoTransformer from '#transformers/clasificacion_elemento_transformer'
 import type CodigoEstandarTransformer from '#transformers/codigo_estandar_transformer'
 import type ElementoTransformer from '#transformers/elemento_transformer'
+import type EntregaTransformer from '#transformers/entrega_transformer'
 import type ItemTransformer from '#transformers/item_transformer'
 import type ModuleTransformer from '#transformers/module_transformer'
+import type NotificacionTransformer from '#transformers/notificacion_transformer'
 import type ObraTransformer from '#transformers/obra_transformer'
 import type RoleTransformer from '#transformers/role_transformer'
+import type SolicitanteTransformer from '#transformers/solicitante_transformer'
 import type SolicitudEquipoTransformer from '#transformers/solicitud_equipo_transformer'
+import type SolicitudMaterialTransformer from '#transformers/solicitud_material_transformer'
+import type SolicitudTransformer from '#transformers/solicitud_transformer'
 import type StandTransformer from '#transformers/stand_transformer'
 import type SubBodegaTransformer from '#transformers/sub_bodega_transformer'
 import type SubcategoriaTransformer from '#transformers/subcategoria_transformer'
@@ -27,6 +33,10 @@ export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
   export namespace AdminUser {
     export type Variants = InferVariants<AdminUserTransformer>
+  }
+  export type Alerta = InferData<AlertaTransformer>
+  export namespace Alerta {
+    export type Variants = InferVariants<AlertaTransformer>
   }
   export type Bodega = InferData<BodegaTransformer>
   export namespace Bodega {
@@ -48,6 +58,10 @@ export namespace Data {
   export namespace Elemento {
     export type Variants = InferVariants<ElementoTransformer>
   }
+  export type Entrega = InferData<EntregaTransformer>
+  export namespace Entrega {
+    export type Variants = InferVariants<EntregaTransformer>
+  }
   export type Item = InferData<ItemTransformer>
   export namespace Item {
     export type Variants = InferVariants<ItemTransformer>
@@ -55,6 +69,10 @@ export namespace Data {
   export type Module = InferData<ModuleTransformer>
   export namespace Module {
     export type Variants = InferVariants<ModuleTransformer>
+  }
+  export type Notificacion = InferData<NotificacionTransformer>
+  export namespace Notificacion {
+    export type Variants = InferVariants<NotificacionTransformer>
   }
   export type Obra = InferData<ObraTransformer>
   export namespace Obra {
@@ -64,9 +82,21 @@ export namespace Data {
   export namespace Role {
     export type Variants = InferVariants<RoleTransformer>
   }
+  export type Solicitante = InferData<SolicitanteTransformer>
+  export namespace Solicitante {
+    export type Variants = InferVariants<SolicitanteTransformer>
+  }
   export type SolicitudEquipo = InferData<SolicitudEquipoTransformer>
   export namespace SolicitudEquipo {
     export type Variants = InferVariants<SolicitudEquipoTransformer>
+  }
+  export type SolicitudMaterial = InferData<SolicitudMaterialTransformer>
+  export namespace SolicitudMaterial {
+    export type Variants = InferVariants<SolicitudMaterialTransformer>
+  }
+  export type Solicitud = InferData<SolicitudTransformer>
+  export namespace Solicitud {
+    export type Variants = InferVariants<SolicitudTransformer>
   }
   export type Stand = InferData<StandTransformer>
   export namespace Stand {

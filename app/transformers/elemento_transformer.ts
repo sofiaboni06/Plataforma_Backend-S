@@ -1,7 +1,19 @@
 import type Elemento from '#models/elemento'
 import { BaseTransformer } from '@adonisjs/core/transformers'
 
+/**
+ * Quien solo pide necesita el elemento para armar la solicitud: nombre,
+ * clasificación y unidad. No ve existencias, mínimos, valor ni en qué stand
+ * está: eso es kardex de bodega.
+ */
 export default class ElementoTransformer extends BaseTransformer<Elemento> {
+  constructor(
+    elemento: Elemento,
+    private conExistencias: boolean = true
+  ) {
+    super(elemento)
+  }
+
   toObject() {
     const subcategoria = this.resource.subcategoria
     const stand = this.resource.stand
@@ -19,9 +31,16 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
       idSubcategoria: this.resource.idSubcategoria,
       idStand: this.resource.idStand,
       nombre: this.resource.nombre,
-      cantidad: this.resource.cantidad,
-      disponible: Number(this.resource.$extras.disponible ?? this.resource.cantidad),
-      cantidadMinima: this.resource.cantidadMinima,
+      ...(this.conExistencias
+        ? {
+            cantidad: this.resource.cantidad,
+            disponible: Number(this.resource.$extras.disponible ?? this.resource.cantidad),
+            cantidadMinima: this.resource.cantidadMinima,
+            valorUnitarioPromedio: this.resource.valorUnitarioPromedio,
+            porcentajeAumento: this.resource.porcentajeAumento,
+            valorConAumento: this.resource.valorConAumento(),
+          }
+        : {}),
       gramaje: this.resource.gramaje,
       idClasificacion: this.resource.idClasificacion,
       clasificacion: clasificacion
@@ -31,9 +50,6 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
             caracter: clasificacion.caracter,
           }
         : null,
-      valorUnitarioPromedio: this.resource.valorUnitarioPromedio,
-      porcentajeAumento: this.resource.porcentajeAumento,
-      valorConAumento: this.resource.valorConAumento(),
       estado: this.resource.estado,
       idUnidadMedida: this.resource.idUnidadMedida,
       codigo: this.resource.codigo,
@@ -84,7 +100,7 @@ export default class ElementoTransformer extends BaseTransformer<Elemento> {
               : null,
           }
         : null,
-      stand: stand
+      stand: this.conExistencias && stand
         ? {
             id: stand.id,
             nombre: stand.nombre,

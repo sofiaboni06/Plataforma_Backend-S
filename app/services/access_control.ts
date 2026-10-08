@@ -1,12 +1,18 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
 import User from '#models/usuario'
-import { buildPermissionCatalog, type PermissionCode } from '#data/permission_catalog'
+import {
+  buildPermissionCatalog,
+  isCenterOnlyCode,
+  type PermissionCode,
+} from '#data/permission_catalog'
 
 /**
  * The dump ships a profile literally named "Administrador". It skips permission
  * checks and administers users across the network, but it does not read another
- * center's inventory: that data stays in the center that owns it.
+ * center's inventory: that data stays in the center that owns it. Solicitudes
+ * and entregas are not its business either: they stay between the instructor
+ * and admin bodega.
  */
 export const ADMIN_PROFILE_NAME = 'Administrador'
 
@@ -60,7 +66,24 @@ async function loadScope(user: User): Promise<AccessScope> {
 }
 
 export function can(scope: AccessScope, code: PermissionCode) {
-  return scope.isAdmin || scope.permissions.has(code)
+  if (scope.isAdmin) {
+    return !isCenterOnlyCode(code)
+  }
+
+  return scope.permissions.has(code)
+}
+
+/**
+ * Quien pide pero no entrega (el instructor). Ve sus solicitudes y sus
+ * entregas, no lo que queda en bodega.
+ */
+export function onlyRequests(scope: AccessScope) {
+  return (
+    !scope.isAdmin &&
+    (can(scope, 'solicitud_material.crear') || can(scope, 'solicitud_equipo.crear')) &&
+    !can(scope, 'solicitud_material.entregar') &&
+    !can(scope, 'solicitud_equipo.entregar')
+  )
 }
 
 export function assertCan(scope: AccessScope, code: PermissionCode) {
@@ -95,8 +118,9 @@ export function assertOwnedByCenter(scope: AccessScope, idCformacion: number, me
 }
 
 /**
- * The instructor asks for stock from anywhere in the center. Warehouse staff
- * only see the bodegas assigned to them.
+ * Who can list elementos of the whole center: the platform admin (catalog of
+ * their own center) and who asks for material. The transformer still hides
+ * stock and stand from the instructor. Warehouse staff stay in assigned bodegas.
  */
 function veKardexDelCentro(scope: AccessScope) {
   return (
@@ -108,11 +132,14 @@ function veKardexDelCentro(scope: AccessScope) {
 
 /**
  * Codes the frontend uses to show or hide buttons. An admin skips the checks at
- * runtime, so it gets the whole catalog instead of an empty list.
+ * runtime, so it gets the catalog instead of an empty list, minus solicitudes
+ * and alertas: those stay with the center.
  */
 export function effectivePermissionCodes(scope: AccessScope): string[] {
   if (scope.isAdmin) {
-    return buildPermissionCatalog().map((definition) => definition.code)
+    return buildPermissionCatalog()
+      .map((definition) => definition.code)
+      .filter((code) => !isCenterOnlyCode(code))
   }
 
   return [...scope.permissions]

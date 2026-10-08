@@ -8,7 +8,7 @@ async function login(client: ApiClient, email: string) {
 }
 
 test.group('Flujo obra, equipo y material', () => {
-  test('el instructor pide, bodega entrega y el equipo se devuelve con novedad', async ({
+  test('el instructor pide, bodega entrega y bodega recibe el equipo con su novedad', async ({
     client,
     assert,
   }) => {
@@ -127,19 +127,24 @@ test.group('Flujo obra, equipo y material', () => {
 
     const visto = await client.get(`/api/v1/inventario/elementos/${materialId}`).bearerToken(instructor)
     visto.assertStatus(200)
-    assert.equal(Number(visto.body().data.cantidad), 20)
-    assert.equal(Number(visto.body().data.disponible), 20)
+    assert.notProperty(visto.body().data, 'cantidad')
+    assert.notProperty(visto.body().data, 'disponible')
 
-    const sinStock = await client
+    const enBodega = await client.get(`/api/v1/inventario/elementos/${materialId}`).bearerToken(bodega)
+    enBodega.assertStatus(200)
+    assert.equal(Number(enBodega.body().data.cantidad), 20)
+    assert.equal(Number(enBodega.body().data.disponible), 20)
+
+    const sinCantidad = await client
       .post('/api/v1/solicitudes-material')
       .bearerToken(instructor)
       .json({
         codigoSolicitud: `MAT-MAL-${suffix}`,
         idObra: obraId,
         idElemento: materialId,
-        cantidad: 21,
+        cantidad: 0,
       })
-    sinStock.assertStatus(422)
+    sinCantidad.assertStatus(422)
 
     const pedidoBodega = await client
       .post('/api/v1/solicitudes-material')
@@ -167,7 +172,7 @@ test.group('Flujo obra, equipo y material', () => {
 
     const reservado = await client
       .get(`/api/v1/inventario/elementos/${materialId}`)
-      .bearerToken(instructor)
+      .bearerToken(bodega)
     reservado.assertStatus(200)
     assert.equal(Number(reservado.body().data.cantidad), 20)
     assert.equal(Number(reservado.body().data.disponible), 15)
@@ -226,7 +231,7 @@ test.group('Flujo obra, equipo y material', () => {
 
     const kardexEquipo = await client
       .get(`/api/v1/inventario/elementos/${equipoId}`)
-      .bearerToken(instructor)
+      .bearerToken(bodega)
     kardexEquipo.assertStatus(200)
     assert.equal(Number(kardexEquipo.body().data.cantidad), 20)
     assert.equal(Number(kardexEquipo.body().data.disponible), 16)
@@ -238,15 +243,15 @@ test.group('Flujo obra, equipo y material', () => {
     assert.equal(entregado.body().data.estado, 'entregado')
     assert.equal(Number(entregado.body().data.elemento.cantidad), 16)
 
-    const devolucionBodega = await client
+    const devolucionInstructor = await client
       .patch(`/api/v1/solicitudes-equipo/${solicitudId}/devolver`)
-      .bearerToken(bodega)
+      .bearerToken(instructor)
       .json({ estadoElemento: 'bueno' })
-    devolucionBodega.assertStatus(403)
+    devolucionInstructor.assertStatus(403)
 
     const devuelto = await client
       .patch(`/api/v1/solicitudes-equipo/${solicitudId}/devolver`)
-      .bearerToken(instructor)
+      .bearerToken(bodega)
       .json({ estadoElemento: 'bueno', observacion: 'Regresa completo' })
     devuelto.assertStatus(200)
     assert.equal(devuelto.body().data.estado, 'devuelto')
@@ -273,7 +278,7 @@ test.group('Flujo obra, equipo y material', () => {
 
     const devueltoDanado = await client
       .patch(`/api/v1/solicitudes-equipo/${danadoId}/devolver`)
-      .bearerToken(instructor)
+      .bearerToken(bodega)
       .json({ estadoElemento: 'danado', observacion: 'No vuelve al stock' })
     devueltoDanado.assertStatus(200)
     assert.equal(devueltoDanado.body().data.estadoElemento, 'danado')

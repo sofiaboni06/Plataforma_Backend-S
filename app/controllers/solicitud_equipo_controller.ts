@@ -1,8 +1,9 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import type { HttpContext } from '@adonisjs/core/http'
-import { resolveScope } from '#services/access_control'
+import { onlyRequests, resolveScope } from '#services/access_control'
 import SolicitudEquipoService from '#services/solicitud_equipo_service'
 import SolicitudEquipoTransformer from '#transformers/solicitud_equipo_transformer'
+import { entregarSolicitudValidator } from '#validators/solicitud'
 import {
   createSolicitudEquipoValidator,
   devolverSolicitudEquipoValidator,
@@ -27,7 +28,7 @@ export default class SolicitudEquipoController {
   async index({ auth, request, serialize }: HttpContext) {
     const scope = await resolveScope(auth.getUserOrFail())
     const solicitudes = await this.service.index(scope, request.input('estado'))
-    return serialize(SolicitudEquipoTransformer.transform(solicitudes))
+    return serialize(SolicitudEquipoTransformer.transform(solicitudes, !onlyRequests(scope)))
   }
 
   async store({ request, auth, response, serialize }: HttpContext) {
@@ -37,22 +38,28 @@ export default class SolicitudEquipoController {
 
     return response.created({
       message: 'Solicitud de equipo registrada correctamente',
-      data: await serialize.withoutWrapping(SolicitudEquipoTransformer.transform(solicitud)),
+      data: await serialize.withoutWrapping(
+        SolicitudEquipoTransformer.transform(solicitud, !onlyRequests(scope))
+      ),
     })
   }
 
   async show({ auth, params, serialize }: HttpContext) {
     const scope = await resolveScope(auth.getUserOrFail())
     const solicitud = await this.service.show(scope, solicitudId(params.id))
-    return serialize(SolicitudEquipoTransformer.transform(solicitud))
+    return serialize(SolicitudEquipoTransformer.transform(solicitud, !onlyRequests(scope)))
   }
 
-  async entregar({ auth, params, response, serialize }: HttpContext) {
+  async entregar({ auth, params, request, response, serialize }: HttpContext) {
+    const payload = await request.validateUsing(entregarSolicitudValidator)
     const scope = await resolveScope(auth.getUserOrFail())
-    const solicitud = await this.service.entregar(scope, solicitudId(params.id))
+    const solicitud = await this.service.entregar(scope, solicitudId(params.id), payload)
 
     return response.ok({
-      message: 'Equipo entregado correctamente',
+      message:
+        solicitud.estado === 'parcial'
+          ? `Se entregaron ${solicitud.cantidadEntregada} de ${solicitud.cantidad}; quedan ${solicitud.cantidad - solicitud.cantidadEntregada} pendientes`
+          : 'Equipo entregado correctamente',
       data: await serialize.withoutWrapping(SolicitudEquipoTransformer.transform(solicitud)),
     })
   }
@@ -60,15 +67,14 @@ export default class SolicitudEquipoController {
   async devolver({ auth, params, request, response, serialize }: HttpContext) {
     const payload = await request.validateUsing(devolverSolicitudEquipoValidator)
     const scope = await resolveScope(auth.getUserOrFail())
-    const solicitud = await this.service.devolver(
-      scope,
-      solicitudId(params.id),
-      payload.estadoElemento,
-      payload.observacion
-    )
+    const solicitud = await this.service.devolver(scope, solicitudId(params.id), payload)
+    const afuera = solicitud.cantidadEntregada - solicitud.cantidadDevuelta
 
     return response.ok({
-      message: 'Equipo devuelto correctamente',
+      message:
+        afuera > 0
+          ? `Devolución registrada; quedan ${afuera} afuera`
+          : 'Equipo devuelto correctamente',
       data: await serialize.withoutWrapping(SolicitudEquipoTransformer.transform(solicitud)),
     })
   }

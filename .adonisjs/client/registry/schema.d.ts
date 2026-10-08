@@ -7,6 +7,42 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
+  'event_stream': {
+    methods: ["GET","HEAD"]
+    pattern: '/__transmit/events'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'subscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/subscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'unsubscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/unsubscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'auth.new_account.store': {
     methods: ["POST"]
     pattern: '/api/v1/auth/signup'
@@ -65,6 +101,42 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/usuario').changePasswordValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['changePassword']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['changePassword']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'account.notificaciones.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/notifications'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'account.notificaciones.update_all': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/account/notifications'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'account.notificaciones.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/account/notifications/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
     }
   }
   'account.access_tokens.destroy': {
@@ -473,6 +545,18 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/elemento').updateElementoValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['update']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'alertas.alertas.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/alertas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
     }
   }
   'items.items.index': {
@@ -958,9 +1042,6 @@ export interface Registry {
   'obras.obras.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/obras'
-  'solicitudesEquipo.solicitud_equipo.index': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/solicitudes-equipo'
     types: {
       body: {}
       paramsTuple: []
@@ -985,25 +1066,6 @@ export interface Registry {
   'obras.obras.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/obras/:id'
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'solicitudesEquipo.solicitud_equipo.store': {
-    methods: ["POST"]
-    pattern: '/api/v1/solicitudes-equipo'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'solicitudesEquipo.solicitud_equipo.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/solicitudes-equipo/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1028,6 +1090,119 @@ export interface Registry {
   'obras.obras.destroy': {
     methods: ["DELETE"]
     pattern: '/api/v1/obras/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['destroy']>>>
+    }
+  }
+  'solicitudes.solicitudes.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudes.solicitudes.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudes.solicitudes.registrar_en_bodega': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes/bodega'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudes.solicitudes.solicitante': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes/solicitantes/:documento'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { documento: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudes.solicitudes.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes/:codigo'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { codigo: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'entregas.entregas.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/entregas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-equipo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes-equipo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-equipo/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
       response: unknown
       errorResponse: unknown
     }
@@ -1035,6 +1210,18 @@ export interface Registry {
   'solicitudesEquipo.solicitud_equipo.entregar': {
     methods: ["PATCH"]
     pattern: '/api/v1/solicitudes-equipo/:id/entregar'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesEquipo.solicitud_equipo.devolver': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/solicitudes-equipo/:id/devolver'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1088,8 +1275,6 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['destroy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/obras_controller').default['destroy']>>>
       response: unknown
       errorResponse: unknown
     }

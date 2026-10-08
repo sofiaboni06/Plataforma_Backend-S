@@ -45,7 +45,6 @@ export const ADMIN_BODEGA_EXCLUDED_PERMISSIONS = new Set<string>([
   'uso_presupuestal.eliminar',
   'solicitud_material.crear',
   'solicitud_equipo.crear',
-  'solicitud_equipo.devolver',
 ])
 
 /**

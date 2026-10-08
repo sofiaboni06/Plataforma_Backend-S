@@ -2,11 +2,25 @@ import '#config/fotos'
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import AlertasController from '#controllers/alertas_controller'
+import EntregasController from '#controllers/entregas_controller'
+import NotificacionesController from '#controllers/notificaciones_controller'
 import SolicitudEquipoController from '#controllers/solicitud_equipo_controller'
 import SolicitudMaterialController from '#controllers/solicitud_material_controller'
+import SolicitudesController from '#controllers/solicitudes_controller'
+import transmit from '@adonisjs/transmit/services/main'
 
 router.get('/', () => {
   return { hello: 'world' }
+})
+
+transmit.registerRoutes((route) => {
+  if (route.getPattern() === '__transmit/events') {
+    return
+  }
+
+  route.use(middleware.auth())
+  route.use(middleware.account())
 })
 
 router
@@ -24,6 +38,9 @@ router
         router.get('profile', [controllers.Profile, 'show'])
         router.patch('profile', [controllers.Profile, 'update'])
         router.patch('password', [controllers.Profile, 'changePassword'])
+        router.get('notifications', [NotificacionesController, 'index'])
+        router.patch('notifications', [NotificacionesController, 'updateAll'])
+        router.patch('notifications/:id', [NotificacionesController, 'update'])
         router.post('logout', [controllers.AccessTokens, 'destroy'])
       })
       .prefix('account')
@@ -150,6 +167,15 @@ router
       })
       .prefix('inventario/elementos')
       .as('elementos')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [AlertasController, 'index']).use(middleware.permission('alerta.ver'))
+      })
+      .prefix('inventario/alertas')
+      .as('alertas')
       .use(middleware.auth())
       .use(middleware.account())
 
@@ -312,9 +338,7 @@ router
         router.get('/', [controllers.Obras, 'index']).use(middleware.permission('obra.ver'))
         router.post('/', [controllers.Obras, 'store']).use(middleware.permission('obra.crear'))
         router.get(':id', [controllers.Obras, 'show']).use(middleware.permission('obra.ver'))
-        router
-          .patch(':id', [controllers.Obras, 'update'])
-          .use(middleware.permission('obra.editar'))
+        router.patch(':id', [controllers.Obras, 'update']).use(middleware.permission('obra.editar'))
         router
           .delete(':id', [controllers.Obras, 'destroy'])
           .use(middleware.permission('obra.eliminar'))
@@ -323,6 +347,29 @@ router
       .as('obras')
       .use(middleware.auth())
       .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [SolicitudesController, 'index'])
+        router.post('/', [SolicitudesController, 'store'])
+        router.post('bodega', [SolicitudesController, 'registrarEnBodega'])
+        router.get('solicitantes/:documento', [SolicitudesController, 'solicitante'])
+        router.get(':codigo', [SolicitudesController, 'show'])
+      })
+      .prefix('solicitudes')
+      .as('solicitudes')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [EntregasController, 'index'])
+      })
+      .prefix('entregas')
+      .as('entregas')
+      .use(middleware.auth())
+      .use(middleware.account())
+
     router
       .group(() => {
         router

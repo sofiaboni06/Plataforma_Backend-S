@@ -4,6 +4,7 @@ import Elemento from '#models/elemento'
 import Item from '#models/item'
 import { assertStandInScope, standIdsQuery, type AccessScope } from '#services/access_control'
 import DisponibilidadService from '#services/disponibilidad_service'
+import NotificacionService from '#services/notificacion_service'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type ElementoPayload = {
@@ -63,6 +64,8 @@ export default class ElementoService {
         idCodigoEstandar: payload.idCodigoEstandar ?? null,
         idUsoPresupuestal: payload.idUsoPresupuestal ?? null,
       })
+
+      await new NotificacionService().aplicarStock(elemento, false)
 
       return this.findById(scope, elemento.id)
     } catch (error) {
@@ -129,6 +132,10 @@ export default class ElementoService {
       await elemento.save()
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudo actualizar el elemento')
+    }
+
+    if (payload.cantidad !== undefined || payload.cantidadMinima !== undefined) {
+      await new NotificacionService().aplicarStock(elemento, true)
     }
 
     return this.findById(scope, id)

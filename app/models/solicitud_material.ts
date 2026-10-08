@@ -1,11 +1,12 @@
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import Elemento from '#models/elemento'
+import Entrega from '#models/entrega'
 import Obra from '#models/obra'
 import User from '#models/usuario'
 
-export type EstadoSolicitudMaterial = 'pendiente' | 'entregado'
+export type EstadoSolicitudMaterial = 'pendiente' | 'parcial' | 'entregado'
 
 export default class SolicitudMaterial extends BaseModel {
   static table = 'solicitud_material'
@@ -25,11 +26,18 @@ export default class SolicitudMaterial extends BaseModel {
   @column({ columnName: 'id_usuario' })
   declare idUsuario: number
 
+  /** Admin bodega que la hizo a nombre del instructor. Null si la pidió él. */
+  @column({ columnName: 'id_usuario_registra' })
+  declare idUsuarioRegistra: number | null
+
   @column({ columnName: 'id_usuario_entrega' })
   declare idUsuarioEntrega: number | null
 
   @column()
   declare cantidad: number
+
+  @column({ columnName: 'cantidad_entregada' })
+  declare cantidadEntregada: number
 
   @column()
   declare ficha: string | null
@@ -55,6 +63,12 @@ export default class SolicitudMaterial extends BaseModel {
   @belongsTo(() => User, { foreignKey: 'idUsuario' })
   declare usuario: BelongsTo<typeof User>
 
+  @belongsTo(() => User, { foreignKey: 'idUsuarioRegistra' })
+  declare usuarioRegistra: BelongsTo<typeof User>
+
   @belongsTo(() => User, { foreignKey: 'idUsuarioEntrega' })
   declare usuarioEntrega: BelongsTo<typeof User>
+
+  @hasMany(() => Entrega, { foreignKey: 'idSolicitudMaterial' })
+  declare entregas: HasMany<typeof Entrega>
 }

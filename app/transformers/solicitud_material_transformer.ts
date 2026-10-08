@@ -1,17 +1,16 @@
 import { BaseTransformer } from '@adonisjs/core/transformers'
-import type SolicitudEquipo from '#models/solicitud_equipo'
+import type SolicitudMaterial from '#models/solicitud_material'
 import {
   cantidadesDe,
-  devolucionJson,
   elementoJson,
   entregaJson,
   fechaIso,
   persona,
 } from '#transformers/solicitud_transformer'
 
-export default class SolicitudEquipoTransformer extends BaseTransformer<SolicitudEquipo> {
+export default class SolicitudMaterialTransformer extends BaseTransformer<SolicitudMaterial> {
   constructor(
-    solicitud: SolicitudEquipo,
+    solicitud: SolicitudMaterial,
     private conExistencias: boolean = true
   ) {
     super(solicitud)
@@ -27,13 +26,11 @@ export default class SolicitudEquipoTransformer extends BaseTransformer<Solicitu
       idElemento: this.resource.idElemento,
       idUsuario: this.resource.idUsuario,
       idUsuarioEntrega: this.resource.idUsuarioEntrega,
-      ...cantidadesDe(this.resource, 'equipo'),
+      ...cantidadesDe(this.resource, 'material'),
       ficha: this.resource.ficha,
       estado: this.resource.estado,
-      estadoElemento: this.resource.estadoElemento,
       fecha: fechaIso(this.resource.fecha),
       fechaEntrega: fechaIso(this.resource.fechaEntrega),
-      fechaDevolucion: fechaIso(this.resource.fechaDevolucion),
       observacion: this.resource.observacion,
       obra: obra
         ? {
@@ -48,7 +45,6 @@ export default class SolicitudEquipoTransformer extends BaseTransformer<Solicitu
       registradaPor: persona(this.resource.usuarioRegistra),
       usuarioEntrega: persona(this.resource.usuarioEntrega),
       entregas: (this.resource.entregas ?? []).map(entregaJson),
-      devoluciones: (this.resource.devoluciones ?? []).map(devolucionJson),
     }
   }
 }

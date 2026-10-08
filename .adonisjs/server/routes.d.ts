@@ -4,11 +4,17 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
+    'event_stream': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
     'auth.access_tokens.store': { paramsTuple?: []; params?: {} }
     'account.profile.show': { paramsTuple?: []; params?: {} }
     'account.profile.update': { paramsTuple?: []; params?: {} }
     'account.profile.change_password': { paramsTuple?: []; params?: {} }
+    'account.notificaciones.index': { paramsTuple?: []; params?: {} }
+    'account.notificaciones.update_all': { paramsTuple?: []; params?: {} }
+    'account.notificaciones.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account.access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'modules.modules.index': { paramsTuple?: []; params?: {} }
     'modules.modules.tree': { paramsTuple?: []; params?: {} }
@@ -43,6 +49,7 @@ export type ScannedRoutes = {
     'elementos.elementos.store_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.destroy_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'alertas.alertas.index': { paramsTuple?: []; params?: {} }
     'items.items.index': { paramsTuple?: []; params?: {} }
     'items.items.store': { paramsTuple?: []; params?: {} }
     'items.items.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -88,17 +95,26 @@ export type ScannedRoutes = {
     'obras.obras.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudes.solicitudes.index': { paramsTuple?: []; params?: {} }
+    'solicitudes.solicitudes.store': { paramsTuple?: []; params?: {} }
+    'solicitudes.solicitudes.registrar_en_bodega': { paramsTuple?: []; params?: {} }
+    'solicitudes.solicitudes.solicitante': { paramsTuple: [ParamValue]; params: {'documento': ParamValue} }
+    'solicitudes.solicitudes.show': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
+    'entregas.entregas.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesEquipo.solicitud_equipo.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesEquipo.solicitud_equipo.devolver': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.index': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
+    'event_stream': { paramsTuple?: []; params?: {} }
     'account.profile.show': { paramsTuple?: []; params?: {} }
+    'account.notificaciones.index': { paramsTuple?: []; params?: {} }
     'modules.modules.index': { paramsTuple?: []; params?: {} }
     'modules.modules.tree': { paramsTuple?: []; params?: {} }
     'modules.modules.catalog': { paramsTuple?: []; params?: {} }
@@ -115,6 +131,7 @@ export type ScannedRoutes = {
     'elementos.elementos.index': { paramsTuple?: []; params?: {} }
     'elementos.elementos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.show_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'alertas.alertas.index': { paramsTuple?: []; params?: {} }
     'items.items.index': { paramsTuple?: []; params?: {} }
     'items.items.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.index': { paramsTuple?: []; params?: {} }
@@ -133,13 +150,19 @@ export type ScannedRoutes = {
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.index': { paramsTuple?: []; params?: {} }
     'obras.obras.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudes.solicitudes.index': { paramsTuple?: []; params?: {} }
+    'solicitudes.solicitudes.solicitante': { paramsTuple: [ParamValue]; params: {'documento': ParamValue} }
+    'solicitudes.solicitudes.show': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
+    'entregas.entregas.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.index': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
+    'event_stream': { paramsTuple?: []; params?: {} }
     'account.profile.show': { paramsTuple?: []; params?: {} }
+    'account.notificaciones.index': { paramsTuple?: []; params?: {} }
     'modules.modules.index': { paramsTuple?: []; params?: {} }
     'modules.modules.tree': { paramsTuple?: []; params?: {} }
     'modules.modules.catalog': { paramsTuple?: []; params?: {} }
@@ -156,6 +179,7 @@ export type ScannedRoutes = {
     'elementos.elementos.index': { paramsTuple?: []; params?: {} }
     'elementos.elementos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.show_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'alertas.alertas.index': { paramsTuple?: []; params?: {} }
     'items.items.index': { paramsTuple?: []; params?: {} }
     'items.items.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bodegas.bodega.index': { paramsTuple?: []; params?: {} }
@@ -174,12 +198,18 @@ export type ScannedRoutes = {
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.index': { paramsTuple?: []; params?: {} }
     'obras.obras.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudes.solicitudes.index': { paramsTuple?: []; params?: {} }
+    'solicitudes.solicitudes.solicitante': { paramsTuple: [ParamValue]; params: {'documento': ParamValue} }
+    'solicitudes.solicitudes.show': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
+    'entregas.entregas.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.index': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.index': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
     'auth.access_tokens.store': { paramsTuple?: []; params?: {} }
     'account.access_tokens.destroy': { paramsTuple?: []; params?: {} }
@@ -199,12 +229,16 @@ export type ScannedRoutes = {
     'codigosEstandar.codigos_estandar.store': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.store': { paramsTuple?: []; params?: {} }
     'obras.obras.store': { paramsTuple?: []; params?: {} }
+    'solicitudes.solicitudes.store': { paramsTuple?: []; params?: {} }
+    'solicitudes.solicitudes.registrar_en_bodega': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'account.profile.update': { paramsTuple?: []; params?: {} }
     'account.profile.change_password': { paramsTuple?: []; params?: {} }
+    'account.notificaciones.update_all': { paramsTuple?: []; params?: {} }
+    'account.notificaciones.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'roles.roles.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'categorias.categorias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -220,6 +254,7 @@ export type ScannedRoutes = {
     'unidadesMedida.unidades_medida.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesEquipo.solicitud_equipo.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'solicitudesEquipo.solicitud_equipo.devolver': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {

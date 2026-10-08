@@ -8,8 +8,9 @@ import PermissionSeeder from '#database/seeders/permission_seeder'
 export const INSTRUCTOR_PROFILE_NAME = 'Instructor'
 
 /**
- * Pide material y equipo para una obra, y devuelve el equipo con su novedad.
- * No entrega: eso lo hace Admin bodega.
+ * Pide material y equipo para una obra. No entrega ni registra devoluciones:
+ * eso lo hace Admin bodega cuando recibe el equipo. Tampoco ve las alertas de
+ * stock, que son de bodega.
  */
 export const INSTRUCTOR_PERMISSIONS = [
   'obra.ver',
@@ -19,7 +20,6 @@ export const INSTRUCTOR_PERMISSIONS = [
   'solicitud_material.crear',
   'solicitud_equipo.ver',
   'solicitud_equipo.crear',
-  'solicitud_equipo.devolver',
 ] as const
 
 const DEMO_USER = {
@@ -50,12 +50,11 @@ export default class extends BaseSeeder {
     if (!perfil) {
       perfil = await Perfil.create({
         nombre: INSTRUCTOR_PROFILE_NAME,
-        descripcion: 'Pide materiales y equipos para una obra del centro, y devuelve el equipo',
+        descripcion: 'Pide materiales y equipos para una obra del centro',
         estado: true,
       })
     } else {
-      perfil.descripcion =
-        'Pide materiales y equipos para una obra del centro, y devuelve el equipo'
+      perfil.descripcion = 'Pide materiales y equipos para una obra del centro'
       await perfil.save()
     }
 

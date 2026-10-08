@@ -26,25 +26,34 @@ Hay dos personas distintas. No armes la misma pantalla para las dos.
 - Mantiene los catálogos estándar. Son **una sola lista para todos los centros**. Si crea una fila, Valle y Cauca la ven. No se manda `idCformacion` y la respuesta ya no lo trae.
 - Usuarios, perfiles y permisos.
 
-**Encargado del centro** (`adminbodega@correo.com`, `isAdmin: false`). Trabaja su centro y las bodegas que le asignaron. Crea ítems, elementos y stands. Los catálogos estándar los usa en selects. Su perfil no trae `bodega.crear` ni `bodega.eliminar`, así que no crea bodegas ni sub-bodegas. La sub-bodega la crea el administrador, y solo dentro de una bodega de su propio centro: `GET` o `POST` sobre la bodega de otro centro responde 403. Crea las obras del centro y entrega las solicitudes pendientes. No pide materiales ni devuelve equipos.
+**Encargado del centro** (`adminbodega@correo.com`, `isAdmin: false`). Trabaja su centro y las bodegas que le asignaron. Crea ítems, elementos y stands. Los catálogos estándar los usa en selects. Su perfil no trae `bodega.crear` ni `bodega.eliminar`, así que no crea bodegas ni sub-bodegas. La sub-bodega la crea el administrador, y solo dentro de una bodega de su propio centro: `GET` o `POST` sobre la bodega de otro centro responde 403. Crea las obras del centro, entrega las solicitudes pendientes y recibe los equipos devueltos: registra en qué estado volvieron (`estadoElemento`). No pide materiales.
 
-**Instructor** (`instructor@correo.com`, `isAdmin: false`). Pide desde cualquier lado, sin estar en la bodega. Ve las obras y el kardex del centro (`cantidad` y `disponible`). Tres acciones: pedir material de consumo, pedir herramienta o equipo, y devolver el equipo con la novedad (`estadoElemento`). No entrega y no crea obras.
+**Instructor** (`instructor@correo.com`, `isAdmin: false`). Pide desde cualquier lado, sin estar en la bodega. Ve las obras y el **catálogo** de elementos (`nombre`, clasificación, unidad, foto). **No** ve `cantidad`, `disponible`, `cantidadMinima`, valor ni `stand`: no le toca el inventario ni lo que quedó en el estante. Ve solo **sus** solicitudes, **sus** entregas y **sus** notificaciones. Para devolver, lleva el equipo a bodega y allí registran la devolución; le llega el aviso `devolucion_equipo`. No entrega, no crea obras y no ve alertas de stock.
 
 ### Pantallas
 
-Administrador (`isAdmin: true`). Aunque `permissions` traiga el catálogo completo, estas son sus pantallas:
+Administrador (`isAdmin: true`). `permissions` **no** trae `solicitud_material.*`, `solicitud_equipo.*` ni `alerta.ver`. No hay menú de solicitudes, entregas, mostrador ni alertas. Sus pantallas:
 
 1. Usuarios, perfiles y permisos. El select de bodegas sale de `GET /users/options` (`bodegas[].id`, `name`, `trainingCenterId`), junto con `centers` y `roles`.
 2. Alta de bodega: `POST /bodegas` con `{ "nombre", "idCformacion", "estado?" }`. Después se asigna con `PUT /users/:id/bodegas`.
 3. Una pantalla de catálogos estándar, la misma lista para todos los centros. Botones de crear, editar y deshabilitar en categorías, subcategorías, clasificaciones, unidades, usos presupuestales y códigos UNSPSC.
 
-El administrador no tiene pantalla para abrir ítems, elementos, stands ni el árbol de bodegas de otro centro.
+El administrador no tiene pantalla para abrir ítems, elementos, stands ni el árbol de bodegas de otro centro. Tampoco lista lo que pidieron en un centro: eso es de Admin bodega.
 
-Encargado (`isAdmin: false`). El botón se muestra solo si el código está en `permissions`:
+Encargado / Admin bodega (`isAdmin: false`). El botón se muestra solo si el código está en `permissions`:
 
 1. Selects de los seis catálogos, solo lectura (`categoria.ver`, `subcategoria.ver`, `clasificacion_elemento.ver`, `unidad_medida.ver`, `uso_presupuestal.ver`, y el listado de UNSPSC con `elemento.ver`).
-2. Ítems y elementos de su centro.
+2. Ítems y elementos de su centro (sí ve existencias).
 3. Stands dentro de una sub-bodega de su bodega (`stand.crear`).
+4. Solicitudes pendientes de **sus** stands: entregar y devolver.
+5. **Mostrador**: registrar la solicitud del instructor que llega sin usar la app (ver más abajo).
+6. Alertas de stock (`alerta.ver`).
+
+Instructor (`isAdmin: false`). Menú mínimo:
+
+1. Pedir (consumo o devolutivo) con `GET /inventario/elementos` **sin** existencias.
+2. Mis solicitudes (`GET /solicitudes`) y el detalle de las suyas.
+3. Campana: solo avisos de entrega, devolución o registro a su nombre. No hay pantalla de inventario ni de alertas.
 
 Los conteos de la red (cuántos centros hay, cuáles tienen inventario) todavía no existen en el API. Esa pantalla queda para después.
 
@@ -94,7 +103,7 @@ El stand se crea sobre esa sub-bodega: `POST /bodegas/sub-bodegas/:id/stands` co
 `POST /auth/login` y `GET /account/profile` devuelven:
 
 - `permissions`: códigos `recurso.accion`, por ejemplo `item.crear`, `bodega.eliminar`.
-- `isAdmin`: el Administrador trae todos los códigos de permiso. Aun así no se le muestran el stock ni las fichas de otros centros. Los catálogos estándar sí son globales y los mantiene él.
+- `isAdmin`: el Administrador trae los códigos de la plataforma, **sin** solicitudes ni alertas. Aun así no se le muestran el stock ni las fichas de otros centros. Los catálogos estándar sí son globales y los mantiene él.
 - `bodegas` y `bodegaIds`: bodegas asignadas a esa persona.
 
 Si el código no está en `permissions`, el botón no se muestra. Un 403 igual puede llegar si el perfil no tiene el módulo Inventario o la bodega no es suya.
@@ -113,6 +122,10 @@ Códigos que usa esta API:
 | `uso_presupuestal` | `ver` `crear` `editar` `eliminar` |
 | `unidad_medida` | `ver` `crear` `editar` `eliminar` |
 | `codigo_estandar` | `crear` `editar` `eliminar` |
+| `alerta` | `ver` |
+| `solicitud_material` | `ver` `crear` `entregar` |
+| `solicitud_equipo` | `ver` `crear` `entregar` `devolver` |
+| `obra` | `ver` `crear` `editar` `eliminar` |
 
 `GET /permissions` (solo admin) devuelve el árbol para los checkboxes: `data.modules[]` → `resources[]` → `permissions[]` con `code`, `action`, `actionLabel`, `name`.
 
@@ -285,6 +298,8 @@ Reglas:
 
 La respuesta incluye `item` (con `subcategoria` y `categoria`), `subcategoria` (con `categoria`), `stand.subBodega.bodega`, `unidadMedida`, `clasificacion`, `codigoEstandar`, `usoPresupuestal` y `cantidadMinima`.
 
+El instructor usa el mismo `GET` para armar el pedido. En su respuesta **no** salen `cantidad`, `disponible`, `cantidadMinima`, valores ni `stand` (`stand` llega `null`). El select es por nombre y clasificación (`consumo` / `devolutivo`), no un kardex.
+
 ```json
 {
   "idItem": 12,
@@ -394,6 +409,222 @@ Unidades de medida:
 ```
 
 `DELETE` deshabilita. Objeto: `{ id, nombre, abreviatura, estado }`.
+
+## Solicitudes y mostrador
+
+Tres roles, tres menús. No reutilices la misma pantalla.
+
+| Quién | Qué ve |
+| --- | --- |
+| Administrador (`isAdmin`) | Nada de esto. `GET /solicitudes`, `/solicitudes/bodega`, `/entregas` y `/inventario/alertas` responden **403**. |
+| Admin bodega (`solicitud_*.entregar`) | Cola de su bodega, entregar, devolver, historial de salidas y **mostrador**. |
+| Instructor (`solicitud_*.crear`, sin `entregar`) | Solo las suyas. Catálogo para pedir, sin existencias. Campana solo de lo suyo. |
+
+### Pedido del instructor (app)
+
+`POST /solicitudes` con `tipo: "consumo"` o `"devolutivo"`. Detalle en [guia-endpoints.md](./guia-endpoints.md). Lista: `GET /solicitudes`. En el detalle del instructor `elemento` no trae `cantidad` de bodega; sí trae lo pedido, lo entregado y lo pendiente **de su solicitud**.
+
+### Mostrador (Admin bodega)
+
+Cuando el instructor se acerca a la bodega y no entra al aplicativo. **Esta pantalla es de Admin bodega**, no del administrador de la plataforma y no del instructor.
+
+Mostrarla si `permissions` tiene `solicitud_material.entregar` o `solicitud_equipo.entregar`.
+
+Flujo:
+
+1. Campo **número de documento**. Al confirmar: `GET /solicitudes/solicitantes/:documento`.
+2. 404 → no hay nadie con ese documento en el centro. No busques en otro centro.
+3. Con la ficha: nombre, `activo`, `puedeConsumo`, `puedeDevolutivo`. Si `activo` es false, no dejes seguir. Ofrece consumo y/o devolutivo según esos flags.
+4. El resto del formulario es el mismo de `POST /solicitudes`: `codigoSolicitud`, `idObra`, `tipo`, `ficha?`, `observacion?`, `elementos[]` (`idElemento`, `cantidad`). Los elementos sí los elige bodega con kardex (`cantidad` / `disponible`).
+5. Enviar a `POST /solicitudes/bodega` con el mismo body **más** `numeroDocumento`.
+6. 201: `registradaEnBodega: true`, `registradaPor` es quien está en mostrador, `usuario` es el instructor. Cada fila ya trae lo que salió y lo que quedó pendiente de **esa** solicitud.
+7. El instructor ve esa factura en su app y recibe un aviso. No tiene que haber iniciado sesión en el mostrador.
+
+Errores: 422 `E_SOLICITANTE_INVALIDO` (documento propio o sin permiso para ese tipo), `E_USUARIO_INACTIVO`, 403 si el elemento no es de un stand de **tus** bodegas.
+
+Cuentas de prueba: documento instructor `1001001005`, bodega `adminbodega@correo.com`.
+
+## Notificaciones y alertas
+
+Dos cosas distintas que se ven juntas:
+
+- **Notificación**: un aviso para una persona. Va a la campana. Es suyo y lo marca como leído.
+- **Alerta**: el estado de un elemento que llegó a su mínimo o se agotó. Es del inventario, no de una persona. Va en la pantalla Inventario → Alertas.
+
+Cada notificación queda guardada en el backend y además llega en vivo. Si la persona no estaba conectada, la ve al volver a entrar con el `GET`. El canal en vivo solo avisa que llegó algo nuevo, no reemplaza la lista.
+
+### Cuándo llega una notificación
+
+| Pasa esto | `tipo` | Le llega a |
+| --- | --- | --- |
+| El instructor pide material | `solicitud_material` | Admin bodega de esa bodega |
+| El instructor pide equipo | `solicitud_equipo` | Admin bodega de esa bodega |
+| Admin bodega entrega el material | `entrega_material` | el instructor que lo pidió |
+| Admin bodega entrega el equipo | `entrega_equipo` | el instructor que lo pidió |
+| Admin bodega recibe el equipo devuelto | `devolucion_equipo` | el instructor que lo pidió |
+| La cantidad de un elemento llega a `cantidadMinima` | `por_agotarse` | Admin bodega de esa bodega |
+| La cantidad llega a 0 | `agotado` | Admin bodega de esa bodega |
+
+El aviso de stock sale una sola vez cuando el elemento entra en alerta, y otra vez si pasa de `por_agotarse` a `agotado`. No se repite en cada entrega. Nadie recibe aviso de lo que hizo él mismo.
+
+El instructor solo recibe avisos de sus propias solicitudes: entrega y devolución. Lo que pasa en bodega (pedidos de otros, stock que se acaba) no le llega.
+
+El administrador de la red no recibe ninguno de estos avisos: son del inventario de cada centro.
+
+El front no crea notificaciones. Las crea el backend cuando pasa la acción.
+
+### Objeto notificación
+
+```json
+{
+  "id": 41,
+  "tipo": "entrega_material",
+  "titulo": "Material entregado",
+  "mensaje": "Te entregaron 3 de Cemento gris.",
+  "leida": false,
+  "recurso": "solicitud_material",
+  "idReferencia": 18,
+  "fecha": "2026-10-06T12:20:11.000-05:00"
+}
+```
+
+`titulo` y `mensaje` ya vienen redactados: se muestran tal cual. `recurso` e `idReferencia` dicen a dónde lleva el clic:
+
+| `recurso` | Al hacer clic |
+| --- | --- |
+| `solicitud_material` | detalle de la solicitud `idReferencia` (`GET /solicitudes-material/:id`) |
+| `solicitud_equipo` | detalle de la solicitud `idReferencia` (`GET /solicitudes-equipo/:id`) |
+| `alerta` | pantalla Inventario → Alertas |
+
+Para el ícono o el color, usa `tipo`. Sugerencia: `agotado` rojo, `por_agotarse` ámbar, `entrega_*` verde, el resto neutro.
+
+### `GET /account/notifications`
+
+Bandeja de quien tiene la sesión. No pide permiso, solo el token. Paginada, la más nueva primero.
+
+| Query | Qué hace |
+| --- | --- |
+| `page` | página, desde 1 |
+| `perPage` | por defecto 20, máximo 100 |
+| `leida` | `false` trae solo las no leídas, `true` solo las leídas. Sin el parámetro trae todas |
+
+```json
+{
+  "data": [ { "id": 41, "tipo": "entrega_material", "...": "..." } ],
+  "meta": { "total": 7, "perPage": 20, "currentPage": 1, "lastPage": 1 }
+}
+```
+
+El número rojo de la campana sale de `GET /account/notifications?leida=false&perPage=1` → `meta.total`.
+
+### `PATCH /account/notifications/:id`
+
+```json
+{ "leida": true }
+```
+
+Marca una. Devuelve la notificación actualizada. `{ "leida": false }` la vuelve a dejar sin leer. Si el id no es tuyo responde 404.
+
+### `PATCH /account/notifications`
+
+```json
+{ "leida": true }
+```
+
+Marca todas las tuyas. Responde `{ "data": { "total": 5 } }`, que es cuántas cambiaron.
+
+### `GET /inventario/alertas`
+
+Permiso `alerta.ver`, que solo tiene Admin bodega. Trae las alertas activas de sus bodegas. Paginada igual que la bandeja. `?estado=false` trae las ya cerradas. El instructor y el administrador de la red reciben 403.
+
+```json
+{
+  "id": 9,
+  "idElemento": 31,
+  "tipo": "por_agotarse",
+  "cantidad": 9,
+  "cantidadMinima": 10,
+  "estado": true,
+  "fecha": "2026-10-06T12:20:11.000-05:00",
+  "elemento": { "id": 31, "nombre": "Cemento gris", "codigo": "CEM-01" }
+}
+```
+
+Hay una sola alerta activa por elemento. Se cierra sola cuando la cantidad vuelve a pasar el mínimo, por ejemplo con un `PATCH /inventario/elementos/:id` que sube `cantidad` o baja `cantidadMinima`. No hay botón para cerrarla a mano.
+
+### En vivo
+
+Instala el cliente:
+
+```sh
+npm i @adonisjs/transmit-client
+```
+
+Conéctate después del login, con el `id` que trae `data` del login o de `GET /account/profile`:
+
+```ts
+import { Transmit } from '@adonisjs/transmit-client'
+
+export type Notificacion = {
+  id: number
+  tipo:
+    | 'por_agotarse'
+    | 'agotado'
+    | 'solicitud_material'
+    | 'solicitud_equipo'
+    | 'entrega_material'
+    | 'entrega_equipo'
+    | 'devolucion_equipo'
+  titulo: string
+  mensaje: string
+  leida: boolean
+  recurso: 'alerta' | 'solicitud_material' | 'solicitud_equipo' | null
+  idReferencia: number | null
+  fecha: string
+}
+
+export function conectarNotificaciones(token: string, idUsuario: number, alLlegar: (aviso: Notificacion) => void) {
+  const transmit = new Transmit({
+    baseUrl: import.meta.env.VITE_API_URL, // http://localhost:3333, sin /api/v1
+    beforeSubscribe: (request: Request) => {
+      request.headers.set('Authorization', `Bearer ${token}`)
+    },
+    beforeUnsubscribe: (request: Request) => {
+      request.headers.set('Authorization', `Bearer ${token}`)
+    },
+  })
+
+  const canal = transmit.subscription(`notificaciones/${idUsuario}`)
+  canal.onMessage<Notificacion>(alLlegar)
+  canal.create()
+
+  return () => canal.delete()
+}
+```
+
+El mensaje que llega tiene la misma forma que un elemento de `GET /account/notifications`. Con eso:
+
+1. Ponlo arriba de la lista de la campana y suma 1 al contador.
+2. Muestra un toast con `titulo` y `mensaje`.
+3. Si es `por_agotarse` o `agotado` y la pantalla de Alertas está abierta, vuelve a pedir `GET /inventario/alertas`.
+4. Si es de una solicitud y la pantalla de solicitudes está abierta, vuelve a pedir la lista.
+
+Reglas:
+
+- Solo te puedes suscribir a tu propio canal. El de otro usuario responde 400 y sin token responde 401.
+- Al cerrar sesión llama la función que devuelve `conectarNotificaciones`. Si entra otra persona en la misma pestaña, conéctate de nuevo con su token y su id.
+- Si se cae la conexión, el cliente reconecta solo. Al reconectar, vuelve a pedir el `GET` para no perder lo que llegó mientras tanto.
+- En producción el dominio del front tiene que estar permitido en CORS del backend. En desarrollo ya funciona.
+
+### Orden para armar la campana
+
+1. Login. Guardar `token` y `id`.
+2. `GET /account/notifications?leida=false&perPage=1` para el contador.
+3. `conectarNotificaciones(token, id, ...)`.
+4. Al abrir la campana, `GET /account/notifications` (primera página).
+5. Clic en un aviso: `PATCH /account/notifications/:id` con `{ "leida": true }` y navegar según `recurso`.
+6. Botón "Marcar todas como leídas": `PATCH /account/notifications` con `{ "leida": true }`.
+7. Logout: cerrar el canal y después `POST /account/logout`.
 
 ## Orden de una pantalla de alta
 

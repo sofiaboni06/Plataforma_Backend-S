@@ -263,7 +263,7 @@ El `POST /api/v1/auth/login` ya existe. Las pantallas `/login` y `/recuperar` se
 
 ### Notificaciones (pestaña de Mi perfil)
 
-No hay tabla. Hasta que el grupo acuerde el esquema, no hay API. Cuando exista: modelo → validador → `GET/PATCH /api/v1/account/notifications`.
+Ya existe. La tabla es `notificacion` y la API es `GET/PATCH /api/v1/account/notifications`. El aviso en vivo llega por Transmit, en el canal `notificaciones/:idUsuario`. Qué evento le avisa a quién está en [guia-endpoints.md](./guia-endpoints.md#alertas-y-notificaciones). Para un aviso nuevo, agreguen el tipo en la migración y en el modelo, y escríbanlo desde `NotificacionService` dentro de la misma transacción de la acción.
 
 ### Usuarios (alta de gente, no “Mi perfil”)
 

@@ -1,0 +1,13 @@
+---
+description: Antes de implementar, nombrar las skills que encajan con la tarea
+alwaysApply: true
+---
+
+# Skills al empezar una tarea
+
+Cuando el usuario pida crear, cambiar, diseñar, corregir o revisar algo, antes de editar archivos dile en una frase corta qué skills vas a seguir y por qué.
+
+- Nombra solo las skills cuya descripción coincide con el pedido. No recites el catálogo completo.
+- Una skill de estilo (`apple-design`, `minimalist-ui`, `industrial-brutalist-ui`, `gpt-taste`) entra solo si el pedido pide ese acabado.
+- En este backend, trabajo de API, modelos, validadores o tests sigue `adonisjs-lucid-expert` y `backend-clean-architecture`.
+- Después de nombrarlas, haz el trabajo.

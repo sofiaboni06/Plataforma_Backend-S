@@ -2,6 +2,9 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
+  eventStream: typeof routes['event_stream']
+  subscribe: typeof routes['subscribe']
+  unsubscribe: typeof routes['unsubscribe']
   auth: {
     newAccount: {
       store: typeof routes['auth.new_account.store']
@@ -15,6 +18,11 @@ export interface ApiDefinition {
       show: typeof routes['account.profile.show']
       update: typeof routes['account.profile.update']
       changePassword: typeof routes['account.profile.change_password']
+    }
+    notificaciones: {
+      index: typeof routes['account.notificaciones.index']
+      updateAll: typeof routes['account.notificaciones.update_all']
+      update: typeof routes['account.notificaciones.update']
     }
     accessTokens: {
       destroy: typeof routes['account.access_tokens.destroy']
@@ -79,6 +87,11 @@ export interface ApiDefinition {
       storeFoto: typeof routes['elementos.elementos.store_foto']
       destroyFoto: typeof routes['elementos.elementos.destroy_foto']
       update: typeof routes['elementos.elementos.update']
+    }
+  }
+  alertas: {
+    alertas: {
+      index: typeof routes['alertas.alertas.index']
     }
   }
   items: {
@@ -156,12 +169,29 @@ export interface ApiDefinition {
       show: typeof routes['obras.obras.show']
       update: typeof routes['obras.obras.update']
       destroy: typeof routes['obras.obras.destroy']
+    }
+  }
+  solicitudes: {
+    solicitudes: {
+      index: typeof routes['solicitudes.solicitudes.index']
+      store: typeof routes['solicitudes.solicitudes.store']
+      registrarEnBodega: typeof routes['solicitudes.solicitudes.registrar_en_bodega']
+      solicitante: typeof routes['solicitudes.solicitudes.solicitante']
+      show: typeof routes['solicitudes.solicitudes.show']
+    }
+  }
+  entregas: {
+    entregas: {
+      index: typeof routes['entregas.entregas.index']
+    }
+  }
   solicitudesEquipo: {
     solicitudEquipo: {
       index: typeof routes['solicitudesEquipo.solicitud_equipo.index']
       store: typeof routes['solicitudesEquipo.solicitud_equipo.store']
       show: typeof routes['solicitudesEquipo.solicitud_equipo.show']
       entregar: typeof routes['solicitudesEquipo.solicitud_equipo.entregar']
+      devolver: typeof routes['solicitudesEquipo.solicitud_equipo.devolver']
     }
   }
   solicitudesMaterial: {

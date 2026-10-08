@@ -2,7 +2,7 @@ import { Exception } from '@adonisjs/core/exceptions'
 import ElementoService from '#services/elemento_service'
 import FotoElementoService from '#services/foto_elemento_service'
 import ElementoTransformer from '#transformers/elemento_transformer'
-import { resolveScope } from '#services/access_control'
+import { onlyRequests, resolveScope } from '#services/access_control'
 import {
   createElementoValidator,
   fotoElementoValidator,
@@ -14,7 +14,7 @@ export default class ElementosController {
   async index({ auth, serialize }: HttpContext) {
     const scope = await resolveScope(auth.getUserOrFail())
     const elementos = await new ElementoService().list(scope)
-    return serialize(ElementoTransformer.transform(elementos))
+    return serialize(ElementoTransformer.transform(elementos, !onlyRequests(scope)))
   }
 
   async store({ request, auth, serialize }: HttpContext) {
@@ -27,7 +27,7 @@ export default class ElementosController {
   async show({ params, auth, serialize }: HttpContext) {
     const scope = await resolveScope(auth.getUserOrFail())
     const elemento = await new ElementoService().findById(scope, Number(params.id))
-    return serialize(ElementoTransformer.transform(elemento))
+    return serialize(ElementoTransformer.transform(elemento, !onlyRequests(scope)))
   }
 
   async update({ params, request, auth, serialize }: HttpContext) {

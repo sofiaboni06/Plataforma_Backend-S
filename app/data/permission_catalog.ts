@@ -85,11 +85,31 @@ export const PERMISSION_RESOURCES = {
     label: 'Solicitudes de equipo',
     actions: ['ver', 'crear', 'entregar', 'devolver'],
   },
+  alerta: {
+    module: 'Inventario',
+    label: 'Alertas',
+    actions: ['ver'],
+  },
 } as const
 
 type PermissionResources = typeof PERMISSION_RESOURCES
 
 export type PermissionResource = keyof PermissionResources
+
+/**
+ * Pedir, entregar, devolver y las alertas de stock son del centro: las ve
+ * quien pide o quien atiende la bodega. El administrador de la plataforma no
+ * las recibe aunque se salte el resto de permisos.
+ */
+export const CENTER_ONLY_RESOURCES: ReadonlySet<PermissionResource> = new Set([
+  'solicitud_material',
+  'solicitud_equipo',
+  'alerta',
+])
+
+export function isCenterOnlyCode(code: string) {
+  return CENTER_ONLY_RESOURCES.has(code.split('.')[0] as PermissionResource)
+}
 
 export type PermissionCode = {
   [R in PermissionResource]: `${R}.${PermissionResources[R]['actions'][number]}`

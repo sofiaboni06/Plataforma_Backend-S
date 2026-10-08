@@ -12,6 +12,11 @@ import {
   type AccessScope,
 } from '#services/access_control'
 import DisponibilidadService from '#services/disponibilidad_service'
+import EntregaService, {
+  type LineaDevolucion,
+  type OpcionesEntrega,
+} from '#services/entrega_service'
+import NotificacionService from '#services/notificacion_service'
 
 type CrearSolicitudEquipo = {
   codigoSolicitud: string
@@ -22,7 +27,18 @@ type CrearSolicitudEquipo = {
   observacion?: string
 }
 
-const ESTADOS = ['pendiente', 'entregado', 'devuelto'] as const
+/**
+ * `detalle` reparte lo que vuelve por estado (5 bueno, 2 dañado). Sin
+ * detalle, vuelve `cantidad` (o todo lo que está afuera) con un solo estado.
+ */
+export type DevolverEquipo = {
+  detalle?: LineaDevolucion[]
+  estadoElemento?: EstadoElementoEquipo
+  cantidad?: number
+  observacion?: string
+}
+
+const ESTADOS = ['pendiente', 'parcial', 'entregado', 'devuelto'] as const
 
 function fail(message: string, status: number, code: string): never {
   throw new Exception(message, { status, code })
@@ -42,14 +58,18 @@ function estadoFiltro(value: unknown) {
 
 export default class SolicitudEquipoService {
   private disponibilidad = new DisponibilidadService()
+  private entregas = new EntregaService()
+  private notificaciones = new NotificacionService()
 
   /**
-   * The request stays pending. Stock leaves the shelf when admin bodega delivers
-   * and comes back only if the instructor returns the tool in good condition.
+   * The request stays pending. It may ask for more than the shelf holds: admin
+   * bodega delivers what there is and the rest stays pending. Stock comes back
+   * only for tools received in good condition.
    */
   async create(scope: AccessScope, payload: CrearSolicitudEquipo) {
     const trx = await db.transaction()
     let solicitudId = 0
+    let avisos: Awaited<ReturnType<NotificacionService['pedidoEquipo']>> = []
 
     try {
       const elemento = await Elemento.query({ client: trx })
@@ -79,17 +99,16 @@ export default class SolicitudEquipoService {
       const obra = await Obra.query({ client: trx }).where('id_obra', payload.idObra).first()
       this.assertObra(scope, obra, true)
 
-      const comprometido =
-        (await this.disponibilidad.comprometido([elemento.id], trx)).get(elemento.id) ?? 0
-      this.disponibilidad.assertCantidad(Number(elemento.cantidad), comprometido, payload.cantidad)
-
       const solicitud = await SolicitudEquipo.create(
         {
           codigoSolicitud: payload.codigoSolicitud,
           idObra: payload.idObra,
           idElemento: payload.idElemento,
           idUsuario: scope.idUsuario,
+          idUsuarioRegistra: null,
           cantidad: payload.cantidad,
+          cantidadEntregada: 0,
+          cantidadDevuelta: 0,
           ficha: payload.ficha ?? null,
           estado: 'pendiente',
           estadoElemento: null,
@@ -103,23 +122,27 @@ export default class SolicitudEquipoService {
       )
 
       solicitudId = solicitud.id
+      avisos = await this.notificaciones.pedidoEquipo(trx, {
+        idSolicitud: solicitud.id,
+        idElemento: elemento.id,
+        idSolicitante: scope.idUsuario,
+        cantidad: payload.cantidad,
+        elemento: elemento.nombre,
+        obra: obra.nombre,
+      })
       await trx.commit()
     } catch (error) {
       await trx.rollback()
       throw error
     }
 
+    this.notificaciones.emitir(avisos)
     return this.show(scope, solicitudId)
   }
 
   async index(scope: AccessScope, estado?: unknown) {
     const filtro = estadoFiltro(estado)
-    const query = this.visibles(scope)
-      .preload('elemento')
-      .preload('obra')
-      .preload('usuario')
-      .preload('usuarioEntrega')
-      .orderBy('fecha', 'desc')
+    const query = this.conRelaciones(this.visibles(scope)).orderBy('fecha', 'desc')
 
     if (filtro) {
       query.where('estado', filtro)
@@ -129,12 +152,8 @@ export default class SolicitudEquipoService {
   }
 
   async show(scope: AccessScope, id: number) {
-    const solicitud = await this.visibles(scope)
+    const solicitud = await this.conRelaciones(this.visibles(scope))
       .where('id_solicitud_equipo', id)
-      .preload('elemento')
-      .preload('obra')
-      .preload('usuario')
-      .preload('usuarioEntrega')
       .first()
 
     if (!solicitud) {
@@ -144,8 +163,17 @@ export default class SolicitudEquipoService {
     return solicitud
   }
 
-  async entregar(scope: AccessScope, id: number) {
+  /**
+   * Sale lo que haya en el estante hasta completar lo pedido. Si no alcanza,
+   * la fila queda `parcial` y se puede volver a entregar cuando llegue más.
+   */
+  async entregar(
+    scope: AccessScope,
+    id: number,
+    opciones: Omit<OpcionesEntrega, 'exigirExistencia'> = {}
+  ) {
     const trx = await db.transaction()
+    let avisos: Awaited<ReturnType<NotificacionService['entregaEquipo']>> = []
 
     try {
       const solicitud = await SolicitudEquipo.query({ client: trx })
@@ -157,8 +185,8 @@ export default class SolicitudEquipoService {
         fail('La solicitud indicada no existe', 404, 'E_NOT_FOUND')
       }
 
-      if (solicitud.estado !== 'pendiente') {
-        fail('Solo se puede entregar una solicitud que esté pendiente', 422, 'E_ESTADO_INVALIDO')
+      if (solicitud.estado !== 'pendiente' && solicitud.estado !== 'parcial') {
+        fail('Esa solicitud ya se entregó completa', 422, 'E_ESTADO_INVALIDO')
       }
 
       const obra = await Obra.query({ client: trx }).where('id_obra', solicitud.idObra).first()
@@ -175,21 +203,25 @@ export default class SolicitudEquipoService {
         fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
       }
 
-      if (Number(elemento.cantidad) < solicitud.cantidad) {
-        fail(
-          'No hay suficiente cantidad disponible para entregar la solicitud',
-          422,
-          'E_STOCK_INSUFICIENTE'
-        )
-      }
+      const resultado = await this.entregas.entregar(
+        trx,
+        scope,
+        { tipo: 'equipo', row: solicitud },
+        elemento,
+        { ...opciones, exigirExistencia: true }
+      )
 
-      elemento.cantidad = Number(elemento.cantidad) - solicitud.cantidad
-      await elemento.useTransaction(trx).save()
-
-      solicitud.estado = 'entregado'
-      solicitud.idUsuarioEntrega = scope.idUsuario
-      solicitud.fechaEntrega = DateTime.now()
-      await solicitud.useTransaction(trx).save()
+      avisos = [
+        ...(await this.notificaciones.entregaEquipo(trx, {
+          idSolicitud: solicitud.id,
+          idDestinatario: solicitud.idUsuario,
+          idQuienEntrega: scope.idUsuario,
+          cantidad: resultado.entregada,
+          pendiente: resultado.pendiente,
+          elemento: elemento.nombre,
+        })),
+        ...(await this.notificaciones.aplicarStock(elemento, true, trx)),
+      ]
 
       await trx.commit()
     } catch (error) {
@@ -197,16 +229,17 @@ export default class SolicitudEquipoService {
       throw error
     }
 
+    this.notificaciones.emitir(avisos)
     return this.show(scope, id)
   }
 
-  async devolver(
-    scope: AccessScope,
-    id: number,
-    estadoElemento: EstadoElementoEquipo,
-    observacion?: string
-  ) {
+  /**
+   * Se puede devolver por partes y mientras la fila siga `parcial`: lo que
+   * cuenta es lo que está afuera (entregado menos devuelto).
+   */
+  async devolver(scope: AccessScope, id: number, input: DevolverEquipo) {
     const trx = await db.transaction()
+    let avisos: Awaited<ReturnType<NotificacionService['devolucionEquipo']>> = []
 
     try {
       const solicitud = await SolicitudEquipo.query({ client: trx })
@@ -218,16 +251,10 @@ export default class SolicitudEquipoService {
         fail('La solicitud indicada no existe', 404, 'E_NOT_FOUND')
       }
 
-      if (solicitud.estado !== 'entregado') {
-        fail('Solo se puede devolver una solicitud que esté entregada', 422, 'E_ESTADO_INVALIDO')
-      }
-
       const obra = await Obra.query({ client: trx }).where('id_obra', solicitud.idObra).first()
       this.assertObra(scope, obra, false)
-
-      if (!scope.isAdmin && solicitud.idUsuario !== scope.idUsuario) {
-        fail('Solo quien pidió el equipo puede registrarle la novedad', 403, 'E_FORBIDDEN')
-      }
+      const idStand = await this.assertElementoDelCentro(scope, solicitud.idElemento, trx)
+      await assertStandInScope(scope, idStand)
 
       const elemento = await Elemento.query({ client: trx })
         .where('id_elemento', solicitud.idElemento)
@@ -238,17 +265,20 @@ export default class SolicitudEquipoService {
         fail('El elemento indicado no existe', 404, 'E_NOT_FOUND')
       }
 
-      solicitud.estado = 'devuelto'
-      solicitud.estadoElemento = estadoElemento
-      solicitud.fechaDevolucion = DateTime.now()
-      solicitud.observacion = observacion?.trim() || null
+      const lineas = this.lineasDevolucion(solicitud, input)
+      const resultado = await this.entregas.devolver(trx, scope, solicitud, elemento, lineas)
 
-      if (estadoElemento === 'bueno') {
-        elemento.cantidad = Number(elemento.cantidad) + solicitud.cantidad
-        await elemento.useTransaction(trx).save()
-      }
-
-      await solicitud.useTransaction(trx).save()
+      avisos = [
+        ...(await this.notificaciones.devolucionEquipo(trx, {
+          idSolicitud: solicitud.id,
+          idDestinatario: solicitud.idUsuario,
+          idQuienRecibe: scope.idUsuario,
+          elemento: elemento.nombre,
+          lineas,
+          afuera: resultado.afuera,
+        })),
+        ...(await this.notificaciones.aplicarStock(elemento, true, trx)),
+      ]
 
       await trx.commit()
     } catch (error) {
@@ -256,17 +286,14 @@ export default class SolicitudEquipoService {
       throw error
     }
 
+    this.notificaciones.emitir(avisos)
     return this.show(scope, id)
   }
 
-  private visibles(scope: AccessScope) {
+  visibles(scope: AccessScope) {
     const query = SolicitudEquipo.query().whereHas('obra', (obra) => {
       obra.where('id_cformacion', scope.idCformacion)
     })
-
-    if (scope.isAdmin) {
-      return query
-    }
 
     if (can(scope, 'solicitud_equipo.entregar') && !can(scope, 'solicitud_equipo.crear')) {
       return query.whereIn(
@@ -276,6 +303,40 @@ export default class SolicitudEquipoService {
     }
 
     return query.where('id_usuario', scope.idUsuario)
+  }
+
+  conRelaciones(query: ReturnType<SolicitudEquipoService['visibles']>) {
+    return query
+      .preload('elemento')
+      .preload('obra')
+      .preload('usuario')
+      .preload('usuarioRegistra')
+      .preload('usuarioEntrega')
+      .preload('entregas', (entregas) => entregas.preload('usuario').orderBy('fecha', 'asc'))
+      .preload('devoluciones', (devoluciones) =>
+        devoluciones.preload('usuario').orderBy('fecha', 'asc')
+      )
+  }
+
+  private lineasDevolucion(solicitud: SolicitudEquipo, input: DevolverEquipo): LineaDevolucion[] {
+    if (input.detalle?.length) {
+      return input.detalle.map((linea) => ({
+        ...linea,
+        observacion: linea.observacion ?? input.observacion,
+      }))
+    }
+
+    if (!input.estadoElemento) {
+      fail('Indica el estado del equipo que se devuelve', 422, 'E_VALIDATION_ERROR')
+    }
+
+    return [
+      {
+        estadoElemento: input.estadoElemento,
+        cantidad: input.cantidad ?? solicitud.cantidadEntregada - solicitud.cantidadDevuelta,
+        observacion: input.observacion,
+      },
+    ]
   }
 
   private assertObra(
