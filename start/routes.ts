@@ -8,6 +8,7 @@ import NotificacionesController from '#controllers/notificaciones_controller'
 import SolicitudEquipoController from '#controllers/solicitud_equipo_controller'
 import SolicitudMaterialController from '#controllers/solicitud_material_controller'
 import SolicitudesController from '#controllers/solicitudes_controller'
+import PasswordRecoveryController from '#controllers/password_recovery_controller'
 import transmit from '@adonisjs/transmit/services/main'
 
 router.get('/', () => {
@@ -29,9 +30,24 @@ router
       .group(() => {
         router.post('signup', [controllers.NewAccount, 'store'])
         router.post('login', [controllers.AccessTokens, 'store'])
+        router.post('recover', [PasswordRecoveryController, 'request'])
+        router.post('recover/verify', [PasswordRecoveryController, 'verify'])
+        router.post('recover/google', [PasswordRecoveryController, 'verifyGoogle'])
+        router.post('recover/reset', [PasswordRecoveryController, 'reset'])
       })
       .prefix('auth')
       .as('auth')
+
+    router
+      .group(() => {
+        router.post('2fa/google/setup', [PasswordRecoveryController, 'setupGoogle'])
+        router.post('2fa/google/confirm', [PasswordRecoveryController, 'confirmGoogle'])
+        router.delete('2fa/google', [PasswordRecoveryController, 'disableGoogle'])
+      })
+      .prefix('auth')
+      .as('authTwoFactor')
+      .use(middleware.auth())
+      .use(middleware.account())
 
     router
       .group(() => {

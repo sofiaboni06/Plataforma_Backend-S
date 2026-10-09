@@ -36,6 +36,48 @@ const routes = {
     tokens: [{"old":"/api/v1/auth/login","type":0,"val":"api","end":""},{"old":"/api/v1/auth/login","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/login","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/login","type":0,"val":"login","end":""}],
     types: placeholder as Registry['auth.access_tokens.store']['types'],
   },
+  'auth.password_recovery.request': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/recover',
+    tokens: [{"old":"/api/v1/auth/recover","type":0,"val":"api","end":""},{"old":"/api/v1/auth/recover","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/recover","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/recover","type":0,"val":"recover","end":""}],
+    types: placeholder as Registry['auth.password_recovery.request']['types'],
+  },
+  'auth.password_recovery.verify': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/recover/verify',
+    tokens: [{"old":"/api/v1/auth/recover/verify","type":0,"val":"api","end":""},{"old":"/api/v1/auth/recover/verify","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/recover/verify","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/recover/verify","type":0,"val":"recover","end":""},{"old":"/api/v1/auth/recover/verify","type":0,"val":"verify","end":""}],
+    types: placeholder as Registry['auth.password_recovery.verify']['types'],
+  },
+  'auth.password_recovery.verify_google': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/recover/google',
+    tokens: [{"old":"/api/v1/auth/recover/google","type":0,"val":"api","end":""},{"old":"/api/v1/auth/recover/google","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/recover/google","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/recover/google","type":0,"val":"recover","end":""},{"old":"/api/v1/auth/recover/google","type":0,"val":"google","end":""}],
+    types: placeholder as Registry['auth.password_recovery.verify_google']['types'],
+  },
+  'auth.password_recovery.reset': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/recover/reset',
+    tokens: [{"old":"/api/v1/auth/recover/reset","type":0,"val":"api","end":""},{"old":"/api/v1/auth/recover/reset","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/recover/reset","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/recover/reset","type":0,"val":"recover","end":""},{"old":"/api/v1/auth/recover/reset","type":0,"val":"reset","end":""}],
+    types: placeholder as Registry['auth.password_recovery.reset']['types'],
+  },
+  'authTwoFactor.password_recovery.setup_google': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/2fa/google/setup',
+    tokens: [{"old":"/api/v1/auth/2fa/google/setup","type":0,"val":"api","end":""},{"old":"/api/v1/auth/2fa/google/setup","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/2fa/google/setup","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/2fa/google/setup","type":0,"val":"2fa","end":""},{"old":"/api/v1/auth/2fa/google/setup","type":0,"val":"google","end":""},{"old":"/api/v1/auth/2fa/google/setup","type":0,"val":"setup","end":""}],
+    types: placeholder as Registry['authTwoFactor.password_recovery.setup_google']['types'],
+  },
+  'authTwoFactor.password_recovery.confirm_google': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/2fa/google/confirm',
+    tokens: [{"old":"/api/v1/auth/2fa/google/confirm","type":0,"val":"api","end":""},{"old":"/api/v1/auth/2fa/google/confirm","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/2fa/google/confirm","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/2fa/google/confirm","type":0,"val":"2fa","end":""},{"old":"/api/v1/auth/2fa/google/confirm","type":0,"val":"google","end":""},{"old":"/api/v1/auth/2fa/google/confirm","type":0,"val":"confirm","end":""}],
+    types: placeholder as Registry['authTwoFactor.password_recovery.confirm_google']['types'],
+  },
+  'authTwoFactor.password_recovery.disable_google': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/auth/2fa/google',
+    tokens: [{"old":"/api/v1/auth/2fa/google","type":0,"val":"api","end":""},{"old":"/api/v1/auth/2fa/google","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/2fa/google","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/2fa/google","type":0,"val":"2fa","end":""},{"old":"/api/v1/auth/2fa/google","type":0,"val":"google","end":""}],
+    types: placeholder as Registry['authTwoFactor.password_recovery.disable_google']['types'],
+  },
   'account.profile.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/account/profile',

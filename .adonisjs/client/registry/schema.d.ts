@@ -67,6 +67,90 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'auth.password_recovery.request': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/recover'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'auth.password_recovery.verify': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/recover/verify'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'auth.password_recovery.verify_google': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/recover/google'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'auth.password_recovery.reset': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/recover/reset'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'authTwoFactor.password_recovery.setup_google': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/2fa/google/setup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'authTwoFactor.password_recovery.confirm_google': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/2fa/google/confirm'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'authTwoFactor.password_recovery.disable_google': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/auth/2fa/google'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'account.profile.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/account/profile'

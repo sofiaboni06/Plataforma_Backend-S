@@ -57,6 +57,12 @@ export default class User extends AuthFinder(BaseModel) {
   @column()
   declare estado: boolean
 
+  @column({ columnName: 'google_authenticator_enabled' })
+  declare googleAuthenticatorEnabled: boolean
+
+  @column({ columnName: 'google_authenticator_secret', serializeAs: null })
+  declare googleAuthenticatorSecret: string | null
+
   @belongsTo(() => Perfil, { foreignKey: 'idPerfil' })
   declare perfil: BelongsTo<typeof Perfil>
 

@@ -12,6 +12,19 @@ export interface ApiDefinition {
     accessTokens: {
       store: typeof routes['auth.access_tokens.store']
     }
+    passwordRecovery: {
+      request: typeof routes['auth.password_recovery.request']
+      verify: typeof routes['auth.password_recovery.verify']
+      verifyGoogle: typeof routes['auth.password_recovery.verify_google']
+      reset: typeof routes['auth.password_recovery.reset']
+    }
+  }
+  authTwoFactor: {
+    passwordRecovery: {
+      setupGoogle: typeof routes['authTwoFactor.password_recovery.setup_google']
+      confirmGoogle: typeof routes['authTwoFactor.password_recovery.confirm_google']
+      disableGoogle: typeof routes['authTwoFactor.password_recovery.disable_google']
+    }
   }
   account: {
     profile: {

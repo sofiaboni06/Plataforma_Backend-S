@@ -9,6 +9,13 @@ export type ScannedRoutes = {
     'unsubscribe': { paramsTuple?: []; params?: {} }
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
     'auth.access_tokens.store': { paramsTuple?: []; params?: {} }
+    'auth.password_recovery.request': { paramsTuple?: []; params?: {} }
+    'auth.password_recovery.verify': { paramsTuple?: []; params?: {} }
+    'auth.password_recovery.verify_google': { paramsTuple?: []; params?: {} }
+    'auth.password_recovery.reset': { paramsTuple?: []; params?: {} }
+    'authTwoFactor.password_recovery.setup_google': { paramsTuple?: []; params?: {} }
+    'authTwoFactor.password_recovery.confirm_google': { paramsTuple?: []; params?: {} }
+    'authTwoFactor.password_recovery.disable_google': { paramsTuple?: []; params?: {} }
     'account.profile.show': { paramsTuple?: []; params?: {} }
     'account.profile.update': { paramsTuple?: []; params?: {} }
     'account.profile.change_password': { paramsTuple?: []; params?: {} }
@@ -217,6 +224,12 @@ export type ScannedRoutes = {
     'unsubscribe': { paramsTuple?: []; params?: {} }
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
     'auth.access_tokens.store': { paramsTuple?: []; params?: {} }
+    'auth.password_recovery.request': { paramsTuple?: []; params?: {} }
+    'auth.password_recovery.verify': { paramsTuple?: []; params?: {} }
+    'auth.password_recovery.verify_google': { paramsTuple?: []; params?: {} }
+    'auth.password_recovery.reset': { paramsTuple?: []; params?: {} }
+    'authTwoFactor.password_recovery.setup_google': { paramsTuple?: []; params?: {} }
+    'authTwoFactor.password_recovery.confirm_google': { paramsTuple?: []; params?: {} }
     'account.access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'modules.modules.store': { paramsTuple?: []; params?: {} }
     'roles.roles.store': { paramsTuple?: []; params?: {} }
@@ -238,6 +251,20 @@ export type ScannedRoutes = {
     'solicitudes.solicitudes.registrar_en_bodega': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
+  }
+  DELETE: {
+    'authTwoFactor.password_recovery.disable_google': { paramsTuple?: []; params?: {} }
+    'categorias.categorias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'elementos.elementos.destroy_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'items.items.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.sub_bodegas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.stand.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bodegas.bodega.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clasificacionesElemento.clasificaciones_elemento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usosPresupuestales.usos_presupuestales.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'codigosEstandar.codigos_estandar.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'unidadesMedida.unidades_medida.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'obras.obras.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'account.profile.update': { paramsTuple?: []; params?: {} }
@@ -268,19 +295,6 @@ export type ScannedRoutes = {
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'roles.roles.sync_permissions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.sync_bodegas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-  }
-  DELETE: {
-    'categorias.categorias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'elementos.elementos.destroy_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'items.items.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'bodegas.sub_bodegas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'bodegas.stand.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'bodegas.bodega.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'clasificacionesElemento.clasificaciones_elemento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'usosPresupuestales.usos_presupuestales.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'codigosEstandar.codigos_estandar.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'unidadesMedida.unidades_medida.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'obras.obras.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {
