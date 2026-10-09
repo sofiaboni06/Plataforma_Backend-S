@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { Exception } from '@adonisjs/core/exceptions'
 import encryption from '@adonisjs/core/services/encryption'
 import hash from '@adonisjs/core/services/hash'
+import logger from '@adonisjs/core/services/logger'
 import { generateSecret, generateURI, verify as verifyTotp } from 'otplib'
 import env from '#start/env'
 import User from '#models/usuario'
@@ -13,6 +14,12 @@ type Mailer = ReturnType<typeof nodemailer.createTransport>
 
 const CODE_MINUTES = 10
 const RESET_TOKEN_MINUTES = 15
+
+/**
+ * Misma respuesta exista o no la cuenta: no se revela quién está registrado,
+ * y el código nunca viaja en la respuesta, en ningún entorno.
+ */
+const RECOVER_MESSAGE = 'Si el correo corresponde a una cuenta, te enviamos un código.'
 
 export default class PasswordRecoveryService {
   private mailer(): Mailer | null {
@@ -30,20 +37,37 @@ export default class PasswordRecoveryService {
     })
   }
 
+  /** En desarrollo y pruebas se puede trabajar sin correo; fuera de ahí no. */
+  private assertMailConfigured() {
+    if (this.mailer()) return
+
+    const nodeEnv = env.get('NODE_ENV')
+    if (nodeEnv === 'test' || nodeEnv === 'development') return
+
+    throw new Exception('El servicio de correo no está configurado', {
+      status: 503,
+      code: 'E_MAIL_NOT_CONFIGURED',
+    })
+  }
+
   private async sendCode(email: string, code: string) {
     const transporter = this.mailer()
 
     if (!transporter) {
-      if (env.get('NODE_ENV') === 'test' || env.get('NODE_ENV') === 'development') {
-        return
-      }
-
-      throw new Exception('El servicio de correo no está configurado', {
-        status: 503,
-        code: 'E_MAIL_NOT_CONFIGURED',
-      })
+      // Solo nombres de variables: nunca valores, correos ni códigos.
+      logger.warn('Correo no configurado: faltan MAIL_HOST/MAIL_USERNAME/MAIL_PASSWORD')
+      return
     }
 
+    try {
+      await this.deliver(transporter, email, code)
+    } catch {
+      // Sin detalles: el error de SMTP puede traer credenciales o el destinatario.
+      logger.error('No se pudo enviar el correo de recuperación')
+    }
+  }
+
+  private async deliver(transporter: Mailer, email: string, code: string) {
     await transporter.sendMail({
       from: `"${env.get('MAIL_FROM_NAME') ?? 'Plataforma SENA'}" <${env.get('MAIL_FROM') ?? env.get('MAIL_USERNAME')}>`,
       to: email,
@@ -68,16 +92,19 @@ export default class PasswordRecoveryService {
   private createResetToken(resetId: number, userId: number) {
     return encryption.encrypt(
       { resetId, userId },
-      { expiresIn: `${RESET_TOKEN_MINUTES}m`, purpose: 'password-reset' },
+      { expiresIn: `${RESET_TOKEN_MINUTES}m`, purpose: 'password-reset' }
     )
   }
 
   async request(email: string) {
+    // Antes de buscar la cuenta: si falta el correo, la respuesta es igual para todos.
+    this.assertMailConfigured()
+
     const normalizedEmail = email.trim().toLowerCase()
     const user = await this.findUser(normalizedEmail)
 
     if (!user || !user.estado) {
-      return { message: 'Si el correo corresponde a una cuenta, recibirás un código.' }
+      return { message: RECOVER_MESSAGE }
     }
 
     const now = DateTime.now()
@@ -90,7 +117,7 @@ export default class PasswordRecoveryService {
     const code = String(randomInt(100000, 1000000))
     const codeHash = await hash.make(code)
 
-    const reset = await PasswordResetCode.create({
+    await PasswordResetCode.create({
       idUsuario: user.id,
       correo: normalizedEmail,
       codigoHash: codeHash,
@@ -101,73 +128,64 @@ export default class PasswordRecoveryService {
 
     await this.sendCode(normalizedEmail, code)
 
-    const response: { message: string; debugCode?: string } = {
-      message: 'Si el correo corresponde a una cuenta, recibirás un código.',
+    return { message: RECOVER_MESSAGE }
+  }
+
+  async verifyCode(email: string, code: string) {
+    const normalizedEmail = email.trim().toLowerCase()
+
+    const user = await this.findUser(normalizedEmail)
+
+    if (!user || !user.estado) {
+      throw new Exception('El código no es válido o ya expiró', {
+        status: 422,
+        code: 'E_INVALID_RECOVERY_CODE',
+      })
     }
 
-    if (env.get('NODE_ENV') === 'test' || env.get('NODE_ENV') === 'development') {
-      response.debugCode = code
+    const reset = await PasswordResetCode.query()
+      .where('id_usuario', user.id)
+      .where('correo', normalizedEmail)
+      .whereNull('usado_en')
+      .where('expira_en', '>', DateTime.now().toSQL()!)
+      .orderBy('id', 'desc')
+      .first()
+
+    if (!reset) {
+      throw new Exception('El código no es válido o ya expiró', {
+        status: 422,
+        code: 'E_INVALID_RECOVERY_CODE',
+      })
     }
 
-    void reset
-    return response
+    const isValidCode = await hash.verify(reset.codigoHash, code)
+
+    if (!isValidCode) {
+      throw new Exception('El código no es válido o ya expiró', {
+        status: 422,
+        code: 'E_INVALID_RECOVERY_CODE',
+      })
+    }
+
+    reset.verificadoEn = DateTime.now()
+    await reset.save()
+
+    return {
+      message: 'Código verificado correctamente.',
+      resetToken: this.createResetToken(reset.id, user.id),
+    }
   }
-
-async verifyCode(email: string, code: string) {
-  const normalizedEmail = email.trim().toLowerCase()
-
-  const user = await this.findUser(normalizedEmail)
-
-  console.log('EMAIL RECIBIDO:', email)
-  console.log('EMAIL NORMALIZADO:', normalizedEmail)
-  console.log('USUARIO ENCONTRADO:', user)
-  console.log('CODIGO RECIBIDO:', code)
-
-  if (!user || !user.estado) {
-    throw new Exception('El código no es válido o ya expiró', {
-      status: 422,
-      code: 'E_INVALID_RECOVERY_CODE',
-    })
-  }
-
-  const reset = await PasswordResetCode.query()
-    .where('id_usuario', user.id)
-    .where('correo', normalizedEmail)
-    .whereNull('usado_en')
-    .where('expira_en', '>', DateTime.now().toSQL()!)
-    .orderBy('id', 'desc')
-    .first()
-
-  if (!reset) {
-    throw new Exception('El código no es válido o ya expiró', {
-      status: 422,
-      code: 'E_INVALID_RECOVERY_CODE',
-    })
-  }
-
-  const isValidCode = await hash.verify(reset.codigoHash, code)
-
-  if (!isValidCode) {
-    throw new Exception('El código no es válido o ya expiró', {
-      status: 422,
-      code: 'E_INVALID_RECOVERY_CODE',
-    })
-  }
-
-  reset.verificadoEn = DateTime.now()
-  await reset.save()
-
-  return {
-    message: 'Código verificado correctamente.',
-    resetToken: this.createResetToken(reset.id, user.id),
-  }
-}
 
   async verifyGoogle(email: string, code: string) {
     const normalizedEmail = email.trim().toLowerCase()
     const user = await this.findUser(normalizedEmail)
 
-    if (!user || !user.estado || !user.googleAuthenticatorEnabled || !user.googleAuthenticatorSecret) {
+    if (
+      !user ||
+      !user.estado ||
+      !user.googleAuthenticatorEnabled ||
+      !user.googleAuthenticatorSecret
+    ) {
       throw new Exception('No se pudo validar Google Authenticator', {
         status: 422,
         code: 'E_INVALID_AUTHENTICATOR',
@@ -213,9 +231,10 @@ async verifyCode(email: string, code: string) {
   }
 
   async resetPassword(resetToken: string, password: string) {
-    const payload = encryption.decrypt(resetToken, 'password-reset') as
-      | { resetId: number; userId: number }
-      | null
+    const payload = encryption.decrypt(resetToken, 'password-reset') as {
+      resetId: number
+      userId: number
+    } | null
 
     if (!payload?.resetId || !payload.userId) {
       throw new Exception('El enlace de recuperación no es válido o expiró', {
