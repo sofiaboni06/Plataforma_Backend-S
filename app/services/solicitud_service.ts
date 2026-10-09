@@ -33,12 +33,10 @@ type CrearSolicitud = {
   tipo: TipoSolicitud
   ficha?: string
   observacion?: string
-  /** Equipo: inicio del préstamo. Consumo: inicio de la actividad. */
+  /** Solo equipo: inicio del préstamo. En consumo se ignora. */
   fechaInicio?: FechaDia
-  /** Solo equipo: hasta cuándo lo pide el instructor. */
+  /** Solo equipo: hasta cuándo lo pide el instructor. En consumo se ignora. */
   fechaDevolucionPropuesta?: FechaDia
-  /** Solo consumo: para cuándo lo necesita entregado. */
-  fechaEntregaRequerida?: FechaDia
   elementos: { idElemento: number; cantidad: number; observacion?: string }[]
 }
 
@@ -700,11 +698,13 @@ export default class SolicitudService {
   }
 
   /**
-   * Las fechas son del pedido, no de cada fila, así que van iguales en todas.
-   * Cada tipo solo acepta las suyas: el consumo no tiene plazo de devolución y
-   * el equipo no tiene fecha de entrega requerida.
+   * Solo el equipo devolutivo lleva fechas: inicio del préstamo y hasta cuándo
+   * lo pide. Son del pedido, no de cada fila, así que van iguales en todas.
+   * El consumo se entrega y ya: si llega alguna fecha, se ignora.
    */
   private validarFechas(payload: CrearSolicitud) {
+    if (payload.tipo !== 'devolutivo') return
+
     const dia = hoy()
     const inicio = payload.fechaInicio
       ? fechaValida(payload.fechaInicio, 'La fecha de inicio')
@@ -712,36 +712,9 @@ export default class SolicitudService {
     const devolucion = payload.fechaDevolucionPropuesta
       ? fechaValida(payload.fechaDevolucionPropuesta, 'La fecha de devolución')
       : null
-    const requerida = payload.fechaEntregaRequerida
-      ? fechaValida(payload.fechaEntregaRequerida, 'La fecha para cuándo lo necesitas')
-      : null
-
-    if (payload.tipo === 'consumo' && devolucion) {
-      fail(
-        'El material de consumo no se devuelve; usa la fecha para cuándo lo necesitas',
-        422,
-        'E_FECHA_INVALIDA'
-      )
-    }
-
-    if (payload.tipo === 'devolutivo' && requerida) {
-      fail(
-        'El equipo devolutivo no tiene fecha de entrega requerida; usa la fecha de devolución',
-        422,
-        'E_FECHA_INVALIDA'
-      )
-    }
 
     if (inicio) {
       noAntesDe(inicio, dia, 'La fecha de inicio no puede ser anterior a hoy')
-    }
-
-    if (requerida) {
-      noAntesDe(
-        requerida,
-        inicio ?? dia,
-        'La fecha para cuándo lo necesitas no puede ser anterior al inicio'
-      )
     }
 
     if (devolucion) {
@@ -750,12 +723,7 @@ export default class SolicitudService {
   }
 
   private fechasDe(payload: CrearSolicitud) {
-    if (payload.tipo === 'consumo') {
-      return {
-        fechaInicio: payload.fechaInicio ?? null,
-        fechaEntregaRequerida: payload.fechaEntregaRequerida ?? null,
-      }
-    }
+    if (payload.tipo !== 'devolutivo') return {}
 
     return {
       fechaInicio: payload.fechaInicio ?? null,
@@ -768,13 +736,8 @@ export default class SolicitudService {
    * fecha y el pedido tampoco la traía, se queda sin fecha (y sin aviso).
    */
   private limiteAlEntregar(factura: Factura, fecha: FechaDia | undefined) {
-    if (!factura.equipos.length) {
-      if (fecha) {
-        fail('El material de consumo no tiene plazo de devolución', 422, 'E_FECHA_INVALIDA')
-      }
-
-      return undefined
-    }
+    // El consumo no tiene plazo: si llega una fecha, se ignora.
+    if (!factura.equipos.length) return undefined
 
     const dia = hoy()
     const propuesta = factura.equipos[0].fechaDevolucionPropuesta

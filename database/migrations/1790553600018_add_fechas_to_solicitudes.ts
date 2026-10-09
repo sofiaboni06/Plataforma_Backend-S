@@ -12,9 +12,9 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
  *   (fecha_devolucion, que ya existía, sigue siendo cuándo volvió de verdad.)
  *
  * solicitud_material (consumo, no se devuelve):
- * - fecha_inicio: cuándo empieza la actividad en la que se usa.
- * - fecha_entrega_requerida: para cuándo lo necesita entregado.
- *   (fecha_entrega, que ya existía, sigue siendo cuándo salió de verdad.)
+ * - fecha_inicio y fecha_entrega_requerida: ya no se usan. El consumo se
+ *   entrega y ya, sin fechas; las columnas quedan vacías para no tener que
+ *   migrar otra vez. (fecha_entrega, que ya existía, sigue siendo cuándo salió.)
  */
 export default class extends BaseSchema {
   async up() {

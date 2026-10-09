@@ -103,11 +103,8 @@ export default class EntregaService {
       fail(`Solo faltan ${faltante} por entregar`, 422, 'E_CANTIDAD_INVALIDA')
     }
 
-    if (opciones.fechaDevolucionLimite !== undefined) {
-      if (fila.tipo !== 'equipo') {
-        fail('El material de consumo no tiene plazo de devolución', 422, 'E_FECHA_INVALIDA')
-      }
-
+    // El consumo no tiene plazo de devolución: si llega una fecha, se ignora.
+    if (opciones.fechaDevolucionLimite !== undefined && fila.tipo === 'equipo') {
       noAntesDe(
         fechaValida(opciones.fechaDevolucionLimite, 'La fecha límite de devolución'),
         hoy(),

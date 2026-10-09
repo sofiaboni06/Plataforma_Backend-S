@@ -103,7 +103,6 @@ export function fechasDe(
       fechaInicio: equipo.fechaInicio ?? null,
       fechaDevolucionPropuesta: equipo.fechaDevolucionPropuesta ?? null,
       fechaDevolucionLimite: equipo.fechaDevolucionLimite ?? null,
-      fechaEntregaRequerida: null,
       plazo: estadoPlazo(
         equipo.fechaDevolucionLimite ?? null,
         equipo.cantidadEntregada - equipo.cantidadDevuelta,
@@ -112,13 +111,11 @@ export function fechasDe(
     }
   }
 
-  const material = row as SolicitudMaterial
-
+  // El consumo se entrega y ya: no lleva fechas ni plazo.
   return {
-    fechaInicio: material.fechaInicio ?? null,
+    fechaInicio: null,
     fechaDevolucionPropuesta: null,
     fechaDevolucionLimite: null,
-    fechaEntregaRequerida: material.fechaEntregaRequerida ?? null,
     plazo: null,
   }
 }
@@ -212,8 +209,6 @@ export default class SolicitudTransformer extends BaseTransformer<Factura> {
         peor?.fechaDevolucionLimite ??
         detalle.find((row) => row.fechaDevolucionLimite)?.fechaDevolucionLimite ??
         null,
-      fechaEntregaRequerida:
-        detalle.find((row) => row.fechaEntregaRequerida)?.fechaEntregaRequerida ?? null,
       plazo: peor?.plazo ?? null,
       totales: {
         lineas: detalle.length,

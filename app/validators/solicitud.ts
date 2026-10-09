@@ -13,12 +13,10 @@ const solicitud = {
   tipo: vine.enum(['consumo', 'devolutivo'] as const),
   ficha: vine.string().trim().maxLength(50).optional(),
   observacion: vine.string().trim().optional(),
-  /** Equipo: inicio del préstamo. Consumo: inicio de la actividad. */
+  /** Solo equipo: inicio del préstamo. En consumo el servicio la ignora. */
   fechaInicio: dia().optional(),
-  /** Solo equipo: hasta cuándo lo pide. */
+  /** Solo equipo: hasta cuándo lo pide. En consumo el servicio la ignora. */
   fechaDevolucionPropuesta: dia().optional(),
-  /** Solo consumo: para cuándo lo necesita entregado. */
-  fechaEntregaRequerida: dia().optional(),
   elementos: vine
     .array(
       vine.object({

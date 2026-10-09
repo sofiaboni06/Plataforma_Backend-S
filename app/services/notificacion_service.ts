@@ -383,24 +383,64 @@ export default class NotificacionService {
       idSolicitud: number
       idDestinatario: number
       idQuienRecibe: number
+      idElemento?: number
       elemento: string
-      lineas: { cantidad: number; estadoElemento: EstadoElementoEquipo }[]
+      lineas: { cantidad: number; estadoElemento: EstadoElementoEquipo; observacion?: string }[]
+      /** La devolución vino unidad por unidad: el aviso las lista todas. */
+      porUnidad?: boolean
+      /** Número (dentro de la solicitud) de la primera unidad que volvió. */
+      primeraUnidad?: number
       afuera: number
     }
   ) {
     const total = input.lineas.reduce((suma, linea) => suma + linea.cantidad, 0)
-    const detalle = input.lineas
-      .map((linea) => `${linea.cantidad} ${ESTADO_EQUIPO[linea.estadoElemento]}`)
+    const conteo = new Map<EstadoElementoEquipo, number>()
+    for (const linea of input.lineas) {
+      conteo.set(linea.estadoElemento, (conteo.get(linea.estadoElemento) ?? 0) + linea.cantidad)
+    }
+    const detalle = [...conteo]
+      .map(([estado, cantidad]) => `${cantidad} ${ESTADO_EQUIPO[estado]}`)
       .join(', ')
     const resto = input.afuera > 0 ? ` Quedan ${input.afuera} por devolver.` : ''
+    const desde = input.primeraUnidad ?? 1
+    const unidades = input.porUnidad
+      ? `\n${input.lineas
+          .map((linea, i) => {
+            const nota = linea.observacion?.trim()
+            return `Unidad ${desde + i}: ${ESTADO_EQUIPO[linea.estadoElemento]}${nota ? ` — ${nota}` : ''}`
+          })
+          .join('\n')}`
+      : ''
+    const mensaje = `Bodega recibió ${total} de ${input.elemento}: ${detalle}.${resto}${unidades}`
+    const conNovedad = input.lineas.some((linea) => linea.estadoElemento !== 'bueno')
 
-    return this.paraUno(trx, input.idDestinatario, input.idQuienRecibe, {
+    const avisos = await this.paraUno(trx, input.idDestinatario, input.idQuienRecibe, {
       tipo: 'devolucion_equipo',
-      titulo: 'Equipo devuelto',
-      mensaje: `Bodega recibió ${total} de ${input.elemento}: ${detalle}.${resto}`,
+      titulo: conNovedad ? 'Equipo devuelto con novedad' : 'Equipo devuelto',
+      mensaje,
       recurso: 'solicitud_equipo',
       idReferencia: input.idSolicitud,
     })
+
+    // Con dañados o perdidos, el resto de bodega también se entera: un solo
+    // aviso por persona con la novedad de cada unidad.
+    if (!conNovedad || input.idElemento === undefined) {
+      return avisos
+    }
+
+    return [
+      ...avisos,
+      ...(await this.paraEncargados(trx, {
+        idElemento: input.idElemento,
+        permiso: 'solicitud_equipo.devolver',
+        excluir: input.idQuienRecibe,
+        tipo: 'devolucion_equipo',
+        titulo: `Novedad en devolución de ${input.elemento}`,
+        mensaje,
+        recurso: 'solicitud_equipo',
+        idReferencia: input.idSolicitud,
+      })),
+    ]
   }
 
   /**

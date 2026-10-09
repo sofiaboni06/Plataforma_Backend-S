@@ -36,6 +36,8 @@ type CrearSolicitudEquipo = {
  */
 export type DevolverEquipo = {
   detalle?: LineaDevolucion[]
+  /** Una por unidad: cada una queda como su propia fila de `devolucion`. */
+  unidades?: { estadoElemento: EstadoElementoEquipo; observacion?: string }[]
   estadoElemento?: EstadoElementoEquipo
   cantidad?: number
   observacion?: string
@@ -325,8 +327,11 @@ export default class SolicitudEquipoService {
           idSolicitud: solicitud.id,
           idDestinatario: solicitud.idUsuario,
           idQuienRecibe: scope.idUsuario,
+          idElemento: elemento.id,
           elemento: elemento.nombre,
           lineas,
+          porUnidad: Boolean(input.unidades?.length),
+          primeraUnidad: solicitud.cantidadDevuelta - resultado.devuelta + 1,
           afuera: resultado.afuera,
         })),
         ...(await this.notificaciones.aplicarStock(elemento, true, trx)),
@@ -381,11 +386,19 @@ export default class SolicitudEquipoService {
       .preload('usuarioEntrega')
       .preload('entregas', (entregas) => entregas.preload('usuario').orderBy('fecha', 'asc'))
       .preload('devoluciones', (devoluciones) =>
-        devoluciones.preload('usuario').orderBy('fecha', 'asc')
+        devoluciones.preload('usuario').orderBy('fecha', 'asc').orderBy('id_devolucion', 'asc')
       )
   }
 
   private lineasDevolucion(solicitud: SolicitudEquipo, input: DevolverEquipo): LineaDevolucion[] {
+    if (input.unidades?.length) {
+      return input.unidades.map((unidad) => ({
+        estadoElemento: unidad.estadoElemento,
+        cantidad: 1,
+        observacion: unidad.observacion ?? input.observacion,
+      }))
+    }
+
     if (input.detalle?.length) {
       return input.detalle.map((linea) => ({
         ...linea,

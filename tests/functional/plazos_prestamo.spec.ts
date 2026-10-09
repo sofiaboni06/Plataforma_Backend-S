@@ -19,7 +19,6 @@ type Fila = {
   fechaInicio: string | null
   fechaDevolucionPropuesta: string | null
   fechaDevolucionLimite: string | null
-  fechaEntregaRequerida: string | null
   plazo: string | null
 }
 
@@ -29,7 +28,6 @@ type Factura = {
   fechaInicio: string | null
   fechaDevolucionPropuesta: string | null
   fechaDevolucionLimite: string | null
-  fechaEntregaRequerida: string | null
   plazo: string | null
   usuario: { id: number }
   detalle: Fila[]
@@ -162,18 +160,19 @@ test.group('Plazos de préstamo y entrega', () => {
     )
     const codigo = `SOL-PLZ-${suffix}`
 
-    // El equipo no acepta la fecha de entrega del consumo, ni al revés.
-    const cruzada = await client
+    // La devolución no puede quedar antes del inicio del préstamo.
+    const alReves = await client
       .post('/api/v1/solicitudes')
       .bearerToken(instructor)
       .json({
         codigoSolicitud: codigo,
         idObra,
         tipo: 'devolutivo',
-        fechaEntregaRequerida: dia(12),
+        fechaInicio: dia(4),
+        fechaDevolucionPropuesta: dia(2),
         elementos: [{ idElemento: taladroId, cantidad: 2 }],
       })
-    cruzada.assertStatus(422)
+    alReves.assertStatus(422)
 
     const pedido = await client
       .post('/api/v1/solicitudes')
@@ -284,27 +283,52 @@ test.group('Plazos de préstamo y entrega', () => {
     devueltos.assertStatus(200)
     assert.isTrue(datosDe<Factura[]>(devueltos).some((row) => row.codigoSolicitud === codigo))
 
-    // El consumo lleva sus fechas y no acepta plazo de devolución.
+    // El consumo se entrega y ya: las fechas que lleguen se ignoran, no
+    // tiene plazo y nunca aparece en Entregas y devoluciones.
+    const codigoMaterial = `SOL-PLZ-MAT-${suffix}`
     const material = await client
       .post('/api/v1/solicitudes')
       .bearerToken(instructor)
       .json({
-        codigoSolicitud: `SOL-PLZ-MAT-${suffix}`,
+        codigoSolicitud: codigoMaterial,
         idObra,
         tipo: 'consumo',
-        fechaInicio: dia(2),
+        fechaInicio: dia(-3),
+        fechaDevolucionPropuesta: dia(-1),
         fechaEntregaRequerida: dia(4),
         elementos: [{ idElemento: pinturaId, cantidad: 3 }],
       })
     material.assertStatus(201)
     const consumo = datosDe<Factura>(material)
-    assert.equal(consumo.fechaEntregaRequerida, dia(4))
+    assert.isNull(consumo.fechaInicio)
     assert.isNull(consumo.fechaDevolucionPropuesta)
+    assert.isNull(consumo.fechaDevolucionLimite)
+    assert.isNull(consumo.plazo)
+    assert.notProperty(consumo, 'fechaEntregaRequerida')
 
-    const conPlazo = await client
-      .patch(`/api/v1/solicitudes/SOL-PLZ-MAT-${suffix}/entregar`)
+    const entregado = await client
+      .patch(`/api/v1/solicitudes/${codigoMaterial}/entregar`)
       .bearerToken(bodega)
-      .json({ fechaDevolucionLimite: dia(7) })
-    conPlazo.assertStatus(422)
+      .json({ fechaDevolucionLimite: dia(-2) })
+    entregado.assertStatus(200)
+    const consumoEntregado = datosDe<Factura>(entregado)
+    assert.isNull(consumoEntregado.fechaDevolucionLimite)
+    assert.isNull(consumoEntregado.plazo)
+    assert.isTrue(consumoEntregado.detalle.every((row) => row.plazo === null))
+
+    for (const vista of ['afuera', 'vencidos', 'todos']) {
+      const prestados = await client
+        .get('/api/v1/solicitudes/prestamos')
+        .bearerToken(bodega)
+        .qs({ vista })
+      prestados.assertStatus(200)
+      assert.isFalse(
+        datosDe<Factura[]>(prestados).some((row) => row.codigoSolicitud === codigoMaterial)
+      )
+    }
+
+    await new PrestamoService().avisarVencidos(dia(10), { emitir: false })
+    const avisosConsumo = await bandeja(client, instructor)
+    assert.isFalse(avisosConsumo.some((row) => row.titulo.includes(codigoMaterial)))
   })
 })
