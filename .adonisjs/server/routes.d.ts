@@ -120,6 +120,8 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
+    'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -169,6 +171,8 @@ export type ScannedRoutes = {
     'solicitudesEquipo.solicitud_equipo.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.index': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
+    'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -218,6 +222,8 @@ export type ScannedRoutes = {
     'solicitudesEquipo.solicitud_equipo.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.index': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
+    'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }

@@ -33,7 +33,7 @@ async function bandeja(client: ApiClient, token: string) {
     .bearerToken(token)
     .qs({ perPage: 100 })
   response.assertStatus(200)
-  return response.body().data as Aviso[]
+  return datosDe<Aviso[]>(response)
 }
 
 async function avisosDonde(client: ApiClient, token: string, cumple: (row: Aviso) => boolean) {
@@ -55,9 +55,9 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
   const subcategoria = await client
     .post('/api/v1/subcategorias')
     .bearerToken(admin)
-    .json({ idCategoria: categoria.body().data.id, nombre: `Sub agrupada ${suffix}`, estado: true })
-  subcategoria.assertStatus(200)
-  const idSubcategoria = subcategoria.body().data.id as number
+      .json({ idCategoria: datosDe<{ id: number }>(categoria).id, nombre: `Sub agrupada ${suffix}`, estado: true })
+    subcategoria.assertStatus(200)
+  const idSubcategoria = datosDe<{ id: number }>(subcategoria).id
 
   const bodegas = await client.get('/api/v1/bodegas').bearerToken(bodega)
   bodegas.assertStatus(200)
@@ -70,11 +70,11 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
   subBodega.assertStatus(200)
 
   const stand = await client
-    .post(`/api/v1/bodegas/sub-bodegas/${subBodega.body().data.id}/stands`)
+    .post(`/api/v1/bodegas/sub-bodegas/${datosDe<{ id: number }>(subBodega).id}/stands`)
     .bearerToken(admin)
     .json({ nombre: `Stand agrupada ${suffix}` })
   stand.assertStatus(200)
-  const idStand = stand.body().data.id as number
+  const idStand = datosDe<{ id: number }>(stand).id
 
   const unidades = await client.get('/api/v1/unidades-medida').bearerToken(admin)
   const idUnidadMedida = (unidades.body().data as { id: number }[])[0].id
@@ -100,7 +100,7 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
       .post('/api/v1/inventario/elementos')
       .bearerToken(admin)
       .json({
-        idItem: item.body().data.id,
+        idItem: datosDe<{ id: number }>(item).id,
         nombre: `${nombre} ${suffix}`,
         idStand,
         cantidad: 10,
@@ -111,7 +111,7 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
         caracter,
       })
     response.assertStatus(200)
-    const id = response.body().data.id as number
+    const id = datosDe<{ id: number }>(response).id
     // La existencia exacta del caso, sin pasar por un ingreso.
     await db.from('elemento').where('id_elemento', id).update({ cantidad })
     return id
@@ -124,7 +124,7 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
   obra.assertStatus(200)
 
   return {
-    idObra: obra.body().data.id as number,
+    idObra: datosDe<{ id: number }>(obra).id,
     pinturaId: await elemento('Pintura', 10, consumo.id, 'consumo'),
     lijaId: await elemento('Lija', 2, consumo.id, 'consumo'),
     cintaId: await elemento('Cinta', 0, consumo.id, 'consumo'),

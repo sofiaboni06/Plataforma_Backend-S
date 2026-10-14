@@ -702,6 +702,18 @@ const routes = {
     tokens: [{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"solicitudes-material","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-material/:id/entregar","type":0,"val":"entregar","end":""}],
     types: placeholder as Registry['solicitudesMaterial.solicitud_material.entregar']['types'],
   },
+  'reportes.reportes.elementos': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/reportes/elementos',
+    tokens: [{"old":"/api/v1/reportes/elementos","type":0,"val":"api","end":""},{"old":"/api/v1/reportes/elementos","type":0,"val":"v1","end":""},{"old":"/api/v1/reportes/elementos","type":0,"val":"reportes","end":""},{"old":"/api/v1/reportes/elementos","type":0,"val":"elementos","end":""}],
+    types: placeholder as Registry['reportes.reportes.elementos']['types'],
+  },
+  'reportes.reportes.bodega': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/reportes/bodega/:id/:formato',
+    tokens: [{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"api","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"v1","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"reportes","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"bodega","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"id","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"formato","end":""}],
+    types: placeholder as Registry['reportes.reportes.bodega']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

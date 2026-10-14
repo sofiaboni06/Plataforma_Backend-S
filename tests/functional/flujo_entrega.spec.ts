@@ -7,6 +7,10 @@ async function login(client: ApiClient, email: string) {
   return response.body().data.token as string
 }
 
+function datosDe<T>(response: { body(): unknown }) {
+  return (response.body() as { data: T }).data
+}
+
 test.group('Flujo obra, equipo y material', () => {
   test('el instructor pide, bodega entrega y bodega recibe el equipo con su novedad', async ({
     client,
@@ -22,14 +26,14 @@ test.group('Flujo obra, equipo y material', () => {
       .bearerToken(admin)
       .json({ nombre: `Flujo ${suffix}`, estado: true })
     categoriaRes.assertStatus(200)
-    const categoriaId = categoriaRes.body().data.id as number
+    const categoriaId = datosDe<{ id: number }>(categoriaRes).id
 
     const subcategoriaRes = await client
       .post('/api/v1/subcategorias')
       .bearerToken(admin)
       .json({ idCategoria: categoriaId, nombre: `Sub flujo ${suffix}`, estado: true })
     subcategoriaRes.assertStatus(200)
-    const subcategoriaId = subcategoriaRes.body().data.id as number
+    const subcategoriaId = datosDe<{ id: number }>(subcategoriaRes).id
 
     const itemHerramienta = await client
       .post('/api/v1/inventario/items')
@@ -62,11 +66,11 @@ test.group('Flujo obra, equipo y material', () => {
     subBodega.assertStatus(200)
 
     const stand = await client
-      .post(`/api/v1/bodegas/sub-bodegas/${subBodega.body().data.id}/stands`)
+      .post(`/api/v1/bodegas/sub-bodegas/${datosDe<{ id: number }>(subBodega).id}/stands`)
       .bearerToken(admin)
       .json({ nombre: `Stand flujo ${suffix}` })
     stand.assertStatus(200)
-    const standId = stand.body().data.id as number
+    const standId = datosDe<{ id: number }>(stand).id
 
     const unidades = await client.get('/api/v1/unidades-medida').bearerToken(admin)
     unidades.assertStatus(200)
@@ -86,7 +90,7 @@ test.group('Flujo obra, equipo y material', () => {
       .post('/api/v1/inventario/elementos')
       .bearerToken(admin)
       .json({
-        idItem: itemHerramienta.body().data.id,
+        idItem: datosDe<{ id: number }>(itemHerramienta).id,
         nombre: `Taladro ${suffix}`,
         idStand: standId,
         cantidad: 20,
@@ -97,13 +101,13 @@ test.group('Flujo obra, equipo y material', () => {
         caracter: 'devolutivo',
       })
     equipo.assertStatus(200)
-    const equipoId = equipo.body().data.id as number
+    const equipoId = datosDe<{ id: number }>(equipo).id
 
     const material = await client
       .post('/api/v1/inventario/elementos')
       .bearerToken(admin)
       .json({
-        idItem: itemMaterial.body().data.id,
+        idItem: datosDe<{ id: number }>(itemMaterial).id,
         nombre: `Tornillo ${suffix}`,
         idStand: standId,
         cantidad: 20,
@@ -114,7 +118,7 @@ test.group('Flujo obra, equipo y material', () => {
         caracter: 'consumo',
       })
     material.assertStatus(200)
-    const materialId = material.body().data.id as number
+    const materialId = datosDe<{ id: number }>(material).id
 
     const obraAjena = await client
       .post('/api/v1/obras')
@@ -127,7 +131,7 @@ test.group('Flujo obra, equipo y material', () => {
       .bearerToken(bodega)
       .json({ nombre: `Obra flujo ${suffix}`, lugar: 'Taller 1' })
     obra.assertStatus(200)
-    const obraId = obra.body().data.id as number
+    const obraId = datosDe<{ id: number }>(obra).id
 
     const visto = await client.get(`/api/v1/inventario/elementos/${materialId}`).bearerToken(instructor)
     visto.assertStatus(200)
@@ -174,8 +178,8 @@ test.group('Flujo obra, equipo y material', () => {
         cantidad: 5,
       })
     pedido.assertStatus(201)
-    const pedidoId = pedido.body().data.id as number
-    assert.equal(pedido.body().data.estado, 'pendiente')
+    const pedidoId = datosDe<{ id: number }>(pedido).id
+    assert.equal(datosDe<{ estado: string }>(pedido).estado, 'pendiente')
 
     const reservado = await client
       .get(`/api/v1/inventario/elementos/${materialId}`)
@@ -194,7 +198,7 @@ test.group('Flujo obra, equipo y material', () => {
       .bearerToken(bodega)
       .qs({ estado: 'pendiente' })
     pendientes.assertStatus(200)
-    const filas = pendientes.body().data as { id: number }[]
+    const filas = datosDe<{ id: number }[]>(pendientes)
     assert.isTrue(filas.some((row) => row.id === pedidoId))
 
     const materialEntregado = await client
@@ -232,9 +236,9 @@ test.group('Flujo obra, equipo y material', () => {
         observacion: 'Para la obra',
       })
     prestamo.assertStatus(201)
-    const solicitudId = prestamo.body().data.id as number
-    assert.equal(prestamo.body().data.estado, 'pendiente')
-    assert.equal(prestamo.body().data.obra.id, obraId)
+    const solicitudId = datosDe<{ id: number }>(prestamo).id
+    assert.equal(datosDe<{ estado: string }>(prestamo).estado, 'pendiente')
+    assert.equal(datosDe<{ obra: { id: number } }>(prestamo).obra.id, obraId)
 
     const kardexEquipo = await client
       .get(`/api/v1/inventario/elementos/${equipoId}`)
@@ -275,7 +279,7 @@ test.group('Flujo obra, equipo y material', () => {
         cantidad: 3,
       })
     prestamoDanado.assertStatus(201)
-    const danadoId = prestamoDanado.body().data.id as number
+    const danadoId = datosDe<{ id: number }>(prestamoDanado).id
 
     const entregadoDanado = await client
       .patch(`/api/v1/solicitudes-equipo/${danadoId}/entregar`)

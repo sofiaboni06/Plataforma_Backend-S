@@ -20,6 +20,7 @@ export const controllers = {
   PasswordRecovery: () => import('#controllers/password_recovery_controller'),
   Permissions: () => import('#controllers/permissions_controller'),
   Profile: () => import('#controllers/profile_controller'),
+  Reportes: () => import('#controllers/reportes_controller'),
   Roles: () => import('#controllers/roles_controller'),
   SolicitudEquipo: () => import('#controllers/solicitud_equipo_controller'),
   SolicitudMaterial: () => import('#controllers/solicitud_material_controller'),

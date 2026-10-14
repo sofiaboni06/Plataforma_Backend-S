@@ -33,7 +33,7 @@ async function bandeja(client: ApiClient, token: string) {
     .bearerToken(token)
     .qs({ perPage: 100 })
   response.assertStatus(200)
-  return response.body().data as Aviso[]
+  return datosDe<Aviso[]>(response)
 }
 
 /** Algunas rutas no traen el tipo de la respuesta: se lee `data` con el tipo esperado. */
@@ -51,9 +51,9 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
   const subcategoria = await client
     .post('/api/v1/subcategorias')
     .bearerToken(admin)
-    .json({ idCategoria: categoria.body().data.id, nombre: `Sub parcial ${suffix}`, estado: true })
+    .json({ idCategoria: datosDe<{ id: number }>(categoria).id, nombre: `Sub parcial ${suffix}`, estado: true })
   subcategoria.assertStatus(200)
-  const idSubcategoria = subcategoria.body().data.id as number
+  const idSubcategoria = datosDe<{ id: number }>(subcategoria).id
 
   const bodegas = await client.get('/api/v1/bodegas').bearerToken(bodega)
   bodegas.assertStatus(200)
@@ -70,7 +70,7 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
     .bearerToken(admin)
     .json({ nombre: `Stand parcial ${suffix}` })
   stand.assertStatus(200)
-  const idStand = stand.body().data.id as number
+  const idStand = datosDe<{ id: number }>(stand).id
 
   const unidades = await client.get('/api/v1/unidades-medida').bearerToken(admin)
   const idUnidadMedida = (unidades.body().data as { id: number }[])[0].id
@@ -98,7 +98,7 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
       .post('/api/v1/inventario/elementos')
       .bearerToken(admin)
       .json({
-        idItem: item.body().data.id,
+        idItem: datosDe<{ id: number }>(item).id,
         nombre: `${nombre} ${suffix}`,
         idStand,
         cantidad: 10,
@@ -109,7 +109,7 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
         caracter,
       })
     response.assertStatus(200)
-    return response.body().data.id as number
+    return datosDe<{ id: number }>(response).id
   }
 
   const obra = await client
@@ -119,7 +119,7 @@ async function preparar(client: ApiClient, admin: string, bodega: string, suffix
   obra.assertStatus(200)
 
   return {
-    idObra: obra.body().data.id as number,
+    idObra: datosDe<{ id: number }>(obra).id,
     pinturaId: await elemento('Pintura', 'PAR-PIN', consumo.id, 'consumo'),
     taladroId: await elemento('Taladro', 'PAR-TAL', herramienta.id, 'devolutivo'),
     // Misma clasificación, distinto tipo: la escoba se presta, los guantes se gastan.
@@ -150,7 +150,7 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
         elementos: [{ idElemento: pinturaId, cantidad: 14 }],
       })
     creada.assertStatus(201)
-    const fila = (creada.body().data.detalle as Fila[])[0]
+    const fila = (datosDe<{ detalle: Fila[] }>(creada).detalle)[0]
     assert.equal(fila.cantidadPendiente, 14)
 
     const kardex = await client
@@ -178,9 +178,9 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
       .bearerToken(instructor)
     factura.assertStatus(200)
-    assert.equal(factura.body().data.estado, 'parcial')
-    assert.equal(factura.body().data.totales.cantidadEntregada, 10)
-    assert.equal(factura.body().data.totales.cantidadPendiente, 4)
+    assert.equal(datosDe<{ estado: string }>(factura).estado, 'parcial')
+    assert.equal(datosDe<{ totales: { cantidadEntregada: number; cantidadPendiente: number } }>(factura).totales.cantidadEntregada, 10)
+    assert.equal(datosDe<{ totales: { cantidadEntregada: number; cantidadPendiente: number } }>(factura).totales.cantidadPendiente, 4)
 
     const avisos = await bandeja(client, instructor)
     const aviso = avisos.find(
@@ -212,8 +212,8 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
     const cerrada = await client
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
       .bearerToken(instructor)
-    assert.equal(cerrada.body().data.estado, 'cerrado')
-    const entregas = (cerrada.body().data.detalle as Fila[])[0].entregas
+    assert.equal(datosDe<{ estado: string }>(cerrada).estado, 'cerrado')
+    const entregas = (datosDe<{ detalle: Fila[] }>(cerrada).detalle)[0].entregas
     assert.deepEqual(
       entregas.map((row) => row.cantidad),
       [10, 4]
@@ -848,7 +848,7 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
       elementos: [{ idElemento: taladroId, cantidad: 1 }],
     })
     aSiMismo.assertStatus(422)
-    assert.equal(aSiMismo.body().code, 'E_SOLICITANTE_INVALIDO')
+    assert.equal((aSiMismo.body() as unknown as { code: string }).code, 'E_SOLICITANTE_INVALIDO')
 
     const sinDocumento = await registrar({ elementos: [{ idElemento: taladroId, cantidad: 1 }] })
     sinDocumento.assertStatus(422)
@@ -858,7 +858,7 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
       elementos: [{ idElemento: pinturaId, cantidad: 1 }],
     })
     tipoDistinto.assertStatus(422)
-    assert.equal(tipoDistinto.body().code, 'E_TIPO_DISTINTO')
+    assert.equal((tipoDistinto.body() as unknown as { code: string }).code, 'E_TIPO_DISTINTO')
 
     const registrada = await registrar({
       numeroDocumento: INSTRUCTOR_DOCUMENTO,
@@ -866,7 +866,7 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
       elementos: [{ idElemento: taladroId, cantidad: 13 }],
     })
     registrada.assertStatus(201)
-    const factura = registrada.body().data
+    const factura = datosDe<{ estado: string; registradaEnBodega: boolean; registradaPor: { email: string }; usuario: { email: string }; detalle: Fila[] }>(registrada)
     assert.equal(factura.estado, 'parcial')
     assert.isTrue(factura.registradaEnBodega)
     assert.equal(factura.registradaPor.email, 'adminbodega@correo.com')
@@ -880,7 +880,7 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
       .bearerToken(instructor)
     vistaInstructor.assertStatus(200)
-    assert.equal(vistaInstructor.body().data.totales.cantidadPendiente, 3)
+    assert.equal(datosDe<{ totales: { cantidadPendiente: number } }>(vistaInstructor).totales.cantidadPendiente, 3)
 
     const avisos = await bandeja(client, instructor)
     const aviso = avisos.find((row) => row.titulo.includes(codigo))
@@ -957,7 +957,7 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
     const cerrada = await client
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
       .bearerToken(instructor)
-    assert.equal(cerrada.body().data.estado, 'cerrado')
+    assert.equal(datosDe<{ estado: string }>(cerrada).estado, 'cerrado')
 
     const historialBodega = await client
       .get('/api/v1/entregas')
@@ -965,11 +965,11 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
       .qs({ documento: INSTRUCTOR_DOCUMENTO, tipo: 'equipo', perPage: 100 })
     historialBodega.assertStatus(200)
     const salidas = (
-      historialBodega.body().data as {
+      (historialBodega.body() as unknown as {
         cantidad: number
         tipo: string
         solicitud: { codigoSolicitud: string; usuario: { email: string } }
-      }[]
+      }[])
     ).filter((row) => row.solicitud.codigoSolicitud === codigo)
     assert.deepEqual(
       salidas.map((row) => row.cantidad),
@@ -984,7 +984,7 @@ test.group('Entregas parciales y solicitud desde bodega', () => {
       .qs({ perPage: 100 })
     historialInstructor.assertStatus(200)
     assert.isTrue(
-      (historialInstructor.body().data as { solicitud: { codigoSolicitud: string } }[]).some(
+      ((historialInstructor.body() as unknown as { solicitud: { codigoSolicitud: string } }[])).some(
         (row) => row.solicitud.codigoSolicitud === codigo
       )
     )

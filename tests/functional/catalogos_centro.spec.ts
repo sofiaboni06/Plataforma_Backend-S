@@ -8,6 +8,10 @@ async function login(client: ApiClient, email: string) {
   return response.body().data.token as string
 }
 
+function datosDe<T>(response: { body(): unknown }) {
+  return (response.body() as { data: T }).data
+}
+
 test.group('Catálogos estándar de la plataforma', () => {
   test('una clasificación o categoría nueva la ven todos y el centro no la crea', async ({
     client,
@@ -30,8 +34,8 @@ test.group('Catálogos estándar de la plataforma', () => {
 
     const idsAdmin = (delAdmin.body().data as { id: number; nombre: string }[]).map((row) => row.id)
     const idsCentro = (delCentro.body().data as { id: number }[]).map((row) => row.id)
-    assert.include(idsAdmin, creada.body().data.id)
-    assert.include(idsCentro, creada.body().data.id)
+    assert.include(idsAdmin, datosDe<{ id: number }>(creada).id)
+    assert.include(idsCentro, datosDe<{ id: number }>(creada).id)
     assert.isTrue(
       (delAdmin.body().data as { nombre: string }[]).some(
         (row) => row.nombre === 'MATERIAL DE CONSUMO'
@@ -58,14 +62,14 @@ test.group('Catálogos estándar de la plataforma', () => {
     const subcategoria = await client
       .post('/api/v1/subcategorias')
       .bearerToken(admin)
-      .json({ idCategoria: categoria.body().data.id, nombre: `Sub global ${suffix}` })
+      .json({ idCategoria: datosDe<{ id: number }>(categoria).id, nombre: `Sub global ${suffix}` })
     subcategoria.assertStatus(200)
 
     const categoriasCentro = await client.get('/api/v1/categorias').bearerToken(bodegaUser)
     categoriasCentro.assertStatus(200)
     assert.isTrue(
       (categoriasCentro.body().data as { id: number }[]).some(
-        (row) => row.id === categoria.body().data.id
+        (row) => row.id === datosDe<{ id: number }>(categoria).id
       )
     )
 
@@ -76,7 +80,7 @@ test.group('Catálogos estándar de la plataforma', () => {
     categoriaAjena.assertStatus(403)
 
     const itemAjeno = await Item.create({
-      idSubcategoria: subcategoria.body().data.id,
+      idSubcategoria: datosDe<{ id: number }>(subcategoria).id,
       idCformacion: 2,
       nombre: `Item cauca ${suffix}`,
       estado: true,
@@ -94,7 +98,7 @@ test.group('Catálogos estándar de la plataforma', () => {
       .bearerToken(bodegaUser)
       .json({
         nombre: `Item valle ${suffix}`,
-        idSubcategoria: subcategoria.body().data.id,
+        idSubcategoria: datosDe<{ id: number }>(subcategoria).id,
       })
     itemPropio.assertStatus(200)
   })
@@ -111,22 +115,27 @@ test.group('Catálogos estándar de la plataforma', () => {
       .bearerToken(admin)
       .json({ nombre: `Bodega para asignar ${suffix}`, idCformacion: 2 })
     creada.assertStatus(200)
-    assert.equal(creada.body().data.idCformacion, 2)
-    assert.equal(creada.body().data.nombre, `Bodega para asignar ${suffix}`)
+    assert.equal(datosDe<{ idCformacion: number }>(creada).idCformacion, 2)
+    assert.equal(datosDe<{ nombre: string }>(creada).nombre, `Bodega para asignar ${suffix}`)
 
     const listado = await client.get('/api/v1/bodegas').bearerToken(admin).qs({ perPage: 100 })
     listado.assertStatus(200)
     const rows = listado.body().data as { id: number }[]
-    assert.isFalse(rows.some((row) => row.id === creada.body().data.id))
+    assert.isFalse(rows.some((row) => row.id === datosDe<{ id: number }>(creada).id))
 
-    const detalle = await client.get(`/api/v1/bodegas/${creada.body().data.id}`).bearerToken(admin)
+    const detalle = await client
+      .get(`/api/v1/bodegas/${datosDe<{ id: number }>(creada).id}`)
+      .bearerToken(admin)
     detalle.assertStatus(403)
 
     const options = await client.get('/api/v1/users/options').bearerToken(admin)
     options.assertStatus(200)
     const bodegas = options.body().data.bodegas as { id: number; trainingCenterId: number }[]
     assert.isTrue(
-      bodegas.some((bodega) => bodega.id === creada.body().data.id && bodega.trainingCenterId === 2)
+      bodegas.some(
+        (bodega) =>
+          bodega.id === datosDe<{ id: number }>(creada).id && bodega.trainingCenterId === 2
+      )
     )
   })
 })

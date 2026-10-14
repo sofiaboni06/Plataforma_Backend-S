@@ -16,13 +16,17 @@ async function login(client: ApiClient, email: string) {
   return response.body().data.token as string
 }
 
+function datosDe<T>(response: { body(): unknown }) {
+  return (response.body() as { data: T }).data
+}
+
 async function bandeja(client: ApiClient, token: string) {
   const response = await client
     .get('/api/v1/account/notifications')
     .bearerToken(token)
     .qs({ perPage: 100 })
   response.assertStatus(200)
-  return response.body().data as Aviso[]
+  return datosDe<Aviso[]>(response)
 }
 
 /**
@@ -76,7 +80,7 @@ test.group('Notificaciones', () => {
       .post('/api/v1/subcategorias')
       .bearerToken(admin)
       .json({
-        idCategoria: categoriaRes.body().data.id,
+        idCategoria: datosDe<{ id: number }>(categoriaRes).id,
         nombre: `Sub aviso ${suffix}`,
         estado: true,
       })
@@ -88,7 +92,7 @@ test.group('Notificaciones', () => {
       .json({
         nombre: `Cemento ${suffix}`,
         descripcion: 'Material de consumo',
-        idSubcategoria: subcategoriaRes.body().data.id,
+        idSubcategoria: datosDe<{ id: number }>(subcategoriaRes).id,
       })
     itemMaterial.assertStatus(200)
 
@@ -98,7 +102,7 @@ test.group('Notificaciones', () => {
       .json({
         nombre: `Taladro aviso ${suffix}`,
         descripcion: 'Equipo devolutivo',
-        idSubcategoria: subcategoriaRes.body().data.id,
+        idSubcategoria: datosDe<{ id: number }>(subcategoriaRes).id,
       })
     itemEquipo.assertStatus(200)
 
@@ -113,11 +117,11 @@ test.group('Notificaciones', () => {
     subBodega.assertStatus(200)
 
     const stand = await client
-      .post(`/api/v1/bodegas/sub-bodegas/${subBodega.body().data.id}/stands`)
+      .post(`/api/v1/bodegas/sub-bodegas/${datosDe<{ id: number }>(subBodega).id}/stands`)
       .bearerToken(admin)
       .json({ nombre: `Stand aviso ${suffix}` })
     stand.assertStatus(200)
-    const standId = stand.body().data.id as number
+    const standId = datosDe<{ id: number }>(stand).id
 
     const unidades = await client.get('/api/v1/unidades-medida').bearerToken(admin)
     unidades.assertStatus(200)
@@ -135,7 +139,7 @@ test.group('Notificaciones', () => {
       .post('/api/v1/inventario/elementos')
       .bearerToken(admin)
       .json({
-        idItem: itemMaterial.body().data.id,
+        idItem: datosDe<{ id: number }>(itemMaterial).id,
         nombre: `Cemento ${suffix}`,
         idStand: standId,
         cantidad: 12,
@@ -147,13 +151,13 @@ test.group('Notificaciones', () => {
         caracter: 'consumo',
       })
     material.assertStatus(200)
-    const materialId = material.body().data.id as number
+    const materialId = datosDe<{ id: number }>(material).id
 
     const equipo = await client
       .post('/api/v1/inventario/elementos')
       .bearerToken(admin)
       .json({
-        idItem: itemEquipo.body().data.id,
+        idItem: datosDe<{ id: number }>(itemEquipo).id,
         nombre: `Taladro aviso ${suffix}`,
         idStand: standId,
         cantidad: 20,
@@ -165,14 +169,14 @@ test.group('Notificaciones', () => {
         caracter: 'devolutivo',
       })
     equipo.assertStatus(200)
-    const equipoId = equipo.body().data.id as number
+    const equipoId = datosDe<{ id: number }>(equipo).id
 
     const obra = await client
       .post('/api/v1/obras')
       .bearerToken(bodega)
       .json({ nombre: `Obra aviso ${suffix}` })
     obra.assertStatus(200)
-    const obraId = obra.body().data.id as number
+    const obraId = datosDe<{ id: number }>(obra).id
 
     const broadcasts: { channel: string; payload: { tipo?: string } }[] = []
     const stopListening = transmit.on('broadcast', (event) => {
@@ -189,7 +193,7 @@ test.group('Notificaciones', () => {
         cantidad: 3,
       })
     pedido.assertStatus(201)
-    const pedidoId = pedido.body().data.id as number
+    const pedidoId = datosDe<{ id: number }>(pedido).id
 
     stopListening()
     assert.isTrue(
@@ -258,7 +262,7 @@ test.group('Notificaciones', () => {
 
     const alertas = await client.get('/api/v1/inventario/alertas').bearerToken(bodega)
     alertas.assertStatus(200)
-    const activas = alertas.body().data as { idElemento: number; tipo: string; estado: boolean }[]
+    const activas = datosDe<{ idElemento: number; tipo: string; estado: boolean }[]>(alertas)
     assert.isTrue(
       activas.some(
         (row) => row.idElemento === materialId && row.tipo === 'por_agotarse' && row.estado
@@ -270,7 +274,7 @@ test.group('Notificaciones', () => {
       .bearerToken(instructor)
       .json({ leida: true })
     todas.assertStatus(200)
-    assert.isAtLeast(todas.body().data.total, 1)
+    assert.isAtLeast(datosDe<{ total: number }>(todas).total, 1)
     const bandejaLeida = await bandeja(client, instructor)
     assert.isFalse(bandejaLeida.some((row) => !row.leida))
 
@@ -297,7 +301,7 @@ test.group('Notificaciones', () => {
         cantidad: 2,
       })
     prestamo.assertStatus(201)
-    const prestamoId = prestamo.body().data.id as number
+    const prestamoId = datosDe<{ id: number }>(prestamo).id
 
     const pedidoEquipo = await bandeja(client, bodega)
     assert.isTrue(

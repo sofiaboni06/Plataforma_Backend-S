@@ -1399,4 +1399,28 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'reportes.reportes.elementos': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/reportes/elementos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'reportes.reportes.bodega': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/reportes/bodega/:id/:formato'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; formato: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
 }

@@ -9,6 +9,10 @@ async function login(client: ApiClient, email: string) {
   return response.body().data.token as string
 }
 
+function datosDe<T>(response: { body(): unknown }) {
+  return (response.body() as { data: T }).data
+}
+
 test.group('Solicitud con varios elementos', () => {
   test('cada solicitud es de un solo tipo y lleva varios elementos', async ({ client, assert }) => {
     const admin = await login(client, 'carlos@correo.com')
@@ -26,12 +30,12 @@ test.group('Solicitud con varios elementos', () => {
       .post('/api/v1/subcategorias')
       .bearerToken(admin)
       .json({
-        idCategoria: categoria.body().data.id,
+        idCategoria: datosDe<{ id: number }>(categoria).id,
         nombre: `Sub factura ${suffix}`,
         estado: true,
       })
     subcategoria.assertStatus(200)
-    const idSubcategoria = subcategoria.body().data.id as number
+    const idSubcategoria = datosDe<{ id: number }>(subcategoria).id
 
     const item = async (nombre: string) => {
       const response = await client
@@ -39,7 +43,7 @@ test.group('Solicitud con varios elementos', () => {
         .bearerToken(admin)
         .json({ nombre: `${nombre} ${suffix}`, descripcion: nombre, idSubcategoria })
       response.assertStatus(200)
-      return response.body().data.id as number
+      return datosDe<{ id: number }>(response).id
     }
 
     const bodegas = await client.get('/api/v1/bodegas').bearerToken(bodega)
@@ -57,7 +61,7 @@ test.group('Solicitud con varios elementos', () => {
       .bearerToken(admin)
       .json({ nombre: `Stand factura ${suffix}` })
     stand.assertStatus(200)
-    const idStand = stand.body().data.id as number
+    const idStand = datosDe<{ id: number }>(stand).id
 
     const unidades = await client.get('/api/v1/unidades-medida').bearerToken(admin)
     unidades.assertStatus(200)
@@ -90,7 +94,7 @@ test.group('Solicitud con varios elementos', () => {
           caracter,
         })
       response.assertStatus(200)
-      return response.body().data.id as number
+      return datosDe<{ id: number }>(response).id
     }
 
     const equipoId = await elemento('Pulidora', 'FAC-EQ', herramienta.id, 'devolutivo')
@@ -102,7 +106,7 @@ test.group('Solicitud con varios elementos', () => {
       .bearerToken(bodega)
       .json({ nombre: `Obra factura ${suffix}` })
     obra.assertStatus(200)
-    const idObra = obra.body().data.id as number
+    const idObra = datosDe<{ id: number }>(obra).id
 
     const codigo = `FAC-${suffix}`
     const pedir = (body: Record<string, unknown>, token = instructor) =>
@@ -140,8 +144,8 @@ test.group('Solicitud con varios elementos', () => {
       ],
     })
     mezclada.assertStatus(422)
-    assert.equal(mezclada.body().code, 'E_TIPO_DISTINTO')
-    assert.include(mezclada.body().message, `Pulidora ${suffix}`)
+    assert.equal((mezclada.body() as unknown as { code: string }).code, 'E_TIPO_DISTINTO')
+    assert.include((mezclada.body() as unknown as { message: string }).message, `Pulidora ${suffix}`)
 
     const filaInexistente = await pedir({
       tipo: 'consumo',
@@ -151,7 +155,7 @@ test.group('Solicitud con varios elementos', () => {
       ],
     })
     filaInexistente.assertStatus(404)
-    assert.include(filaInexistente.body().message, 'fila 2')
+    assert.include((filaInexistente.body() as unknown as { message: string }).message, 'fila 2')
 
     const nadaGuardado = await client
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
@@ -168,7 +172,15 @@ test.group('Solicitud con varios elementos', () => {
       ],
     })
     creada.assertStatus(201)
-    const factura = creada.body().data
+    const factura = datosDe<{
+      codigoSolicitud: string
+      tipo: string
+      estado: string
+      ficha: string | null
+      obra: { id: number }
+      totales: { lineas: number; pendientes: number }
+      detalle: (Fila & { observacion: string | null })[]
+    }>(creada)
     assert.equal(factura.codigoSolicitud, codigo)
     assert.equal(factura.tipo, 'consumo')
     assert.equal(factura.estado, 'pendiente')
@@ -218,9 +230,9 @@ test.group('Solicitud con varios elementos', () => {
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
       .bearerToken(instructor)
     propiaInstructor.assertStatus(200)
-    const filasInstructor = propiaInstructor.body().data.detalle as {
-      elemento: Record<string, unknown>
-    }[]
+    const filasInstructor = datosDe<{
+      detalle: { elemento: Record<string, unknown> }[]
+    }>(propiaInstructor).detalle
     assert.isTrue(filasInstructor.every((row) => !('cantidad' in row.elemento)))
 
     const materialInstructor = await client
@@ -241,7 +253,7 @@ test.group('Solicitud con varios elementos', () => {
       .bearerToken(bodega)
       .qs({ perPage: 100 })
     avisos.assertStatus(200)
-    const deEsta = (avisos.body().data as { tipo: string; titulo: string }[]).filter((row) =>
+    const deEsta = datosDe<{ tipo: string; titulo: string }[]>(avisos).filter((row) =>
       row.titulo.includes(codigo)
     )
     assert.equal(deEsta.length, 1)
@@ -252,7 +264,7 @@ test.group('Solicitud con varios elementos', () => {
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
       .bearerToken(bodega)
     vistaBodega.assertStatus(200)
-    assert.equal(vistaBodega.body().data.totales.lineas, 2)
+    assert.equal(datosDe<{ totales: { lineas: number } }>(vistaBodega).totales.lineas, 2)
 
     const entregaLija = await client
       .patch(`/api/v1/solicitudes-material/${filaLija.id}/entregar`)
@@ -262,7 +274,7 @@ test.group('Solicitud con varios elementos', () => {
     const parcial = await client
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
       .bearerToken(instructor)
-    assert.equal(parcial.body().data.estado, 'parcial')
+    assert.equal(datosDe<{ estado: string }>(parcial).estado, 'parcial')
 
     const entregaCinta = await client
       .patch(`/api/v1/solicitudes-material/${filaCinta.id}/entregar`)
@@ -272,7 +284,7 @@ test.group('Solicitud con varios elementos', () => {
     const consumoCerrada = await client
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigo)}`)
       .bearerToken(instructor)
-    assert.equal(consumoCerrada.body().data.estado, 'cerrado')
+    assert.equal(datosDe<{ estado: string }>(consumoCerrada).estado, 'cerrado')
 
     const codigoEquipo = `FAC-EQ-${suffix}`
     const deEquipo = await client
@@ -285,8 +297,8 @@ test.group('Solicitud con varios elementos', () => {
         elementos: [{ idElemento: equipoId, cantidad: 2 }],
       })
     deEquipo.assertStatus(201)
-    assert.equal(deEquipo.body().data.tipo, 'devolutivo')
-    const filaEquipo = (deEquipo.body().data.detalle as Fila[])[0]
+    assert.equal(datosDe<{ tipo: string; detalle: Fila[] }>(deEquipo).tipo, 'devolutivo')
+    const filaEquipo = (datosDe<{ tipo: string; detalle: Fila[] }>(deEquipo).detalle)[0]
     assert.equal(filaEquipo.tipo, 'equipo')
 
     const entregaEquipo = await client
@@ -297,7 +309,7 @@ test.group('Solicitud con varios elementos', () => {
     const afuera = await client
       .get(`/api/v1/solicitudes/${encodeURIComponent(codigoEquipo)}`)
       .bearerToken(instructor)
-    assert.equal(afuera.body().data.estado, 'entregado')
+    assert.equal(datosDe<{ estado: string }>(afuera).estado, 'entregado')
 
     const devuelto = await client
       .patch(`/api/v1/solicitudes-equipo/${filaEquipo.id}/devolver`)
@@ -310,7 +322,7 @@ test.group('Solicitud con varios elementos', () => {
       .bearerToken(instructor)
       .qs({ estado: 'cerrado' })
     cerradas.assertStatus(200)
-    const codigos = (cerradas.body().data as { codigoSolicitud: string }[]).map(
+    const codigos = datosDe<{ codigoSolicitud: string }[]>(cerradas).map(
       (row) => row.codigoSolicitud
     )
     assert.includeMembers(codigos, [codigo, codigoEquipo])

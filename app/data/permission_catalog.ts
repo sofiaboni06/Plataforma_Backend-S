@@ -6,7 +6,7 @@
  * `module` must match `modulo.nombre` in the dump, since permissions hang from
  * the module a profile was granted.
  */
-export const PERMISSION_ACTIONS = ['ver', 'crear', 'editar', 'eliminar', 'entregar', 'devolver'] as const
+export const PERMISSION_ACTIONS = ['ver', 'crear', 'editar', 'eliminar', 'entregar', 'devolver', 'generar'] as const
 
 export type PermissionAction = (typeof PERMISSION_ACTIONS)[number]
 
@@ -17,6 +17,7 @@ export const ACTION_LABELS: Record<PermissionAction, string> = {
   eliminar: 'Eliminar',
   entregar: 'Entregar',
   devolver: 'Devolver',
+  generar: 'Generar',
 }
 
 export const PERMISSION_RESOURCES = {
@@ -89,6 +90,11 @@ export const PERMISSION_RESOURCES = {
     module: 'Inventario',
     label: 'Alertas',
     actions: ['ver'],
+  },
+  reporte: {
+    module: 'Inventario',
+    label: 'Reportes',
+    actions: ['generar'],
   },
 } as const
 

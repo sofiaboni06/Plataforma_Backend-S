@@ -218,4 +218,10 @@ export interface ApiDefinition {
       entregar: typeof routes['solicitudesMaterial.solicitud_material.entregar']
     }
   }
+  reportes: {
+    reportes: {
+      elementos: typeof routes['reportes.reportes.elementos']
+      bodega: typeof routes['reportes.reportes.bodega']
+    }
+  }
 }

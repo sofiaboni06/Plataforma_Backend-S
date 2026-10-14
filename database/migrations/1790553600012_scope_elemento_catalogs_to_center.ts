@@ -1,4 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+import type { QueryClientContract } from '@adonisjs/lucid/types/database'
 
 /**
  * Clasificación, unidad de medida, código UNSPSC y uso presupuestal eran
@@ -92,12 +93,7 @@ export default class extends BaseSchema {
   }
 }
 
-async function tieCatalogToCenter(
-  db: {
-    rawQuery: (sql: string, bindings?: unknown[]) => Promise<unknown>
-  },
-  spec: CatalogSpec
-) {
+async function tieCatalogToCenter(db: QueryClientContract, spec: CatalogSpec) {
   await db.rawQuery(`
     ALTER TABLE ${spec.table}
       ADD COLUMN IF NOT EXISTS id_cformacion integer NULL
@@ -186,12 +182,7 @@ async function tieCatalogToCenter(
   }
 }
 
-async function untieCatalog(
-  db: {
-    rawQuery: (sql: string, bindings?: unknown[]) => Promise<unknown>
-  },
-  spec: CatalogSpec
-) {
+async function untieCatalog(db: QueryClientContract, spec: CatalogSpec) {
   await db.rawQuery(`DROP INDEX IF EXISTS ${spec.table}_id_cformacion_idx`)
   await db.rawQuery(`DROP INDEX IF EXISTS uq_${spec.table}_centro_nombre`)
   await db.rawQuery(`DROP INDEX IF EXISTS uq_${spec.table}_centro_codigo`)

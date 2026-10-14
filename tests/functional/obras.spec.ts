@@ -9,6 +9,10 @@ async function login(client: ApiClient, email: string) {
 
 type ObraRow = { id: number; idCformacion: number; nombre: string; lugar: string | null; estado: boolean }
 
+function datosDe<T>(response: { body(): unknown }) {
+  return (response.body() as { data: T }).data
+}
+
 test.group('Obras (CRUD)', () => {
   test('crear, listar, cambiar y apagar una obra', async ({ client, assert }) => {
     const token = await login(client, 'adminbodega@correo.com')
@@ -80,7 +84,7 @@ test.group('Obras (CRUD)', () => {
       .bearerToken(admin)
       .json({ nombre, lugar: 'Sede 2', idCformacion: 2 })
     ajena.assertStatus(200)
-    assert.equal(ajena.body().data.idCformacion, 2)
+    assert.equal(datosDe<{ idCformacion: number }>(ajena).idCformacion, 2)
 
     const propias = await client.get('/api/v1/obras').bearerToken(bodegaUser)
     propias.assertStatus(200)
@@ -89,10 +93,10 @@ test.group('Obras (CRUD)', () => {
     assert.isFalse(rows.some((row) => row.nombre === nombre))
 
     // no puede verla ni cambiarla por id
-    const detalle = await client.get(`/api/v1/obras/${ajena.body().data.id}`).bearerToken(bodegaUser)
+    const detalle = await client.get(`/api/v1/obras/${datosDe<{ id: number }>(ajena).id}`).bearerToken(bodegaUser)
     detalle.assertStatus(403)
     const cambio = await client
-      .patch(`/api/v1/obras/${ajena.body().data.id}`)
+      .patch(`/api/v1/obras/${datosDe<{ id: number }>(ajena).id}`)
       .bearerToken(bodegaUser)
       .json({ nombre: 'hackeada' })
     cambio.assertStatus(403)
@@ -103,7 +107,7 @@ test.group('Obras (CRUD)', () => {
       .bearerToken(bodegaUser)
       .json({ nombre: `Forzada ${suffix}`, idCformacion: 2 })
     forzada.assertStatus(200)
-    assert.equal(forzada.body().data.idCformacion, 1)
+    assert.equal(datosDe<{ idCformacion: number }>(forzada).idCformacion, 1)
   })
 
   test('no se repite el nombre dentro del mismo centro', async ({ client }) => {

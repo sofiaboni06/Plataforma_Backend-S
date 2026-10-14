@@ -9,6 +9,7 @@ import SolicitudEquipoController from '#controllers/solicitud_equipo_controller'
 import SolicitudMaterialController from '#controllers/solicitud_material_controller'
 import SolicitudesController from '#controllers/solicitudes_controller'
 import PasswordRecoveryController from '#controllers/password_recovery_controller'
+import ReportesController from '#controllers/reportes_controller'
 import transmit from '@adonisjs/transmit/services/main'
 
 router.get('/', () => {
@@ -429,6 +430,20 @@ router
       })
       .prefix('solicitudes-material')
       .as('solicitudesMaterial')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('elementos', [ReportesController, 'elementos'])
+          .use(middleware.permission('reporte.generar'))
+        router
+          .get('bodega/:id/:formato', [ReportesController, 'bodega'])
+          .use(middleware.permission('reporte.generar'))
+      })
+      .prefix('reportes')
+      .as('reportes')
       .use(middleware.auth())
       .use(middleware.account())
   })
