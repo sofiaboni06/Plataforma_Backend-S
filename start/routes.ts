@@ -10,6 +10,8 @@ import SolicitudMaterialController from '#controllers/solicitud_material_control
 import SolicitudesController from '#controllers/solicitudes_controller'
 import PasswordRecoveryController from '#controllers/password_recovery_controller'
 import ReportesController from '#controllers/reportes_controller'
+import RedesConocimientoController from '#controllers/redes_conocimiento_controller'
+import LineasTematicasController from '#controllers/lineas_tematicas_controller'
 import transmit from '@adonisjs/transmit/services/main'
 
 router.get('/', () => {
@@ -446,5 +448,50 @@ router
       .as('reportes')
       .use(middleware.auth())
       .use(middleware.account())
+
+      
+router
+.group(() => {
+  router
+    .get('/redes-conocimiento', [RedesConocimientoController, 'index'])
+    .as('redes_conocimiento.index')
+
+  router
+    .post('/redes-conocimiento', [RedesConocimientoController, 'store'])
+    .as('redes_conocimiento.store')
+
+  router
+    .get('/redes-conocimiento/:id', [RedesConocimientoController, 'show'])
+    .as('redes_conocimiento.show')
+
+  router
+    .patch('/redes-conocimiento/:id', [RedesConocimientoController, 'update'])
+    .as('redes_conocimiento.update')
+
+  router
+    .delete('/redes-conocimiento/:id', [RedesConocimientoController, 'destroy'])
+    .as('redes_conocimiento.destroy')
+
+  router
+    .get('/lineas-tematicas', [LineasTematicasController, 'index'])
+    .as('lineas_tematicas.index')
+
+  router
+    .post('/lineas-tematicas', [LineasTematicasController, 'store'])
+    .as('lineas_tematicas.store')
+
+  router
+    .get('/lineas-tematicas/:id', [LineasTematicasController, 'show'])
+    .as('lineas_tematicas.show')
+
+  router
+    .patch('/lineas-tematicas/:id', [LineasTematicasController, 'update'])
+    .as('lineas_tematicas.update')
+
+  router
+    .delete('/lineas-tematicas/:id', [LineasTematicasController, 'destroy'])
+    .as('lineas_tematicas.destroy')
+})
+
   })
   .prefix('/api/v1')
