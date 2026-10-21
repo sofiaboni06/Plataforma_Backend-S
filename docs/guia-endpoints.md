@@ -411,3 +411,31 @@ sin token responde 401. Al cerrar sesión llama `canal.delete()`.
 Archivos: `notificacion_service.ts`, `alerta_service.ts`, `start/transmit.ts`,
 `tests/functional/notificaciones.spec.ts`.
 
+
+## Materiales de formaci�n
+
+Un material de formaci�n es un **elemento del inventario que un programa de formaci�n necesita**,
+con su cantidad base de referencia: es la fila de la tabla `lista_maestra_material` (pareja
+programa+elemento �nica). No duplica el elemento ni toca inventario: el material solo lo referencia
+por `idElemento`, y bodega sigue mandando sobre su stock.
+
+| M�todo | Ruta | Notas |
+| --- | --- | --- |
+| `GET` | `/materiales-formacion` | listado con `programa` y `elemento`. `?idPrograma=` / `?estado=` |
+| `GET` | `/materiales-formacion/programas` | opciones del selector: programas activos (`id`, `codigo`, `nombre`, `version`) |
+| `GET` | `/materiales-formacion/elementos` | opciones del selector: identificación global de elementos (`id`, `nombre`, `codigo`, `estado`, `unidadMedida`), sin stock ni ubicación |
+| `POST` | `/materiales-formacion` | `idPrograma`, `idElemento`, `cantidadBase` (>= 1), `observaciones?`, `estado?`. Pareja repetida responde 409; programa o elemento inactivos, 422 |
+| `GET` | `/materiales-formacion/:id` | detalle |
+| `PATCH` | `/materiales-formacion/:id` | mismos campos, todos opcionales |
+| `DELETE` | `/materiales-formacion/:id` | **deshabilita** (`estado=false`). No se borra: las solicitudes por programa referencian la fila con FK |
+
+Permisos `material_formacion.ver/crear/editar/eliminar`, m�dulo `Materiales de Formaci�n`. No son
+de centro, as� que el Administrador de la plataforma los recibe sin nada m�s. Para los dem�s
+perfiles falta correr `node ace db:seed` (idempotente, requiere autorizaci�n) y asignar los
+permisos en Roles.
+
+Archivos: `app/models/lista_maestra_material.ts`, `app/models/programa_formacion.ts` (vista
+m�nima del cat�logo), `app/services/material_formacion_service.ts`,
+`app/transformers/material_formacion_transformer.ts`,
+`app/controllers/materiales_formacion_controller.ts`,
+`tests/functional/material_formacion.spec.ts`.

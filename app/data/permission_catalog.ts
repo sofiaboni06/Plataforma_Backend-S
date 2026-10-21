@@ -96,6 +96,11 @@ export const PERMISSION_RESOURCES = {
     label: 'Reportes',
     actions: ['generar'],
   },
+  material_formacion: {
+    module: 'Materiales de Formación',
+    label: 'Materiales de formación',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
 } as const
 
 type PermissionResources = typeof PERMISSION_RESOURCES

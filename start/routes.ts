@@ -8,6 +8,7 @@ import NotificacionesController from '#controllers/notificaciones_controller'
 import SolicitudEquipoController from '#controllers/solicitud_equipo_controller'
 import SolicitudMaterialController from '#controllers/solicitud_material_controller'
 import SolicitudesController from '#controllers/solicitudes_controller'
+import MaterialesFormacionController from '#controllers/materiales_formacion_controller'
 import PasswordRecoveryController from '#controllers/password_recovery_controller'
 import ReportesController from '#controllers/reportes_controller'
 import transmit from '@adonisjs/transmit/services/main'
@@ -430,6 +431,45 @@ router
       })
       .prefix('solicitudes-material')
       .as('solicitudesMaterial')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    /* CRUD de materiales de formación: qué elemento usa cada programa y con
+     * qué cantidad base. Catálogo de plataforma, no de centro. */
+    router
+      .group(() => {
+        router
+          .get('/', [MaterialesFormacionController, 'index'])
+          .use(middleware.permission('material_formacion.ver'))
+        router
+          .get('programas', [MaterialesFormacionController, 'programas'])
+          .use(middleware.permission('material_formacion.ver'))
+        router
+          .get('elementos', [MaterialesFormacionController, 'elementos'])
+          .use(middleware.permission('material_formacion.ver'))
+        /* Solicitudes de materiales por programa: flujo propio de
+         * formación, sin obras, bodega, entregas ni devoluciones. */
+        router
+          .get('solicitudes', [MaterialesFormacionController, 'solicitudesIndex'])
+          .use(middleware.permission('material_formacion.ver'))
+        router
+          .post('solicitudes', [MaterialesFormacionController, 'solicitudesStore'])
+          .use(middleware.permission('material_formacion.crear'))
+        router
+          .post('/', [MaterialesFormacionController, 'store'])
+          .use(middleware.permission('material_formacion.crear'))
+        router
+          .get(':id', [MaterialesFormacionController, 'show'])
+          .use(middleware.permission('material_formacion.ver'))
+        router
+          .patch(':id', [MaterialesFormacionController, 'update'])
+          .use(middleware.permission('material_formacion.editar'))
+        router
+          .delete(':id', [MaterialesFormacionController, 'destroy'])
+          .use(middleware.permission('material_formacion.eliminar'))
+      })
+      .prefix('materiales-formacion')
+      .as('materialesFormacion')
       .use(middleware.auth())
       .use(middleware.account())
 
