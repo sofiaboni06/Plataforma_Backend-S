@@ -1,4 +1,6 @@
 import ProfileService from '#services/profile_service'
+import UsuarioService from '#services/usuario_service'
+import ProgramaFormacionTransformer from '#transformers/programa_formacion_transformer'
 import UserTransformer from '#transformers/user_transformer'
 import { effectivePermissionCodes, resolveScope } from '#services/access_control'
 import { changePasswordValidator, updateProfileValidator } from '#validators/usuario'
@@ -27,6 +29,12 @@ export default class ProfileController {
     return {
       message: 'Contraseña actualizada',
     }
+  }
+
+  async programas({ auth, serialize }: HttpContext) {
+    const account = auth.getUserOrFail()
+    const programas = await new UsuarioService().programas(account.id)
+    return serialize(ProgramaFormacionTransformer.transform(programas))
   }
 
   private async present(account: User, user: User) {

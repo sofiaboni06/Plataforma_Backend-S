@@ -56,6 +56,7 @@ router
         router.get('profile', [controllers.Profile, 'show'])
         router.patch('profile', [controllers.Profile, 'update'])
         router.patch('password', [controllers.Profile, 'changePassword'])
+        router.get('programas', [controllers.Profile, 'programas'])
         router.get('notifications', [NotificacionesController, 'index'])
         router.patch('notifications', [NotificacionesController, 'updateAll'])
         router.patch('notifications/:id', [NotificacionesController, 'update'])
@@ -98,6 +99,8 @@ router
         router.get('options', [controllers.Users, 'options'])
         router.get('/', [controllers.Users, 'index'])
         router.post('/', [controllers.Users, 'store'])
+        router.get(':id/programas', [controllers.Users, 'programas'])
+        router.put(':id/programas', [controllers.Users, 'syncProgramas'])
         router.get(':id', [controllers.Users, 'show'])
         router.patch(':id', [controllers.Users, 'update'])
         router.put(':id/bodegas', [controllers.Users, 'syncBodegas'])
@@ -348,6 +351,148 @@ router
       })
       .prefix('unidades-medida')
       .as('unidadesMedida')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.NivelesPrograma, 'index'])
+          .use(middleware.permission('nivel_formacion.ver'))
+        router
+          .post('/', [controllers.NivelesPrograma, 'store'])
+          .use(middleware.permission('nivel_formacion.crear'))
+        router
+          .get(':id', [controllers.NivelesPrograma, 'show'])
+          .use(middleware.permission('nivel_formacion.ver'))
+        router
+          .patch(':id', [controllers.NivelesPrograma, 'update'])
+          .use(middleware.permission('nivel_formacion.editar'))
+        router
+          .delete(':id', [controllers.NivelesPrograma, 'destroy'])
+          .use(middleware.permission('nivel_formacion.eliminar'))
+      })
+      .prefix('niveles-programa')
+      .as('nivelesPrograma')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.RedesConocimiento, 'index'])
+          .use(middleware.permission('red_conocimiento.ver'))
+        router
+          .get('options', [controllers.RedesConocimiento, 'options'])
+          .use(middleware.permission('red_conocimiento.ver'))
+        router
+          .post('/', [controllers.RedesConocimiento, 'store'])
+          .use(middleware.permission('red_conocimiento.crear'))
+        router
+          .get(':id', [controllers.RedesConocimiento, 'show'])
+          .use(middleware.permission('red_conocimiento.ver'))
+        router
+          .patch(':id', [controllers.RedesConocimiento, 'update'])
+          .use(middleware.permission('red_conocimiento.editar'))
+        router
+          .put(':id/lineas-tematicas', [controllers.RedesConocimiento, 'syncLineas'])
+          .use(middleware.permission('red_conocimiento.editar'))
+        router
+          .delete(':id', [controllers.RedesConocimiento, 'destroy'])
+          .use(middleware.permission('red_conocimiento.eliminar'))
+      })
+      .prefix('redes-conocimiento')
+      .as('redesConocimiento')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.LineasTematicas, 'index'])
+          .use(middleware.permission('linea_tematica.ver'))
+        router
+          .get('options', [controllers.LineasTematicas, 'options'])
+          .use(middleware.permission('linea_tematica.ver'))
+        router
+          .post('/', [controllers.LineasTematicas, 'store'])
+          .use(middleware.permission('linea_tematica.crear'))
+        router
+          .get(':id', [controllers.LineasTematicas, 'show'])
+          .use(middleware.permission('linea_tematica.ver'))
+        router
+          .patch(':id', [controllers.LineasTematicas, 'update'])
+          .use(middleware.permission('linea_tematica.editar'))
+        router
+          .delete(':id', [controllers.LineasTematicas, 'destroy'])
+          .use(middleware.permission('linea_tematica.eliminar'))
+      })
+      .prefix('lineas-tematicas')
+      .as('lineasTematicas')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.ProgramasFormacion, 'index'])
+          .use(middleware.permission('programa_formacion.ver'))
+        router
+          .get('options', [controllers.ProgramasFormacion, 'options'])
+          .use(middleware.permission('programa_formacion.ver'))
+        router
+          .post('/', [controllers.ProgramasFormacion, 'store'])
+          .use(middleware.permission('programa_formacion.crear'))
+        router
+          .get(':id/usuarios', [controllers.ProgramasFormacion, 'usuarios'])
+          .use(middleware.permission('instructor_programa.ver'))
+        router
+          .get(':id', [controllers.ProgramasFormacion, 'show'])
+          .use(middleware.permission('programa_formacion.ver'))
+        router
+          .patch(':id', [controllers.ProgramasFormacion, 'update'])
+          .use(middleware.permission('programa_formacion.editar'))
+        router
+          .delete(':id', [controllers.ProgramasFormacion, 'destroy'])
+          .use(middleware.permission('programa_formacion.eliminar'))
+      })
+      .prefix('programas-formacion')
+      .as('programasFormacion')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.Fichas, 'index'])
+          .use(middleware.permission('ficha.ver'))
+        router
+          .get('options', [controllers.Fichas, 'options'])
+          .use(middleware.permission('ficha.ver'))
+        router
+          .post('/', [controllers.Fichas, 'store'])
+          .use(middleware.permission('ficha.crear'))
+        router
+          .get(':id', [controllers.Fichas, 'show'])
+          .use(middleware.permission('ficha.ver'))
+        router
+          .patch(':id', [controllers.Fichas, 'update'])
+          .use(middleware.permission('ficha.editar'))
+        router
+          .delete(':id', [controllers.Fichas, 'destroy'])
+          .use(middleware.permission('ficha.eliminar'))
+      })
+      .prefix('fichas')
+      .as('fichas')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.Jornadas, 'index'])
+      })
+      .prefix('jornadas')
+      .as('jornadas')
       .use(middleware.auth())
       .use(middleware.account())
 

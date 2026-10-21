@@ -31,6 +31,7 @@ export interface ApiDefinition {
       show: typeof routes['account.profile.show']
       update: typeof routes['account.profile.update']
       changePassword: typeof routes['account.profile.change_password']
+      programas: typeof routes['account.profile.programas']
     }
     notificaciones: {
       index: typeof routes['account.notificaciones.index']
@@ -64,6 +65,8 @@ export interface ApiDefinition {
       options: typeof routes['users.users.options']
       index: typeof routes['users.users.index']
       store: typeof routes['users.users.store']
+      programas: typeof routes['users.users.programas']
+      syncProgramas: typeof routes['users.users.sync_programas']
       show: typeof routes['users.users.show']
       update: typeof routes['users.users.update']
       syncBodegas: typeof routes['users.users.sync_bodegas']
@@ -173,6 +176,62 @@ export interface ApiDefinition {
       show: typeof routes['unidadesMedida.unidades_medida.show']
       update: typeof routes['unidadesMedida.unidades_medida.update']
       destroy: typeof routes['unidadesMedida.unidades_medida.destroy']
+    }
+  }
+  nivelesPrograma: {
+    nivelesPrograma: {
+      index: typeof routes['nivelesPrograma.niveles_programa.index']
+      store: typeof routes['nivelesPrograma.niveles_programa.store']
+      show: typeof routes['nivelesPrograma.niveles_programa.show']
+      update: typeof routes['nivelesPrograma.niveles_programa.update']
+      destroy: typeof routes['nivelesPrograma.niveles_programa.destroy']
+    }
+  }
+  redesConocimiento: {
+    redesConocimiento: {
+      index: typeof routes['redesConocimiento.redes_conocimiento.index']
+      options: typeof routes['redesConocimiento.redes_conocimiento.options']
+      store: typeof routes['redesConocimiento.redes_conocimiento.store']
+      show: typeof routes['redesConocimiento.redes_conocimiento.show']
+      update: typeof routes['redesConocimiento.redes_conocimiento.update']
+      syncLineas: typeof routes['redesConocimiento.redes_conocimiento.sync_lineas']
+      destroy: typeof routes['redesConocimiento.redes_conocimiento.destroy']
+    }
+  }
+  lineasTematicas: {
+    lineasTematicas: {
+      index: typeof routes['lineasTematicas.lineas_tematicas.index']
+      options: typeof routes['lineasTematicas.lineas_tematicas.options']
+      store: typeof routes['lineasTematicas.lineas_tematicas.store']
+      show: typeof routes['lineasTematicas.lineas_tematicas.show']
+      update: typeof routes['lineasTematicas.lineas_tematicas.update']
+      destroy: typeof routes['lineasTematicas.lineas_tematicas.destroy']
+    }
+  }
+  programasFormacion: {
+    programasFormacion: {
+      index: typeof routes['programasFormacion.programas_formacion.index']
+      options: typeof routes['programasFormacion.programas_formacion.options']
+      store: typeof routes['programasFormacion.programas_formacion.store']
+      usuarios: typeof routes['programasFormacion.programas_formacion.usuarios']
+      show: typeof routes['programasFormacion.programas_formacion.show']
+      update: typeof routes['programasFormacion.programas_formacion.update']
+      destroy: typeof routes['programasFormacion.programas_formacion.destroy']
+    }
+  }
+  fichas: {
+    fichas: {
+      index: typeof routes['fichas.fichas.index']
+      options: typeof routes['fichas.fichas.options']
+      store: typeof routes['fichas.fichas.store']
+      show: typeof routes['fichas.fichas.show']
+      update: typeof routes['fichas.fichas.update']
+      destroy: typeof routes['fichas.fichas.destroy']
+    }
+  }
+  jornadas: {
+    jornadas: {
+      index: typeof routes['jornadas.jornadas.index']
     }
   }
   obras: {
