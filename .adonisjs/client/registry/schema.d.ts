@@ -187,6 +187,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['changePassword']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'account.profile.programas': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/programas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['programas']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['programas']>>>
+    }
+  }
   'account.notificaciones.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/account/notifications'
@@ -389,6 +401,30 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/usuario').createUserValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/users_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'users.users.programas': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/users/:id/programas'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/users_controller').default['programas']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['programas']>>>
+    }
+  }
+  'users.users.sync_programas': {
+    methods: ["PUT"]
+    pattern: '/api/v1/users/:id/programas'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/usuario').assignProgramasValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/usuario').assignProgramasValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/users_controller').default['syncProgramas']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/users_controller').default['syncProgramas']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'users.users.show': {
@@ -1121,6 +1157,390 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/unidades_medida_controller').default['destroy']>>>
+    }
+  }
+  'nivelesPrograma.niveles_programa.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/niveles-programa'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['index']>>>
+    }
+  }
+  'nivelesPrograma.niveles_programa.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/niveles-programa'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/nivel_programa').createNivelProgramaValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/nivel_programa').createNivelProgramaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'nivelesPrograma.niveles_programa.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/niveles-programa/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['show']>>>
+    }
+  }
+  'nivelesPrograma.niveles_programa.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/niveles-programa/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/nivel_programa').updateNivelProgramaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/nivel_programa').updateNivelProgramaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'nivelesPrograma.niveles_programa.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/niveles-programa/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/niveles_programa_controller').default['destroy']>>>
+    }
+  }
+  'redesConocimiento.redes_conocimiento.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/redes-conocimiento'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['index']>>>
+    }
+  }
+  'redesConocimiento.redes_conocimiento.options': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/redes-conocimiento/options'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['options']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['options']>>>
+    }
+  }
+  'redesConocimiento.redes_conocimiento.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/redes-conocimiento'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/red_conocimiento').createRedConocimientoValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/red_conocimiento').createRedConocimientoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'redesConocimiento.redes_conocimiento.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/redes-conocimiento/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['show']>>>
+    }
+  }
+  'redesConocimiento.redes_conocimiento.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/redes-conocimiento/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/red_conocimiento').updateRedConocimientoValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/red_conocimiento').updateRedConocimientoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'redesConocimiento.redes_conocimiento.sync_lineas': {
+    methods: ["PUT"]
+    pattern: '/api/v1/redes-conocimiento/:id/lineas-tematicas'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/red_conocimiento').syncLineasTematicasValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/red_conocimiento').syncLineasTematicasValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['syncLineas']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['syncLineas']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'redesConocimiento.redes_conocimiento.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/redes-conocimiento/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redes_conocimiento_controller').default['destroy']>>>
+    }
+  }
+  'lineasTematicas.lineas_tematicas.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/lineas-tematicas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['index']>>>
+    }
+  }
+  'lineasTematicas.lineas_tematicas.options': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/lineas-tematicas/options'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['options']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['options']>>>
+    }
+  }
+  'lineasTematicas.lineas_tematicas.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/lineas-tematicas'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/linea_tematica').createLineaTematicaValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/linea_tematica').createLineaTematicaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'lineasTematicas.lineas_tematicas.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/lineas-tematicas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['show']>>>
+    }
+  }
+  'lineasTematicas.lineas_tematicas.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/lineas-tematicas/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/linea_tematica').updateLineaTematicaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/linea_tematica').updateLineaTematicaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'lineasTematicas.lineas_tematicas.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/lineas-tematicas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lineas_tematicas_controller').default['destroy']>>>
+    }
+  }
+  'programasFormacion.programas_formacion.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/programas-formacion'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['index']>>>
+    }
+  }
+  'programasFormacion.programas_formacion.options': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/programas-formacion/options'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['options']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['options']>>>
+    }
+  }
+  'programasFormacion.programas_formacion.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/programas-formacion'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/programa_formacion').createProgramaFormacionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/programa_formacion').createProgramaFormacionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'programasFormacion.programas_formacion.usuarios': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/programas-formacion/:id/usuarios'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['usuarios']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['usuarios']>>>
+    }
+  }
+  'programasFormacion.programas_formacion.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/programas-formacion/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['show']>>>
+    }
+  }
+  'programasFormacion.programas_formacion.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/programas-formacion/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/programa_formacion').updateProgramaFormacionValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/programa_formacion').updateProgramaFormacionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'programasFormacion.programas_formacion.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/programas-formacion/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['destroy']>>>
+    }
+  }
+  'fichas.fichas.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/fichas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['index']>>>
+    }
+  }
+  'fichas.fichas.options': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/fichas/options'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['options']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['options']>>>
+    }
+  }
+  'fichas.fichas.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/fichas'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/ficha').createFichaValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/ficha').createFichaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'fichas.fichas.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/fichas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['show']>>>
+    }
+  }
+  'fichas.fichas.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/fichas/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/ficha').updateFichaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/ficha').updateFichaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'fichas.fichas.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/fichas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/fichas_controller').default['destroy']>>>
+    }
+  }
+  'jornadas.jornadas.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/jornadas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/jornadas_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/jornadas_controller').default['index']>>>
     }
   }
   'obras.obras.index': {

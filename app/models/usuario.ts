@@ -8,6 +8,7 @@ import Bodega from '#models/bodega'
 import Modulo from '#models/modulo'
 import Perfil from '#models/perfil'
 import Permiso from '#models/permiso'
+import ProgramaFormacion from '#models/programa_formacion'
 import SolicitudEquipo from '#models/solicitud_equipo'
 import SolicitudMaterial from '#models/solicitud_material'
 import TrainingCenter from '#models/training_center'
@@ -84,6 +85,17 @@ export default class User extends AuthFinder(BaseModel) {
     pivotColumns: ['estado'],
   })
   declare bodegas: ManyToMany<typeof Bodega>
+
+  @manyToMany(() => ProgramaFormacion, {
+    pivotTable: 'usuario_programa_formacion',
+    localKey: 'id',
+    pivotForeignKey: 'id_usuario',
+    relatedKey: 'id',
+    pivotRelatedForeignKey: 'id_programa_formacion',
+    pivotColumns: ['estado'],
+    pivotTimestamps: true,
+  })
+  declare programasFormacion: ManyToMany<typeof ProgramaFormacion>
 
   @computed()
   get fullName() {

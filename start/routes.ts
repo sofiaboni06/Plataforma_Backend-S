@@ -55,6 +55,7 @@ router
         router.get('profile', [controllers.Profile, 'show'])
         router.patch('profile', [controllers.Profile, 'update'])
         router.patch('password', [controllers.Profile, 'changePassword'])
+        router.get('programas', [controllers.Profile, 'programas'])
         router.get('notifications', [NotificacionesController, 'index'])
         router.patch('notifications', [NotificacionesController, 'updateAll'])
         router.patch('notifications/:id', [NotificacionesController, 'update'])
@@ -97,6 +98,8 @@ router
         router.get('options', [controllers.Users, 'options'])
         router.get('/', [controllers.Users, 'index'])
         router.post('/', [controllers.Users, 'store'])
+        router.get(':id/programas', [controllers.Users, 'programas'])
+        router.put(':id/programas', [controllers.Users, 'syncProgramas'])
         router.get(':id', [controllers.Users, 'show'])
         router.patch(':id', [controllers.Users, 'update'])
         router.put(':id/bodegas', [controllers.Users, 'syncBodegas'])
@@ -347,6 +350,90 @@ router
       })
       .prefix('unidades-medida')
       .as('unidadesMedida')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.NivelesPrograma, 'index'])
+        router.post('/', [controllers.NivelesPrograma, 'store']).use(middleware.admin())
+        router.get(':id', [controllers.NivelesPrograma, 'show'])
+        router.patch(':id', [controllers.NivelesPrograma, 'update']).use(middleware.admin())
+        router.delete(':id', [controllers.NivelesPrograma, 'destroy']).use(middleware.admin())
+      })
+      .prefix('niveles-programa')
+      .as('nivelesPrograma')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.RedesConocimiento, 'index'])
+        router.get('options', [controllers.RedesConocimiento, 'options'])
+        router.post('/', [controllers.RedesConocimiento, 'store']).use(middleware.admin())
+        router.get(':id', [controllers.RedesConocimiento, 'show'])
+        router.patch(':id', [controllers.RedesConocimiento, 'update']).use(middleware.admin())
+        router
+          .put(':id/lineas-tematicas', [controllers.RedesConocimiento, 'syncLineas'])
+          .use(middleware.admin())
+        router.delete(':id', [controllers.RedesConocimiento, 'destroy']).use(middleware.admin())
+      })
+      .prefix('redes-conocimiento')
+      .as('redesConocimiento')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.LineasTematicas, 'index'])
+        router.get('options', [controllers.LineasTematicas, 'options'])
+        router.post('/', [controllers.LineasTematicas, 'store']).use(middleware.admin())
+        router.get(':id', [controllers.LineasTematicas, 'show'])
+        router.patch(':id', [controllers.LineasTematicas, 'update']).use(middleware.admin())
+        router.delete(':id', [controllers.LineasTematicas, 'destroy']).use(middleware.admin())
+      })
+      .prefix('lineas-tematicas')
+      .as('lineasTematicas')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.ProgramasFormacion, 'index'])
+        router.get('options', [controllers.ProgramasFormacion, 'options'])
+        router.post('/', [controllers.ProgramasFormacion, 'store']).use(middleware.admin())
+        router
+          .get(':id/usuarios', [controllers.ProgramasFormacion, 'usuarios'])
+          .use(middleware.admin())
+        router.get(':id', [controllers.ProgramasFormacion, 'show'])
+        router.patch(':id', [controllers.ProgramasFormacion, 'update']).use(middleware.admin())
+        router.delete(':id', [controllers.ProgramasFormacion, 'destroy']).use(middleware.admin())
+      })
+      .prefix('programas-formacion')
+      .as('programasFormacion')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.Fichas, 'index'])
+        router.get('options', [controllers.Fichas, 'options'])
+        router.post('/', [controllers.Fichas, 'store']).use(middleware.admin())
+        router.get(':id', [controllers.Fichas, 'show'])
+        router.patch(':id', [controllers.Fichas, 'update']).use(middleware.admin())
+        router.delete(':id', [controllers.Fichas, 'destroy']).use(middleware.admin())
+      })
+      .prefix('fichas')
+      .as('fichas')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [controllers.Jornadas, 'index'])
+      })
+      .prefix('jornadas')
+      .as('jornadas')
       .use(middleware.auth())
       .use(middleware.account())
 
