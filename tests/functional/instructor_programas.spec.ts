@@ -40,11 +40,21 @@ async function crearPrograma(client: ApiClient, token: string, suffix: number) {
       codigo: `INST-${suffix}`,
       nombre: `Programa instructor ${suffix}`,
       version: '1',
-      centroIds: [1],
     })
   programa.assertStatus(200)
+  const programaId = datosDe<{ id: number }>(programa).id
 
-  return datosDe<{ id: number }>(programa).id
+  const ficha = await client
+    .post('/api/v1/fichas')
+    .bearerToken(token)
+    .json({
+      idPrograma: programaId,
+      idCformacion: 1,
+      numeroFicha: `INST-F-${suffix}`,
+    })
+  ficha.assertStatus(200)
+
+  return programaId
 }
 
 async function idDeUsuario(client: ApiClient, token: string, email: string) {

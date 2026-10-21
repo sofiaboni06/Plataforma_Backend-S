@@ -3,7 +3,6 @@ import db from '@adonisjs/lucid/services/db'
 import NivelPrograma from '#models/nivel_programa'
 import ProgramaFormacion from '#models/programa_formacion'
 import RedConocimiento from '#models/red_conocimiento'
-import TrainingCenter from '#models/training_center'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type ProgramaFormacionPayload = {
@@ -15,7 +14,6 @@ type ProgramaFormacionPayload = {
   version: string
   duracionTotalHoras?: number | null
   cupoBaseAprendices?: number
-  centroIds?: number[]
   estado?: boolean
 }
 
@@ -32,8 +30,8 @@ export default class ProgramaFormacionService {
       .preload('nivel')
       .preload('redConocimiento')
       .preload('lineaTematica')
-      .preload('centros', (centros) => {
-        centros.orderBy('c_formacion.nombre', 'asc')
+      .preload('fichas', (fichas) => {
+        fichas.preload('centroFormacion')
       })
       .where('estado_programa', options.estado ?? true)
       .orderBy('nombre_programa', 'asc')
@@ -45,10 +43,7 @@ export default class ProgramaFormacionService {
     if (options.idCformacion) {
       query.whereIn(
         'id_programa_formacion',
-        db
-          .from('programa_formacion_centro')
-          .select('id_programa_formacion')
-          .where('id_cformacion', options.idCformacion)
+        db.from('ficha').select('programa_id').where('centro_formacion_id', options.idCformacion)
       )
     }
 
@@ -65,15 +60,14 @@ export default class ProgramaFormacionService {
       .preload('nivel')
       .preload('redConocimiento')
       .preload('lineaTematica')
-      .preload('centros', (centros) => {
-        centros.orderBy('c_formacion.nombre', 'asc')
+      .preload('fichas', (fichas) => {
+        fichas.preload('centroFormacion')
       })
       .firstOrFail()
   }
 
   async store(payload: ProgramaFormacionPayload) {
     await this.assertRedLinea(payload.idRedConocimiento, payload.idLineaTematica)
-    const centroIds = await this.assertCentros(payload.centroIds ?? [])
 
     try {
       const programa = await ProgramaFormacion.create({
@@ -87,8 +81,6 @@ export default class ProgramaFormacionService {
         cupoBaseAprendices: payload.cupoBaseAprendices ?? 30,
         estado: payload.estado ?? true,
       })
-
-      await this.syncCentros(programa.id, centroIds)
 
       return this.show(programa.id)
     } catch (error) {
@@ -105,9 +97,6 @@ export default class ProgramaFormacionService {
     if (payload.idRedConocimiento !== undefined || payload.idLineaTematica !== undefined) {
       await this.assertRedLinea(idRedConocimiento, idLineaTematica)
     }
-
-    const centroIds =
-      payload.centroIds !== undefined ? await this.assertCentros(payload.centroIds) : undefined
 
     programa.merge({
       ...(payload.idRedConocimiento !== undefined
@@ -133,25 +122,11 @@ export default class ProgramaFormacionService {
 
     try {
       await programa.save()
-
-      if (centroIds !== undefined) {
-        await this.syncCentros(id, centroIds)
-        await this.dropAssignmentsOutsideCentros(id, centroIds)
-      }
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudo actualizar el programa de formación')
     }
 
     return this.show(id)
-  }
-
-  async ensureCentro(programaId: number, idCformacion: number) {
-    await db.rawQuery(
-      `INSERT INTO programa_formacion_centro (id_programa_formacion, id_cformacion)
-       VALUES (?, ?)
-       ON CONFLICT DO NOTHING`,
-      [programaId, idCformacion]
-    )
   }
 
   async remove(id: number) {
@@ -176,7 +151,7 @@ export default class ProgramaFormacionService {
   }
 
   async options() {
-    const [niveles, redes, centros] = await Promise.all([
+    const [niveles, redes] = await Promise.all([
       NivelPrograma.query().orderBy('nivel_programa', 'asc'),
       RedConocimiento.query()
         .where('estado', true)
@@ -184,7 +159,6 @@ export default class ProgramaFormacionService {
           lineas.where('estado', true).orderBy('linea_tematica', 'asc')
         })
         .orderBy('red_conocimiento', 'asc'),
-      TrainingCenter.query().preload('regional').orderBy('nombre', 'asc'),
     ])
 
     return {
@@ -194,63 +168,7 @@ export default class ProgramaFormacionService {
         nombre: red.nombre,
         lineas: red.lineasTematicas.map((linea) => ({ id: linea.id, nombre: linea.nombre })),
       })),
-      centros: centros.map((centro) => ({
-        id: centro.id,
-        nombre: centro.nombre,
-        regional: centro.regional?.nombre ?? '',
-      })),
     }
-  }
-
-  private async assertCentros(centroIds: number[]) {
-    const uniqueIds = [...new Set(centroIds)]
-
-    if (!uniqueIds.length) {
-      throw new Exception('Seleccione al menos un centro de formación para el programa', {
-        status: 422,
-        code: 'E_VALIDATION_ERROR',
-      })
-    }
-
-    const centros = await TrainingCenter.query().whereIn('id', uniqueIds)
-
-    if (centros.length !== uniqueIds.length) {
-      throw new Exception('Hay un centro de formación que no existe', {
-        status: 422,
-        code: 'E_VALIDATION_ERROR',
-      })
-    }
-
-    return uniqueIds
-  }
-
-  private async syncCentros(programaId: number, centroIds: number[]) {
-    const programa = await ProgramaFormacion.findOrFail(programaId)
-    const pivot = Object.fromEntries(centroIds.map((centroId) => [centroId, {}]))
-
-    await programa.related('centros').sync(pivot)
-  }
-
-  private async dropAssignmentsOutsideCentros(programaId: number, centroIds: number[]) {
-    const stale = await db
-      .from('usuario_programa_formacion as upf')
-      .join('usuario as u', 'u.id_usuario', 'upf.id_usuario')
-      .where('upf.id_programa_formacion', programaId)
-      .whereNotIn('u.id_cformacion', centroIds)
-      .select('upf.id_usuario')
-
-    if (!stale.length) {
-      return
-    }
-
-    await db
-      .from('usuario_programa_formacion')
-      .where('id_programa_formacion', programaId)
-      .whereIn(
-        'id_usuario',
-        stale.map((row) => Number(row.id_usuario))
-      )
-      .delete()
   }
 
   private async assertRedLinea(idRedConocimiento: number, idLineaTematica: number) {

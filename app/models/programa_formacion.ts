@@ -4,7 +4,6 @@ import Ficha from '#models/ficha'
 import LineaTematica from '#models/linea_tematica'
 import NivelPrograma from '#models/nivel_programa'
 import RedConocimiento from '#models/red_conocimiento'
-import TrainingCenter from '#models/training_center'
 import User from '#models/usuario'
 
 export default class ProgramaFormacion extends BaseModel {
@@ -51,16 +50,6 @@ export default class ProgramaFormacion extends BaseModel {
 
   @hasMany(() => Ficha, { foreignKey: 'programaId' })
   declare fichas: HasMany<typeof Ficha>
-
-  @manyToMany(() => TrainingCenter, {
-    pivotTable: 'programa_formacion_centro',
-    localKey: 'id',
-    pivotForeignKey: 'id_programa_formacion',
-    relatedKey: 'id',
-    pivotRelatedForeignKey: 'id_cformacion',
-    pivotTimestamps: true,
-  })
-  declare centros: ManyToMany<typeof TrainingCenter>
 
   @manyToMany(() => User, {
     pivotTable: 'usuario_programa_formacion',

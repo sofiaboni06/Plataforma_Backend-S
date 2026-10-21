@@ -22,16 +22,6 @@ export const createProgramaFormacionValidator = vine.compile(
     version: vine.string().trim().minLength(1).maxLength(20),
     duracionTotalHoras: vine.number().positive().withoutDecimals().nullable().optional(),
     cupoBaseAprendices: vine.number().positive().withoutDecimals().optional(),
-    centroIds: vine
-      .array(
-        vine
-          .number()
-          .positive()
-          .withoutDecimals()
-          .exists({ table: 'c_formacion', column: 'id_cformacion' })
-      )
-      .minLength(1)
-      .distinct(),
     estado: vine.boolean().optional(),
   })
 )
@@ -61,17 +51,6 @@ export const updateProgramaFormacionValidator = vine.compile(
     version: vine.string().trim().minLength(1).maxLength(20).optional(),
     duracionTotalHoras: vine.number().positive().withoutDecimals().nullable().optional(),
     cupoBaseAprendices: vine.number().positive().withoutDecimals().optional(),
-    centroIds: vine
-      .array(
-        vine
-          .number()
-          .positive()
-          .withoutDecimals()
-          .exists({ table: 'c_formacion', column: 'id_cformacion' })
-      )
-      .minLength(1)
-      .distinct()
-      .optional(),
     estado: vine.boolean().optional(),
   })
 )

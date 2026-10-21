@@ -6,7 +6,6 @@ import ProgramaFormacion from '#models/programa_formacion'
 import TrainingCenter from '#models/training_center'
 import { assertOwnedByCenter, centerIdFor, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
-import ProgramaFormacionService from '#services/programa_formacion_service'
 
 type CreateFichaPayload = {
   idPrograma: number
@@ -22,8 +21,6 @@ type CreateFichaPayload = {
 type UpdateFichaPayload = Partial<CreateFichaPayload>
 
 export default class FichaService {
-  private programas = new ProgramaFormacionService()
-
   async index(
     scope: AccessScope,
     options: { estado?: boolean; idCformacion?: number; idPrograma?: number; search?: string } = {}
@@ -82,8 +79,6 @@ export default class FichaService {
         estado: payload.estado ?? true,
       })
 
-      await this.programas.ensureCentro(ficha.programaId, ficha.centroFormacionId)
-
       return this.show(scope, ficha.id)
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudo crear la ficha')
@@ -130,7 +125,6 @@ export default class FichaService {
 
     try {
       await ficha.save()
-      await this.programas.ensureCentro(ficha.programaId, ficha.centroFormacionId)
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudo actualizar la ficha')
     }

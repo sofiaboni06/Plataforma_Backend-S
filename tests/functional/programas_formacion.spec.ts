@@ -44,7 +44,6 @@ async function crearCadena(client: ApiClient, token: string, suffix: number) {
       nombre: `Programa ${suffix}`,
       version: '1',
       duracionTotalHoras: 2200,
-      centroIds: [1],
     })
   programa.assertStatus(200)
 
@@ -81,20 +80,6 @@ test.group('Programas de formación, niveles y fichas', () => {
     programa.assertStatus(200)
     assert.equal(datosDe<{ nivel: { id: number } }>(programa).nivel.id, nivelId)
 
-    const delCentro = await client
-      .get('/api/v1/programas-formacion?idCformacion=1')
-      .bearerToken(admin)
-    delCentro.assertStatus(200)
-    assert.isTrue((delCentro.body().data as { id: number }[]).some((row) => row.id === programaId))
-
-    const deOtroCentro = await client
-      .get('/api/v1/programas-formacion?idCformacion=2')
-      .bearerToken(admin)
-    deOtroCentro.assertStatus(200)
-    assert.isFalse(
-      (deOtroCentro.body().data as { id: number }[]).some((row) => row.id === programaId)
-    )
-
     const ficha = await client
       .post('/api/v1/fichas')
       .bearerToken(admin)
@@ -112,6 +97,29 @@ test.group('Programas de formación, niveles y fichas', () => {
     )
     assert.equal(fichaRow.programa.id, programaId)
     assert.equal(fichaRow.centroFormacionId, 1)
+
+    const conFicha = await client
+      .get(`/api/v1/programas-formacion/${programaId}`)
+      .bearerToken(admin)
+    conFicha.assertStatus(200)
+    assert.deepEqual(
+      datosDe<{ centros: { id: number }[] }>(conFicha).centros.map((centro) => centro.id),
+      [1]
+    )
+
+    const delCentro = await client
+      .get('/api/v1/programas-formacion?idCformacion=1')
+      .bearerToken(admin)
+    delCentro.assertStatus(200)
+    assert.isTrue((delCentro.body().data as { id: number }[]).some((row) => row.id === programaId))
+
+    const deOtroCentro = await client
+      .get('/api/v1/programas-formacion?idCformacion=2')
+      .bearerToken(admin)
+    deOtroCentro.assertStatus(200)
+    assert.isFalse(
+      (deOtroCentro.body().data as { id: number }[]).some((row) => row.id === programaId)
+    )
 
     const lista = await client.get('/api/v1/fichas').bearerToken(admin)
     lista.assertStatus(200)
@@ -159,12 +167,11 @@ test.group('Programas de formación, niveles y fichas', () => {
         codigo: `BAD-${suffix}`,
         nombre: `Programa inválido ${suffix}`,
         version: '1',
-        centroIds: [1],
       })
     programa.assertStatus(422)
   })
 
-  test('una ficha de otro centro no aparece y un no-admin no administra', async ({
+  test('un perfil sin permisos de formación no entra y el admin sí', async ({
     client,
     assert,
   }) => {
@@ -186,11 +193,9 @@ test.group('Programas de formación, niveles y fichas', () => {
     const ajenaRow = datosDe<{ id: number; centroFormacionId: number }>(ajena)
     assert.equal(ajenaRow.centroFormacionId, 2)
 
+    // Un perfil de bodega no trae permisos de formación: ni siquiera lista.
     const propias = await client.get('/api/v1/fichas').bearerToken(bodegaUser)
-    propias.assertStatus(200)
-    const rows = propias.body().data as { id: number; centroFormacionId: number }[]
-    assert.isTrue(rows.every((row) => row.centroFormacionId === 1))
-    assert.isFalse(rows.some((row) => row.id === ajenaRow.id))
+    propias.assertStatus(403)
 
     const detalle = await client.get(`/api/v1/fichas/${ajenaRow.id}`).bearerToken(bodegaUser)
     detalle.assertStatus(403)
@@ -210,8 +215,11 @@ test.group('Programas de formación, niveles y fichas', () => {
       .json({ nombre: `No ${suffix}` })
     crearNivel.assertStatus(403)
 
-    // los catálogos globales sí se pueden leer
-    const programas = await client.get('/api/v1/programas-formacion').bearerToken(bodegaUser)
+    const programasAjenos = await client.get('/api/v1/programas-formacion').bearerToken(bodegaUser)
+    programasAjenos.assertStatus(403)
+
+    // El admin sí administra el catálogo.
+    const programas = await client.get('/api/v1/programas-formacion').bearerToken(admin)
     programas.assertStatus(200)
     assert.isTrue((programas.body().data as { id: number }[]).some((row) => row.id === programaId))
   })

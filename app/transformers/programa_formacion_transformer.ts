@@ -3,6 +3,15 @@ import type ProgramaFormacion from '#models/programa_formacion'
 
 export default class ProgramaFormacionTransformer extends BaseTransformer<ProgramaFormacion> {
   toObject() {
+    const centros = new Map<number, { id: number; nombre: string }>()
+
+    for (const ficha of this.resource.fichas ?? []) {
+      const centro = ficha.centroFormacion
+      if (centro) {
+        centros.set(centro.id, { id: centro.id, nombre: centro.nombre })
+      }
+    }
+
     return {
       id: this.resource.id,
       idRedConocimiento: this.resource.idRedConocimiento,
@@ -32,10 +41,7 @@ export default class ProgramaFormacionTransformer extends BaseTransformer<Progra
             nombre: this.resource.lineaTematica.nombre,
           }
         : null,
-      centros: (this.resource.centros ?? []).map((centro) => ({
-        id: centro.id,
-        nombre: centro.nombre,
-      })),
+      centros: [...centros.values()].sort((a, b) => a.nombre.localeCompare(b.nombre)),
     }
   }
 }

@@ -227,6 +227,9 @@ export default class UsuarioService {
           .preload('nivel')
           .preload('redConocimiento')
           .preload('lineaTematica')
+          .preload('fichas', (fichas) => {
+            fichas.preload('centroFormacion')
+          })
           .orderBy('nombre_programa', 'asc')
       })
       .first()
@@ -364,12 +367,12 @@ export default class UsuarioService {
     }
 
     const offered = await db
-      .from('programa_formacion_centro')
-      .where('id_cformacion', idCformacion)
-      .whereIn('id_programa_formacion', programaIds)
-      .select('id_programa_formacion')
+      .from('ficha')
+      .where('centro_formacion_id', idCformacion)
+      .whereIn('programa_id', programaIds)
+      .select('programa_id')
 
-    const offeredIds = new Set(offered.map((row) => Number(row.id_programa_formacion)))
+    const offeredIds = new Set(offered.map((row) => Number(row.programa_id)))
     const outside = programaIds.filter((programaId) => !offeredIds.has(programaId))
 
     if (outside.length) {
@@ -391,14 +394,14 @@ export default class UsuarioService {
     }
 
     const offered = await db
-      .from('programa_formacion_centro')
-      .where('id_cformacion', user.idCformacion)
+      .from('ficha')
+      .where('centro_formacion_id', user.idCformacion)
       .whereIn(
-        'id_programa_formacion',
+        'programa_id',
         assigned.map((programa) => programa.id)
       )
-      .select('id_programa_formacion')
-    const offeredIds = new Set(offered.map((row) => Number(row.id_programa_formacion)))
+      .select('programa_id')
+    const offeredIds = new Set(offered.map((row) => Number(row.programa_id)))
     const outside = assigned
       .filter((programa) => !offeredIds.has(programa.id))
       .map((programa) => programa.id)
