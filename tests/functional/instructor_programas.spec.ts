@@ -176,6 +176,47 @@ test.group('Instructores y programas de formación', () => {
     assert.isTrue(datosDe<{ id: number }[]>(listado).some((fila) => fila.id === programaId))
   })
 
+  test('el admin crea un coordinador con programas en el mismo POST', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await login(client, 'carlos@correo.com')
+    const suffix = Date.now()
+    const programaId = await crearPrograma(client, admin, suffix)
+
+    const roles = await client.get('/api/v1/roles').bearerToken(admin)
+    roles.assertStatus(200)
+    const coordinador = (roles.body().data as { id: number; name: string }[]).find((role) =>
+      /^coordinador/i.test(role.name)
+    )
+
+    if (!coordinador) {
+      throw new Error('El perfil coordinador no está en la base de datos')
+    }
+
+    const creado = await client
+      .post('/api/v1/users')
+      .bearerToken(admin)
+      .json({
+        nombres: 'Nuevo',
+        apellidos: `Coordinador ${suffix}`,
+        tipoDocumento: 'CC',
+        numeroDocumento: `COORD-${suffix}`,
+        email: `nuevo.coordinador.${suffix}@correo.com`,
+        password: '123456',
+        passwordConfirmation: '123456',
+        idPerfil: coordinador.id,
+        idCformacion: 1,
+        programaIds: [programaId],
+      })
+    creado.assertStatus(200)
+    const usuarioId = datosDe<{ id: number }>(creado).id
+
+    const listado = await client.get(`/api/v1/users/${usuarioId}/programas`).bearerToken(admin)
+    listado.assertStatus(200)
+    assert.isTrue(datosDe<{ id: number }[]>(listado).some((fila) => fila.id === programaId))
+  })
+
   test('rechaza programas que no ofrece el centro del instructor', async ({ client, assert }) => {
     const admin = await login(client, 'carlos@correo.com')
     const suffix = Date.now()

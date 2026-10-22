@@ -125,6 +125,11 @@ export type ScannedRoutes = {
     'programasFormacion.programas_formacion.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.listar': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.crear': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.importar': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.actualizar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.eliminar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.index': { paramsTuple?: []; params?: {} }
     'fichas.fichas.options': { paramsTuple?: []; params?: {} }
     'fichas.fichas.store': { paramsTuple?: []; params?: {} }
@@ -209,6 +214,7 @@ export type ScannedRoutes = {
     'programasFormacion.programas_formacion.options': { paramsTuple?: []; params?: {} }
     'programasFormacion.programas_formacion.usuarios': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.listar': { paramsTuple?: []; params?: {} }
     'fichas.fichas.index': { paramsTuple?: []; params?: {} }
     'fichas.fichas.options': { paramsTuple?: []; params?: {} }
     'fichas.fichas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -278,6 +284,7 @@ export type ScannedRoutes = {
     'programasFormacion.programas_formacion.options': { paramsTuple?: []; params?: {} }
     'programasFormacion.programas_formacion.usuarios': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.listar': { paramsTuple?: []; params?: {} }
     'fichas.fichas.index': { paramsTuple?: []; params?: {} }
     'fichas.fichas.options': { paramsTuple?: []; params?: {} }
     'fichas.fichas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -327,6 +334,8 @@ export type ScannedRoutes = {
     'redesConocimiento.redes_conocimiento.store': { paramsTuple?: []; params?: {} }
     'lineasTematicas.lineas_tematicas.store': { paramsTuple?: []; params?: {} }
     'programasFormacion.programas_formacion.store': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.crear': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.importar': { paramsTuple?: []; params?: {} }
     'fichas.fichas.store': { paramsTuple?: []; params?: {} }
     'obras.obras.store': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.store': { paramsTuple?: []; params?: {} }
@@ -350,6 +359,7 @@ export type ScannedRoutes = {
     'redesConocimiento.redes_conocimiento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'lineasTematicas.lineas_tematicas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.eliminar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
@@ -375,6 +385,7 @@ export type ScannedRoutes = {
     'redesConocimiento.redes_conocimiento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'lineasTematicas.lineas_tematicas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.actualizar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudes.solicitudes.entregar': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }

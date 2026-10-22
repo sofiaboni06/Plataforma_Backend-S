@@ -732,6 +732,36 @@ const routes = {
     tokens: [{"old":"/api/v1/programas-formacion/:id","type":0,"val":"api","end":""},{"old":"/api/v1/programas-formacion/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/programas-formacion/:id","type":0,"val":"programas-formacion","end":""},{"old":"/api/v1/programas-formacion/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['programasFormacion.programas_formacion.destroy']['types'],
   },
+  'listasMaestrasMaterial.listas_maestras_material.listar': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/listas-maestras-material',
+    tokens: [{"old":"/api/v1/listas-maestras-material","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material","type":0,"val":"listas-maestras-material","end":""}],
+    types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.listar']['types'],
+  },
+  'listasMaestrasMaterial.listas_maestras_material.crear': {
+    methods: ["POST"],
+    pattern: '/api/v1/listas-maestras-material',
+    tokens: [{"old":"/api/v1/listas-maestras-material","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material","type":0,"val":"listas-maestras-material","end":""}],
+    types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.crear']['types'],
+  },
+  'listasMaestrasMaterial.listas_maestras_material.importar': {
+    methods: ["POST"],
+    pattern: '/api/v1/listas-maestras-material/importar',
+    tokens: [{"old":"/api/v1/listas-maestras-material/importar","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material/importar","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material/importar","type":0,"val":"listas-maestras-material","end":""},{"old":"/api/v1/listas-maestras-material/importar","type":0,"val":"importar","end":""}],
+    types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.importar']['types'],
+  },
+  'listasMaestrasMaterial.listas_maestras_material.actualizar': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/listas-maestras-material/:id',
+    tokens: [{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"listas-maestras-material","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.actualizar']['types'],
+  },
+  'listasMaestrasMaterial.listas_maestras_material.eliminar': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/listas-maestras-material/:id',
+    tokens: [{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"listas-maestras-material","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.eliminar']['types'],
+  },
   'fichas.fichas.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/fichas',

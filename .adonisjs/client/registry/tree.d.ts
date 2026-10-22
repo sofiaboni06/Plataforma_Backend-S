@@ -219,6 +219,15 @@ export interface ApiDefinition {
       destroy: typeof routes['programasFormacion.programas_formacion.destroy']
     }
   }
+  listasMaestrasMaterial: {
+    listasMaestrasMaterial: {
+      listar: typeof routes['listasMaestrasMaterial.listas_maestras_material.listar']
+      crear: typeof routes['listasMaestrasMaterial.listas_maestras_material.crear']
+      importar: typeof routes['listasMaestrasMaterial.listas_maestras_material.importar']
+      actualizar: typeof routes['listasMaestrasMaterial.listas_maestras_material.actualizar']
+      eliminar: typeof routes['listasMaestrasMaterial.listas_maestras_material.eliminar']
+    }
+  }
   fichas: {
     fichas: {
       index: typeof routes['fichas.fichas.index']

@@ -100,7 +100,7 @@ export default class UsuarioService {
     await this.assertProgramasInCenter(payload.idCformacion, programaIds)
 
     if (programaIds.length) {
-      this.assertInstructorPerfil(role)
+      this.assertProgramasPerfil(role)
     }
 
     const user = await User.create({
@@ -198,7 +198,7 @@ export default class UsuarioService {
       await this.dropProgramasOutsideCenter(user)
     }
 
-    if (nextRole && !this.isInstructorPerfil(nextRole)) {
+    if (nextRole && !this.isProgramasPerfil(nextRole)) {
       await user.related('programasFormacion').detach()
     }
 
@@ -247,7 +247,7 @@ export default class UsuarioService {
       throw new Exception('El usuario no existe', { status: 404, code: 'E_NOT_FOUND' })
     }
 
-    this.assertInstructorPerfil(user.perfil)
+    this.assertProgramasPerfil(user.perfil)
 
     const uniqueIds = [...new Set(programIds)]
     await this.assertProgramas(uniqueIds)
@@ -359,7 +359,7 @@ export default class UsuarioService {
   }
 
   /**
-   * Un instructor solo puede dictar programas que su centro tenga asociados.
+   * Un usuario solo puede tener programas que su centro tenga asociados.
    */
   private async assertProgramasInCenter(idCformacion: number, programaIds: number[]) {
     if (!programaIds.length) {
@@ -377,7 +377,7 @@ export default class UsuarioService {
 
     if (outside.length) {
       throw new Exception(
-        `Estos programas no están disponibles en el centro de formación del instructor: ${outside.join(', ')}`,
+        `Estos programas no están disponibles en el centro de formación del usuario: ${outside.join(', ')}`,
         { status: 422, code: 'E_VALIDATION_ERROR' }
       )
     }
@@ -411,16 +411,23 @@ export default class UsuarioService {
     }
   }
 
-  private isInstructorPerfil(perfil: Perfil | null | undefined) {
-    return Boolean(perfil && /^instructor/i.test(perfil.nombre))
+  /**
+   * Los programas de formación se asignan a instructores y coordinadores.
+   * La regla se basa en el nombre del perfil, no en datos extra del usuario.
+   */
+  private isProgramasPerfil(perfil: Perfil | null | undefined) {
+    return Boolean(perfil && /^(instructor|coordinador)/i.test(perfil.nombre))
   }
 
-  private assertInstructorPerfil(perfil: Perfil | null | undefined) {
-    if (!this.isInstructorPerfil(perfil)) {
-      throw new Exception('Solo se pueden asignar programas a usuarios con perfil Instructor', {
-        status: 422,
-        code: 'E_VALIDATION_ERROR',
-      })
+  private assertProgramasPerfil(perfil: Perfil | null | undefined) {
+    if (!this.isProgramasPerfil(perfil)) {
+      throw new Exception(
+        'Solo se pueden asignar programas a usuarios con perfil Instructor o Coordinador',
+        {
+          status: 422,
+          code: 'E_VALIDATION_ERROR',
+        }
+      )
     }
   }
 

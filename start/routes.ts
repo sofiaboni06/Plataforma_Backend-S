@@ -462,6 +462,19 @@ router
 
     router
       .group(() => {
+        router.get('/', [controllers.ListasMaestrasMaterial, 'listar'])
+        router.post('/', [controllers.ListasMaestrasMaterial, 'crear'])
+        router.post('/importar', [controllers.ListasMaestrasMaterial, 'importar'])
+        router.patch('/:id', [controllers.ListasMaestrasMaterial, 'actualizar'])
+        router.delete('/:id', [controllers.ListasMaestrasMaterial, 'eliminar'])
+      })
+      .prefix('listas-maestras-material')
+      .as('listasMaestrasMaterial')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
         router
           .get('/', [controllers.Fichas, 'index'])
           .use(middleware.permission('ficha.ver'))

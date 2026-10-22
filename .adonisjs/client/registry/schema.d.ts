@@ -1459,6 +1459,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/programas_formacion_controller').default['destroy']>>>
     }
   }
+  'listasMaestrasMaterial.listas_maestras_material.listar': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/listas-maestras-material'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['listar']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['listar']>>>
+    }
+  }
+  'listasMaestrasMaterial.listas_maestras_material.crear': {
+    methods: ["POST"]
+    pattern: '/api/v1/listas-maestras-material'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['crear']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['crear']>>>
+    }
+  }
+  'listasMaestrasMaterial.listas_maestras_material.importar': {
+    methods: ["POST"]
+    pattern: '/api/v1/listas-maestras-material/importar'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['importar']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['importar']>>>
+    }
+  }
+  'listasMaestrasMaterial.listas_maestras_material.actualizar': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/listas-maestras-material/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['actualizar']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['actualizar']>>>
+    }
+  }
+  'listasMaestrasMaterial.listas_maestras_material.eliminar': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/listas-maestras-material/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['eliminar']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['eliminar']>>>
+    }
+  }
   'fichas.fichas.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/fichas'

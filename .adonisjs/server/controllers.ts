@@ -16,6 +16,7 @@ export const controllers = {
   Items: () => import('#controllers/items_controller'),
   Jornadas: () => import('#controllers/jornadas_controller'),
   LineasTematicas: () => import('#controllers/lineas_tematicas_controller'),
+  ListasMaestrasMaterial: () => import('#controllers/listas_maestras_material_controller'),
   Modules: () => import('#controllers/modules_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   NivelesPrograma: () => import('#controllers/niveles_programa_controller'),
