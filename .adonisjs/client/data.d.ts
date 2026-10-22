@@ -13,10 +13,16 @@ import type ClasificacionElementoTransformer from '#transformers/clasificacion_e
 import type CodigoEstandarTransformer from '#transformers/codigo_estandar_transformer'
 import type ElementoTransformer from '#transformers/elemento_transformer'
 import type EntregaTransformer from '#transformers/entrega_transformer'
+import type FichaTransformer from '#transformers/ficha_transformer'
 import type ItemTransformer from '#transformers/item_transformer'
+import type JornadaTransformer from '#transformers/jornada_transformer'
+import type LineaTematicaTransformer from '#transformers/linea_tematica_transformer'
 import type ModuleTransformer from '#transformers/module_transformer'
+import type NivelProgramaTransformer from '#transformers/nivel_programa_transformer'
 import type NotificacionTransformer from '#transformers/notificacion_transformer'
 import type ObraTransformer from '#transformers/obra_transformer'
+import type ProgramaFormacionTransformer from '#transformers/programa_formacion_transformer'
+import type RedConocimientoTransformer from '#transformers/red_conocimiento_transformer'
 import type RoleTransformer from '#transformers/role_transformer'
 import type SolicitanteTransformer from '#transformers/solicitante_transformer'
 import type SolicitudEquipoTransformer from '#transformers/solicitud_equipo_transformer'
@@ -63,13 +69,29 @@ export namespace Data {
   export namespace Entrega {
     export type Variants = InferVariants<EntregaTransformer>
   }
+  export type Ficha = InferData<FichaTransformer>
+  export namespace Ficha {
+    export type Variants = InferVariants<FichaTransformer>
+  }
   export type Item = InferData<ItemTransformer>
   export namespace Item {
     export type Variants = InferVariants<ItemTransformer>
   }
+  export type Jornada = InferData<JornadaTransformer>
+  export namespace Jornada {
+    export type Variants = InferVariants<JornadaTransformer>
+  }
+  export type LineaTematica = InferData<LineaTematicaTransformer>
+  export namespace LineaTematica {
+    export type Variants = InferVariants<LineaTematicaTransformer>
+  }
   export type Module = InferData<ModuleTransformer>
   export namespace Module {
     export type Variants = InferVariants<ModuleTransformer>
+  }
+  export type NivelPrograma = InferData<NivelProgramaTransformer>
+  export namespace NivelPrograma {
+    export type Variants = InferVariants<NivelProgramaTransformer>
   }
   export type Notificacion = InferData<NotificacionTransformer>
   export namespace Notificacion {
@@ -78,6 +100,14 @@ export namespace Data {
   export type Obra = InferData<ObraTransformer>
   export namespace Obra {
     export type Variants = InferVariants<ObraTransformer>
+  }
+  export type ProgramaFormacion = InferData<ProgramaFormacionTransformer>
+  export namespace ProgramaFormacion {
+    export type Variants = InferVariants<ProgramaFormacionTransformer>
+  }
+  export type RedConocimiento = InferData<RedConocimientoTransformer>
+  export namespace RedConocimiento {
+    export type Variants = InferVariants<RedConocimientoTransformer>
   }
   export type Role = InferData<RoleTransformer>
   export namespace Role {

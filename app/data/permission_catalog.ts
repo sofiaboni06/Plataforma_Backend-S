@@ -96,6 +96,36 @@ export const PERMISSION_RESOURCES = {
     label: 'Reportes',
     actions: ['generar'],
   },
+  programa_formacion: {
+    module: 'Materiales de Formación',
+    label: 'Programas de formación',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  ficha: {
+    module: 'Materiales de Formación',
+    label: 'Fichas',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  red_conocimiento: {
+    module: 'Materiales de Formación',
+    label: 'Redes de conocimiento',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  linea_tematica: {
+    module: 'Materiales de Formación',
+    label: 'Líneas temáticas',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  nivel_formacion: {
+    module: 'Materiales de Formación',
+    label: 'Niveles de formación',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  instructor_programa: {
+    module: 'Materiales de Formación',
+    label: 'Instructores por programa',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
 } as const
 
 type PermissionResources = typeof PERMISSION_RESOURCES

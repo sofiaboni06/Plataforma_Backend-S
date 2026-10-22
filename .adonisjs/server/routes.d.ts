@@ -19,6 +19,7 @@ export type ScannedRoutes = {
     'account.profile.show': { paramsTuple?: []; params?: {} }
     'account.profile.update': { paramsTuple?: []; params?: {} }
     'account.profile.change_password': { paramsTuple?: []; params?: {} }
+    'account.profile.programas': { paramsTuple?: []; params?: {} }
     'account.notificaciones.index': { paramsTuple?: []; params?: {} }
     'account.notificaciones.update_all': { paramsTuple?: []; params?: {} }
     'account.notificaciones.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -36,6 +37,8 @@ export type ScannedRoutes = {
     'users.users.options': { paramsTuple?: []; params?: {} }
     'users.users.index': { paramsTuple?: []; params?: {} }
     'users.users.store': { paramsTuple?: []; params?: {} }
+    'users.users.programas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'users.users.sync_programas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.sync_bodegas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -97,6 +100,43 @@ export type ScannedRoutes = {
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'nivelesPrograma.niveles_programa.index': { paramsTuple?: []; params?: {} }
+    'nivelesPrograma.niveles_programa.store': { paramsTuple?: []; params?: {} }
+    'nivelesPrograma.niveles_programa.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'nivelesPrograma.niveles_programa.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'nivelesPrograma.niveles_programa.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redesConocimiento.redes_conocimiento.index': { paramsTuple?: []; params?: {} }
+    'redesConocimiento.redes_conocimiento.options': { paramsTuple?: []; params?: {} }
+    'redesConocimiento.redes_conocimiento.store': { paramsTuple?: []; params?: {} }
+    'redesConocimiento.redes_conocimiento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redesConocimiento.redes_conocimiento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redesConocimiento.redes_conocimiento.sync_lineas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redesConocimiento.redes_conocimiento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineasTematicas.lineas_tematicas.index': { paramsTuple?: []; params?: {} }
+    'lineasTematicas.lineas_tematicas.options': { paramsTuple?: []; params?: {} }
+    'lineasTematicas.lineas_tematicas.store': { paramsTuple?: []; params?: {} }
+    'lineasTematicas.lineas_tematicas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineasTematicas.lineas_tematicas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineasTematicas.lineas_tematicas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.index': { paramsTuple?: []; params?: {} }
+    'programasFormacion.programas_formacion.options': { paramsTuple?: []; params?: {} }
+    'programasFormacion.programas_formacion.store': { paramsTuple?: []; params?: {} }
+    'programasFormacion.programas_formacion.usuarios': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.listar': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.crear': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.importar': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.actualizar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.eliminar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'fichas.fichas.index': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.options': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.store': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'fichas.fichas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'fichas.fichas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'jornadas.jornadas.index': { paramsTuple?: []; params?: {} }
     'obras.obras.index': { paramsTuple?: []; params?: {} }
     'obras.obras.store': { paramsTuple?: []; params?: {} }
     'obras.obras.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -130,6 +170,7 @@ export type ScannedRoutes = {
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
     'account.profile.show': { paramsTuple?: []; params?: {} }
+    'account.profile.programas': { paramsTuple?: []; params?: {} }
     'account.notificaciones.index': { paramsTuple?: []; params?: {} }
     'modules.modules.index': { paramsTuple?: []; params?: {} }
     'modules.modules.tree': { paramsTuple?: []; params?: {} }
@@ -138,6 +179,7 @@ export type ScannedRoutes = {
     'roles.roles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.options': { paramsTuple?: []; params?: {} }
     'users.users.index': { paramsTuple?: []; params?: {} }
+    'users.users.programas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'permissions.permissions.index': { paramsTuple?: []; params?: {} }
     'categorias.categorias.index': { paramsTuple?: []; params?: {} }
@@ -164,6 +206,23 @@ export type ScannedRoutes = {
     'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'nivelesPrograma.niveles_programa.index': { paramsTuple?: []; params?: {} }
+    'nivelesPrograma.niveles_programa.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redesConocimiento.redes_conocimiento.index': { paramsTuple?: []; params?: {} }
+    'redesConocimiento.redes_conocimiento.options': { paramsTuple?: []; params?: {} }
+    'redesConocimiento.redes_conocimiento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineasTematicas.lineas_tematicas.index': { paramsTuple?: []; params?: {} }
+    'lineasTematicas.lineas_tematicas.options': { paramsTuple?: []; params?: {} }
+    'lineasTematicas.lineas_tematicas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.index': { paramsTuple?: []; params?: {} }
+    'programasFormacion.programas_formacion.options': { paramsTuple?: []; params?: {} }
+    'programasFormacion.programas_formacion.usuarios': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.listar': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.index': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.options': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'jornadas.jornadas.index': { paramsTuple?: []; params?: {} }
     'obras.obras.index': { paramsTuple?: []; params?: {} }
     'obras.obras.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudes.solicitudes.index': { paramsTuple?: []; params?: {} }
@@ -182,6 +241,7 @@ export type ScannedRoutes = {
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
     'account.profile.show': { paramsTuple?: []; params?: {} }
+    'account.profile.programas': { paramsTuple?: []; params?: {} }
     'account.notificaciones.index': { paramsTuple?: []; params?: {} }
     'modules.modules.index': { paramsTuple?: []; params?: {} }
     'modules.modules.tree': { paramsTuple?: []; params?: {} }
@@ -190,6 +250,7 @@ export type ScannedRoutes = {
     'roles.roles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.options': { paramsTuple?: []; params?: {} }
     'users.users.index': { paramsTuple?: []; params?: {} }
+    'users.users.programas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'permissions.permissions.index': { paramsTuple?: []; params?: {} }
     'categorias.categorias.index': { paramsTuple?: []; params?: {} }
@@ -216,6 +277,23 @@ export type ScannedRoutes = {
     'codigosEstandar.codigos_estandar.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.index': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'nivelesPrograma.niveles_programa.index': { paramsTuple?: []; params?: {} }
+    'nivelesPrograma.niveles_programa.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redesConocimiento.redes_conocimiento.index': { paramsTuple?: []; params?: {} }
+    'redesConocimiento.redes_conocimiento.options': { paramsTuple?: []; params?: {} }
+    'redesConocimiento.redes_conocimiento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineasTematicas.lineas_tematicas.index': { paramsTuple?: []; params?: {} }
+    'lineasTematicas.lineas_tematicas.options': { paramsTuple?: []; params?: {} }
+    'lineasTematicas.lineas_tematicas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.index': { paramsTuple?: []; params?: {} }
+    'programasFormacion.programas_formacion.options': { paramsTuple?: []; params?: {} }
+    'programasFormacion.programas_formacion.usuarios': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.listar': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.index': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.options': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'jornadas.jornadas.index': { paramsTuple?: []; params?: {} }
     'obras.obras.index': { paramsTuple?: []; params?: {} }
     'obras.obras.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudes.solicitudes.index': { paramsTuple?: []; params?: {} }
@@ -258,6 +336,13 @@ export type ScannedRoutes = {
     'usosPresupuestales.usos_presupuestales.store': { paramsTuple?: []; params?: {} }
     'codigosEstandar.codigos_estandar.store': { paramsTuple?: []; params?: {} }
     'unidadesMedida.unidades_medida.store': { paramsTuple?: []; params?: {} }
+    'nivelesPrograma.niveles_programa.store': { paramsTuple?: []; params?: {} }
+    'redesConocimiento.redes_conocimiento.store': { paramsTuple?: []; params?: {} }
+    'lineasTematicas.lineas_tematicas.store': { paramsTuple?: []; params?: {} }
+    'programasFormacion.programas_formacion.store': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.crear': { paramsTuple?: []; params?: {} }
+    'listasMaestrasMaterial.listas_maestras_material.importar': { paramsTuple?: []; params?: {} }
+    'fichas.fichas.store': { paramsTuple?: []; params?: {} }
     'obras.obras.store': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.store': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.registrar_en_bodega': { paramsTuple?: []; params?: {} }
@@ -277,6 +362,12 @@ export type ScannedRoutes = {
     'usosPresupuestales.usos_presupuestales.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'codigosEstandar.codigos_estandar.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'nivelesPrograma.niveles_programa.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redesConocimiento.redes_conocimiento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineasTematicas.lineas_tematicas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.eliminar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'fichas.fichas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'vigencias.vigencias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
@@ -298,6 +389,12 @@ export type ScannedRoutes = {
     'usosPresupuestales.usos_presupuestales.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'codigosEstandar.codigos_estandar.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'nivelesPrograma.niveles_programa.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redesConocimiento.redes_conocimiento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineasTematicas.lineas_tematicas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'programasFormacion.programas_formacion.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'listasMaestrasMaterial.listas_maestras_material.actualizar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'fichas.fichas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudes.solicitudes.entregar': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
     'solicitudes.solicitudes.plazo': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
@@ -308,8 +405,13 @@ export type ScannedRoutes = {
   PUT: {
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'roles.roles.sync_permissions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'users.users.sync_programas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.sync_bodegas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+<<<<<<< HEAD
     'vigencias.vigencias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+=======
+    'redesConocimiento.redes_conocimiento.sync_lineas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+>>>>>>> 76a93fff97104c45e7c5666fb348ade98a1c32bd
   }
 }
 declare module '@adonisjs/core/types/http' {

@@ -1,7 +1,9 @@
 import UsuarioService from '#services/usuario_service'
 import AdminUserTransformer from '#transformers/admin_user_transformer'
+import ProgramaFormacionTransformer from '#transformers/programa_formacion_transformer'
 import {
   assignBodegasValidator,
+  assignProgramasValidator,
   createUserValidator,
   updateUserValidator,
 } from '#validators/usuario'
@@ -35,6 +37,7 @@ export default class UsersController {
       idPerfil: payload.idPerfil,
       idCformacion: payload.idCformacion,
       bodegaIds: payload.bodegaIds,
+      programaIds: payload.programaIds,
     })
     return serialize(AdminUserTransformer.transform(user))
   }
@@ -74,5 +77,19 @@ export default class UsersController {
     const payload = await request.validateUsing(assignBodegasValidator)
     const user = await new UsuarioService().syncBodegas(Number(params.id), payload.bodegaIds)
     return serialize(AdminUserTransformer.transform(user))
+  }
+
+  async programas({ params, serialize }: HttpContext) {
+    const programas = await new UsuarioService().programas(Number(params.id))
+    return serialize(ProgramaFormacionTransformer.transform(programas))
+  }
+
+  async syncProgramas({ params, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(assignProgramasValidator)
+    const programas = await new UsuarioService().syncProgramas(
+      Number(params.id),
+      payload.programaIds
+    )
+    return serialize(ProgramaFormacionTransformer.transform(programas))
   }
 }
