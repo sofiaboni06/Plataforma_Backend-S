@@ -1423,4 +1423,52 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'vigencias.vigencias.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/vigencias'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/vigencias_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/vigencias_controller').default['index']>>>
+    }
+  }
+  'vigencias.vigencias.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/vigencias'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/vigencia').createVigenciaValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/vigencia').createVigenciaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/vigencias_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/vigencias_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'vigencias.vigencias.update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/vigencias/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/vigencia').updateVigenciaValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/vigencia').updateVigenciaValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/vigencias_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/vigencias_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'vigencias.vigencias.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/vigencias/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/vigencias_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/vigencias_controller').default['destroy']>>>
+    }
+  }
 }

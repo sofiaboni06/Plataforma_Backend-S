@@ -714,6 +714,30 @@ const routes = {
     tokens: [{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"api","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"v1","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"reportes","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"bodega","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"id","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"formato","end":""}],
     types: placeholder as Registry['reportes.reportes.bodega']['types'],
   },
+  'vigencias.vigencias.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/vigencias',
+    tokens: [{"old":"/api/v1/vigencias","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias","type":0,"val":"vigencias","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.index']['types'],
+  },
+  'vigencias.vigencias.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/vigencias',
+    tokens: [{"old":"/api/v1/vigencias","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias","type":0,"val":"vigencias","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.store']['types'],
+  },
+  'vigencias.vigencias.update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/vigencias/:id',
+    tokens: [{"old":"/api/v1/vigencias/:id","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:id","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.update']['types'],
+  },
+  'vigencias.vigencias.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/vigencias/:id',
+    tokens: [{"old":"/api/v1/vigencias/:id","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:id","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.destroy']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

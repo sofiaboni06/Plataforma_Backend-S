@@ -446,5 +446,17 @@ router
       .as('reportes')
       .use(middleware.auth())
       .use(middleware.account())
-  })
+
+    router
+      .group(() => {
+        router.get('/', [controllers.Vigencias, 'index'])
+        router.post('/', [controllers.Vigencias, 'store'])
+        router.put('/:id', [controllers.Vigencias, 'update'])
+        router.delete('/:id', [controllers.Vigencias, 'destroy'])
+      })
+      .prefix('vigencias')
+      .as('vigencias')
+      .use(middleware.auth())
+      .use(middleware.account())
+     })
   .prefix('/api/v1')

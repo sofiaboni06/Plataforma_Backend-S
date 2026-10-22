@@ -31,4 +31,5 @@ export const controllers = {
   UnidadesMedida: () => import('#controllers/unidades_medida_controller'),
   Users: () => import('#controllers/users_controller'),
   UsosPresupuestales: () => import('#controllers/usos_presupuestales_controller'),
+  Vigencias: () => import('#controllers/vigencias_controller'),
 }

@@ -224,4 +224,12 @@ export interface ApiDefinition {
       bodega: typeof routes['reportes.reportes.bodega']
     }
   }
+  vigencias: {
+    vigencias: {
+      index: typeof routes['vigencias.vigencias.index']
+      store: typeof routes['vigencias.vigencias.store']
+      update: typeof routes['vigencias.vigencias.update']
+      destroy: typeof routes['vigencias.vigencias.destroy']
+    }
+  }
 }

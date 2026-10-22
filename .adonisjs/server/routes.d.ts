@@ -122,6 +122,10 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'vigencias.vigencias.index': { paramsTuple?: []; params?: {} }
+    'vigencias.vigencias.store': { paramsTuple?: []; params?: {} }
+    'vigencias.vigencias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'vigencias.vigencias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -173,6 +177,7 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'vigencias.vigencias.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -224,6 +229,7 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'vigencias.vigencias.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -257,6 +263,7 @@ export type ScannedRoutes = {
     'solicitudes.solicitudes.registrar_en_bodega': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
+    'vigencias.vigencias.store': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'authTwoFactor.password_recovery.disable_google': { paramsTuple?: []; params?: {} }
@@ -271,6 +278,7 @@ export type ScannedRoutes = {
     'codigosEstandar.codigos_estandar.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'vigencias.vigencias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'account.profile.update': { paramsTuple?: []; params?: {} }
@@ -301,6 +309,7 @@ export type ScannedRoutes = {
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'roles.roles.sync_permissions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.sync_bodegas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'vigencias.vigencias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {
