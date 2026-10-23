@@ -15,6 +15,34 @@ function datosDe<T>(response: { body(): unknown }) {
   return (response.body() as { data: T }).data
 }
 
+async function idDeUsuario(client: ApiClient, token: string, email: string) {
+  const usuarios = await client.get('/api/v1/users').bearerToken(token)
+  usuarios.assertStatus(200)
+  const usuario = (usuarios.body().data as { id: number; email: string }[]).find(
+    (user) => user.email === email
+  )
+  if (!usuario) {
+    throw new Error(`Falta el usuario ${email}`)
+  }
+  return usuario.id
+}
+
+async function asignarPrograma(
+  client: ApiClient,
+  token: string,
+  userId: number,
+  programaId: number
+) {
+  const actuales = await client.get(`/api/v1/users/${userId}/programas`).bearerToken(token)
+  actuales.assertStatus(200)
+  const ids = datosDe<{ id: number }[]>(actuales).map((fila) => fila.id)
+  const asignado = await client
+    .put(`/api/v1/users/${userId}/programas`)
+    .bearerToken(token)
+    .json({ programaIds: [...new Set([...ids, programaId])] })
+  asignado.assertStatus(200)
+}
+
 async function crearPrograma(client: ApiClient, token: string, suffix: number) {
   const linea = await client
     .post('/api/v1/lineas-tematicas')
@@ -96,11 +124,13 @@ test.group('Lista maestra, vigencia y solicitudes de formación', () => {
     vigencias.assertStatus(401)
   })
 
-  test('carga el anexo SENA a la lista maestra y pide sobre esa lista', async ({
+  test('carga el anexo SENA, el instructor pide y coordinación decide', async ({
     client,
     assert,
   }) => {
     const admin = await login(client, 'carlos@correo.com')
+    const instructor = await login(client, 'instructor@correo.com')
+    const coordinador = await login(client, 'coordinador@correo.com')
     const suffix = Date.now()
     const { programaId, fichaId } = await crearPrograma(client, admin, suffix)
 
@@ -128,8 +158,8 @@ test.group('Lista maestra, vigencia y solicitudes de formación', () => {
       .bearerToken(admin)
     lista.assertStatus(200)
     const materiales = datosDe<Array<{ id: number; codigoUnspsc: string }>>(lista)
-    assert.isTrue(materiales.some((item) => item.codigoUnspsc === '44111905'))
-    const materialId = materiales[0].id
+    const material = materiales.find((item) => item.codigoUnspsc === '44111905')
+    assert.exists(material)
 
     const vigencia = await client
       .post('/api/v1/vigencias')
@@ -142,39 +172,76 @@ test.group('Lista maestra, vigencia y solicitudes de formación', () => {
       })
     vigencia.assertStatus(200)
 
-    const usuarios = await client.get('/api/v1/users').bearerToken(admin)
-    usuarios.assertStatus(200)
-    const instructor = (usuarios.body().data as { id: number; email: string }[]).find(
-      (user) => user.email === 'instructor@correo.com'
-    )
-    if (!instructor) {
-      throw new Error('Falta el usuario instructor@correo.com')
-    }
+    const instructorId = await idDeUsuario(client, admin, 'instructor@correo.com')
+    const coordinadorId = await idDeUsuario(client, admin, 'coordinador@correo.com')
+    await asignarPrograma(client, admin, instructorId, programaId)
+    await asignarPrograma(client, admin, coordinadorId, programaId)
 
-    await client
-      .put(`/api/v1/users/${instructor.id}/programas`)
-      .bearerToken(admin)
-      .json({ programaIds: [programaId] })
+    const vistaCoordinador = await client
+      .get(`/api/v1/listas-maestras-material?programaId=${programaId}`)
+      .bearerToken(coordinador)
+    vistaCoordinador.assertStatus(200)
 
     const solicitud = await client
       .post('/api/v1/solicitudes-programa')
-      .bearerToken(admin)
+      .bearerToken(instructor)
       .json({
         programaId,
         fichaId,
-        instructorId: instructor.id,
-        items: [{ listaMaestraId: materialId, cantidadSolicitada: 4 }],
+        items: [{ listaMaestraId: material!.id, cantidadSolicitada: 4 }],
       })
     solicitud.assertStatus(200)
-    const creada = datosDe<{ id: number; estado: string }>(solicitud)
+    const creada = datosDe<{ id: number; estado: string; items: Array<{ id: number }> }>(solicitud)
     assert.equal(creada.estado, 'borrador')
+    assert.lengthOf(creada.items, 1)
 
     const enviada = await client
       .post(`/api/v1/solicitudes-programa/${creada.id}/enviar`)
-      .bearerToken(admin)
+      .bearerToken(instructor)
     enviada.assertStatus(200)
     assert.equal(datosDe<{ estado: string }>(enviada).estado, 'enviada')
-    assert.lengthOf(datosDe<{ items: unknown[] }>(enviada).items, 1)
+
+    const avisosCoordinador = await client
+      .get('/api/v1/account/notifications')
+      .bearerToken(coordinador)
+      .qs({ perPage: 100 })
+    avisosCoordinador.assertStatus(200)
+    const bandejaCoordinador = datosDe<Array<{ tipo: string; idReferencia: number | null }>>(
+      avisosCoordinador
+    )
+    assert.isTrue(
+      bandejaCoordinador.some(
+        (aviso) => aviso.tipo === 'solicitud_programa' && aviso.idReferencia === creada.id
+      )
+    )
+
+    const decidida = await client
+      .post(`/api/v1/solicitudes-programa/${creada.id}/decidir`)
+      .bearerToken(coordinador)
+      .json({
+        items: [{ id: creada.items[0].id, accion: 'entregar' }],
+      })
+    decidida.assertStatus(200)
+    const resultado = datosDe<{ estado: string; items: Array<{ estado: string; cantidadAprobada: number }> }>(
+      decidida
+    )
+    assert.equal(resultado.estado, 'aprobada')
+    assert.equal(resultado.items[0].estado, 'aprobado')
+    assert.equal(resultado.items[0].cantidadAprobada, 4)
+
+    const avisosInstructor = await client
+      .get('/api/v1/account/notifications')
+      .bearerToken(instructor)
+      .qs({ perPage: 100 })
+    avisosInstructor.assertStatus(200)
+    const bandejaInstructor = datosDe<Array<{ tipo: string; idReferencia: number | null }>>(
+      avisosInstructor
+    )
+    assert.isTrue(
+      bandejaInstructor.some(
+        (aviso) => aviso.tipo === 'decision_solicitud_programa' && aviso.idReferencia === creada.id
+      )
+    )
   })
 
   test('un excel sin encabezados de UNSPSC no se carga', async ({ client, assert }) => {

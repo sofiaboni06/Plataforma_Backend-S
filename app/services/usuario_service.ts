@@ -199,7 +199,7 @@ export default class UsuarioService {
     }
 
     if (nextRole && !this.isProgramasPerfil(nextRole)) {
-      await user.related('programasFormacion').detach()
+      await db.from('usuario_programa_formacion').where('id_usuario', user.id).update({ estado: false })
     }
 
     return this.show(user.id)
@@ -335,11 +335,38 @@ export default class UsuarioService {
     }
   }
 
+  /**
+   * El dump impide borrar `usuario_programa_formacion` si ya hay solicitudes.
+   * Se desactiva el pivot en vez de hacer detach.
+   */
   private async syncProgramaPivot(user: User, programIds: number[]) {
-    const pivot = Object.fromEntries(programIds.map((programId) => [programId, { estado: true }]))
+    const wanted = new Set(programIds)
 
     try {
-      await user.related('programasFormacion').sync(pivot)
+      const existing = await db
+        .from('usuario_programa_formacion')
+        .where('id_usuario', user.id)
+        .select('id_usuario_programa', 'id_programa_formacion', 'estado')
+
+      for (const row of existing) {
+        const programId = Number(row.id_programa_formacion)
+        const activa = wanted.has(programId)
+        if (Boolean(row.estado) !== activa) {
+          await db
+            .from('usuario_programa_formacion')
+            .where('id_usuario_programa', row.id_usuario_programa)
+            .update({ estado: activa })
+        }
+        wanted.delete(programId)
+      }
+
+      for (const programId of wanted) {
+        await db.table('usuario_programa_formacion').insert({
+          id_usuario: user.id,
+          id_programa_formacion: programId,
+          estado: true,
+        })
+      }
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudieron asignar los programas de formación')
     }
@@ -458,7 +485,11 @@ export default class UsuarioService {
       .map((programa) => programa.id)
 
     if (outside.length) {
-      await user.related('programasFormacion').detach(outside)
+      await db
+        .from('usuario_programa_formacion')
+        .where('id_usuario', user.id)
+        .whereIn('id_programa_formacion', outside)
+        .update({ estado: false })
     }
   }
 

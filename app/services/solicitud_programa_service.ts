@@ -73,9 +73,7 @@ export default class SolicitudProgramaService {
     const vigencia = await this.vigenciaObjetivo(payload.vigencia)
     const instructorId =
       scope.isAdmin && payload.instructorId ? payload.instructorId : scope.idUsuario
-    if (scope.isAdmin) {
-      await this.ensureAssignment(instructorId, payload.programaId)
-    } else {
+    if (!scope.isAdmin) {
       await this.assertProgramaDelInstructor(scope, payload.programaId)
     }
     const ficha = await Ficha.findOrFail(payload.fichaId)
@@ -107,20 +105,27 @@ export default class SolicitudProgramaService {
       })
     }
 
+    const trx = await db.transaction()
     try {
-      const solicitud = await SolicitudMaterialPrograma.create({
-        instructorId,
-        programaId: payload.programaId,
-        fichaId: payload.fichaId,
-        vigencia: vigencia.anio,
-        estado: 'borrador',
-        observacion: payload.observacion ?? null,
-      })
+      await this.ensureAssignment(instructorId, payload.programaId, trx)
+      const solicitud = await SolicitudMaterialPrograma.create(
+        {
+          instructorId,
+          programaId: payload.programaId,
+          fichaId: payload.fichaId,
+          vigencia: vigencia.anio,
+          estado: 'borrador',
+          observacion: payload.observacion ?? null,
+        },
+        { client: trx }
+      )
 
-      await this.replaceItems(solicitud, payload.items)
-      await this.historial(solicitud.id, null, 'borrador', scope.idUsuario, payload.observacion)
+      await this.replaceItems(solicitud, payload.items, trx)
+      await trx.commit()
       return this.show(scope, solicitud.id)
     } catch (error) {
+      await trx.rollback()
+      if (error instanceof Exception) throw error
       rethrowDatabaseError(error, 'No se pudo crear la solicitud de materiales de formación')
     }
   }
@@ -142,8 +147,18 @@ export default class SolicitudProgramaService {
     }
 
     if (payload.observacion !== undefined) solicitud.observacion = payload.observacion
-    await solicitud.save()
-    if (payload.items) await this.replaceItems(solicitud, payload.items)
+
+    const trx = await db.transaction()
+    try {
+      solicitud.useTransaction(trx)
+      await solicitud.save()
+      if (payload.items) await this.replaceItems(solicitud, payload.items, trx)
+      await trx.commit()
+    } catch (error) {
+      await trx.rollback()
+      if (error instanceof Exception) throw error
+      rethrowDatabaseError(error, 'No se pudo actualizar la solicitud de materiales de formación')
+    }
     return this.show(scope, id)
   }
 
@@ -368,11 +383,18 @@ export default class SolicitudProgramaService {
     return this.show(scope, id)
   }
 
-  private async replaceItems(solicitud: SolicitudMaterialPrograma, items: ItemPayload[]) {
-    await DetalleSolicitudPrograma.query().where('solicitudId', solicitud.id).delete()
+  private async replaceItems(
+    solicitud: SolicitudMaterialPrograma,
+    items: ItemPayload[],
+    trx?: TransactionClientContract
+  ) {
+    const detalles = DetalleSolicitudPrograma.query(trx ? { client: trx } : undefined)
+    await detalles.where('solicitudId', solicitud.id).delete()
 
     for (const item of items) {
-      const material = await ListaMaestraMaterial.findOrFail(item.listaMaestraId)
+      const material = await ListaMaestraMaterial.query(trx ? { client: trx } : undefined)
+        .where('id', item.listaMaestraId)
+        .firstOrFail()
       if (material.programaId !== solicitud.programaId || !material.estado) {
         throw new Exception('El material no pertenece a la lista maestra de ese programa', {
           status: 422,
@@ -380,14 +402,17 @@ export default class SolicitudProgramaService {
         })
       }
 
-      await DetalleSolicitudPrograma.create({
-        solicitudId: solicitud.id,
-        programaId: solicitud.programaId,
-        listaMaestraId: material.id,
-        cantidadMaestraReferencia: material.cantidadBase,
-        cantidadSolicitada: item.cantidadSolicitada,
-        estado: 'pendiente',
-      })
+      await DetalleSolicitudPrograma.create(
+        {
+          solicitudId: solicitud.id,
+          programaId: solicitud.programaId,
+          listaMaestraId: material.id,
+          cantidadMaestraReferencia: material.cantidadBase,
+          cantidadSolicitada: item.cantidadSolicitada,
+          estado: 'pendiente',
+        },
+        trx ? { client: trx } : undefined
+      )
     }
   }
 
@@ -426,8 +451,13 @@ export default class SolicitudProgramaService {
     }
   }
 
-  private async ensureAssignment(userId: number, programaId: number) {
-    const assigned = await db
+  private async ensureAssignment(
+    userId: number,
+    programaId: number,
+    trx?: TransactionClientContract
+  ) {
+    const client = trx ?? db
+    const assigned = await client
       .from('usuario_programa_formacion')
       .where('id_usuario', userId)
       .where('id_programa_formacion', programaId)
@@ -435,7 +465,7 @@ export default class SolicitudProgramaService {
 
     if (assigned) {
       if (!assigned.estado) {
-        await db
+        await client
           .from('usuario_programa_formacion')
           .where('id_usuario_programa', assigned.id_usuario_programa)
           .update({ estado: true })
@@ -443,7 +473,7 @@ export default class SolicitudProgramaService {
       return
     }
 
-    await db.table('usuario_programa_formacion').insert({
+    await client.table('usuario_programa_formacion').insert({
       id_usuario: userId,
       id_programa_formacion: programaId,
       estado: true,

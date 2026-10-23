@@ -238,17 +238,38 @@ export default class ListaMaestraMaterialService {
       .where('estado', true)
       .first()
 
-    if (!assigned) {
-      throw new Exception(
-        'No tienes este programa de formación asignado. Pídele al administrador que te lo asigne.',
-        {
-          status: 403,
-          code: 'E_FORBIDDEN',
-        }
-      )
+    if (assigned) return programa
+
+    if (can(scope, 'solicitud_programa.editar') && (await this.coordinadorCubre(scope, programa))) {
+      return programa
     }
 
-    return programa
+    throw new Exception(
+      'No tienes este programa de formación asignado. Pídele al administrador que te lo asigne.',
+      {
+        status: 403,
+        code: 'E_FORBIDDEN',
+      }
+    )
+  }
+
+  private async coordinadorCubre(scope: AccessScope, programa: ProgramaFormacion) {
+    const alcance = await db
+      .from('usuario_red_conocimiento')
+      .where('id_usuario', scope.idUsuario)
+      .where('estado', true)
+      .select('id_red_conocimiento', 'id_linea_tematica')
+
+    if (!alcance.length) return false
+
+    return alcance.some((fila) => {
+      const mismaRed = Number(fila.id_red_conocimiento) === programa.idRedConocimiento
+      const mismaLinea =
+        fila.id_linea_tematica === null ||
+        fila.id_linea_tematica === undefined ||
+        Number(fila.id_linea_tematica) === programa.idLineaTematica
+      return mismaRed && mismaLinea
+    })
   }
 }
 
