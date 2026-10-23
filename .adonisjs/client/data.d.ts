@@ -6,6 +6,7 @@
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type AdminUserTransformer from '#transformers/admin_user_transformer'
+import type AgregarMaterialLmTransformer from '#transformers/agregar_material_lm_transformer'
 import type AlertaTransformer from '#transformers/alerta_transformer'
 import type BodegaTransformer from '#transformers/bodega_transformer'
 import type CategoriaTransformer from '#transformers/categoria_transformer'
@@ -40,6 +41,10 @@ export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
   export namespace AdminUser {
     export type Variants = InferVariants<AdminUserTransformer>
+  }
+  export type AgregarMaterialLm = InferData<AgregarMaterialLmTransformer>
+  export namespace AgregarMaterialLm {
+    export type Variants = InferVariants<AgregarMaterialLmTransformer>
   }
   export type Alerta = InferData<AlertaTransformer>
   export namespace Alerta {

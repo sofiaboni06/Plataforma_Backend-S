@@ -1519,6 +1519,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['eliminar']>>>
     }
   }
+  'agregarMaterialLm.agregar_material_lm.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/agregar-material-lm'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/agregar_material_lm').listarAgregarMaterialLmValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'agregarMaterialLm.agregar_material_lm.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/agregar-material-lm'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/agregar_material_lm').crearAgregarMaterialLmValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/agregar_material_lm').crearAgregarMaterialLmValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'agregarMaterialLm.agregar_material_lm.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/agregar-material-lm/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['show']>>>
+    }
+  }
+  'agregarMaterialLm.agregar_material_lm.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/agregar-material-lm/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/agregar_material_lm').actualizarAgregarMaterialLmValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/agregar_material_lm').actualizarAgregarMaterialLmValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'agregarMaterialLm.agregar_material_lm.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/agregar-material-lm/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/agregar_material_lm_controller').default['destroy']>>>
+    }
+  }
   'fichas.fichas.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/fichas'

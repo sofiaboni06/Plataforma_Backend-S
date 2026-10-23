@@ -476,6 +476,24 @@ router
     router
       .group(() => {
         router
+          .get('/', [controllers.AgregarMaterialLm, 'index'])
+        router
+          .post('/', [controllers.AgregarMaterialLm, 'store'])
+        router
+          .get(':id', [controllers.AgregarMaterialLm, 'show'])
+        router
+          .patch(':id', [controllers.AgregarMaterialLm, 'update'])
+        router
+          .delete(':id', [controllers.AgregarMaterialLm, 'destroy'])
+      })
+      .prefix('agregar-material-lm')
+      .as('agregarMaterialLm')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
           .get('/', [controllers.Fichas, 'index'])
           .use(middleware.permission('ficha.ver'))
         router
@@ -616,5 +634,5 @@ router
       .as('vigencias')
       .use(middleware.auth())
       .use(middleware.account())
-     })
+  })
   .prefix('/api/v1')

@@ -130,6 +130,11 @@ export type ScannedRoutes = {
     'listasMaestrasMaterial.listas_maestras_material.importar': { paramsTuple?: []; params?: {} }
     'listasMaestrasMaterial.listas_maestras_material.actualizar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'listasMaestrasMaterial.listas_maestras_material.eliminar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'agregarMaterialLm.agregar_material_lm.index': { paramsTuple?: []; params?: {} }
+    'agregarMaterialLm.agregar_material_lm.store': { paramsTuple?: []; params?: {} }
+    'agregarMaterialLm.agregar_material_lm.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'agregarMaterialLm.agregar_material_lm.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'agregarMaterialLm.agregar_material_lm.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.index': { paramsTuple?: []; params?: {} }
     'fichas.fichas.options': { paramsTuple?: []; params?: {} }
     'fichas.fichas.store': { paramsTuple?: []; params?: {} }
@@ -219,6 +224,8 @@ export type ScannedRoutes = {
     'programasFormacion.programas_formacion.usuarios': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'listasMaestrasMaterial.listas_maestras_material.listar': { paramsTuple?: []; params?: {} }
+    'agregarMaterialLm.agregar_material_lm.index': { paramsTuple?: []; params?: {} }
+    'agregarMaterialLm.agregar_material_lm.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.index': { paramsTuple?: []; params?: {} }
     'fichas.fichas.options': { paramsTuple?: []; params?: {} }
     'fichas.fichas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -290,6 +297,8 @@ export type ScannedRoutes = {
     'programasFormacion.programas_formacion.usuarios': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'listasMaestrasMaterial.listas_maestras_material.listar': { paramsTuple?: []; params?: {} }
+    'agregarMaterialLm.agregar_material_lm.index': { paramsTuple?: []; params?: {} }
+    'agregarMaterialLm.agregar_material_lm.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.index': { paramsTuple?: []; params?: {} }
     'fichas.fichas.options': { paramsTuple?: []; params?: {} }
     'fichas.fichas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -342,6 +351,7 @@ export type ScannedRoutes = {
     'programasFormacion.programas_formacion.store': { paramsTuple?: []; params?: {} }
     'listasMaestrasMaterial.listas_maestras_material.crear': { paramsTuple?: []; params?: {} }
     'listasMaestrasMaterial.listas_maestras_material.importar': { paramsTuple?: []; params?: {} }
+    'agregarMaterialLm.agregar_material_lm.store': { paramsTuple?: []; params?: {} }
     'fichas.fichas.store': { paramsTuple?: []; params?: {} }
     'obras.obras.store': { paramsTuple?: []; params?: {} }
     'solicitudes.solicitudes.store': { paramsTuple?: []; params?: {} }
@@ -367,6 +377,7 @@ export type ScannedRoutes = {
     'lineasTematicas.lineas_tematicas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'listasMaestrasMaterial.listas_maestras_material.eliminar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'agregarMaterialLm.agregar_material_lm.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'vigencias.vigencias.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -394,6 +405,7 @@ export type ScannedRoutes = {
     'lineasTematicas.lineas_tematicas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'listasMaestrasMaterial.listas_maestras_material.actualizar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'agregarMaterialLm.agregar_material_lm.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudes.solicitudes.entregar': { paramsTuple: [ParamValue]; params: {'codigo': ParamValue} }
@@ -407,11 +419,8 @@ export type ScannedRoutes = {
     'roles.roles.sync_permissions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.sync_programas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.users.sync_bodegas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-<<<<<<< HEAD
-    'vigencias.vigencias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-=======
     'redesConocimiento.redes_conocimiento.sync_lineas': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
->>>>>>> 76a93fff97104c45e7c5666fb348ade98a1c32bd
+    'vigencias.vigencias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

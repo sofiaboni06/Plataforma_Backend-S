@@ -228,6 +228,15 @@ export interface ApiDefinition {
       eliminar: typeof routes['listasMaestrasMaterial.listas_maestras_material.eliminar']
     }
   }
+  agregarMaterialLm: {
+    agregarMaterialLm: {
+      index: typeof routes['agregarMaterialLm.agregar_material_lm.index']
+      store: typeof routes['agregarMaterialLm.agregar_material_lm.store']
+      show: typeof routes['agregarMaterialLm.agregar_material_lm.show']
+      update: typeof routes['agregarMaterialLm.agregar_material_lm.update']
+      destroy: typeof routes['agregarMaterialLm.agregar_material_lm.destroy']
+    }
+  }
   fichas: {
     fichas: {
       index: typeof routes['fichas.fichas.index']

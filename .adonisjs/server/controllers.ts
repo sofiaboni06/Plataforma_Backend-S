@@ -5,6 +5,7 @@
 
 export const controllers = {
   AccessTokens: () => import('#controllers/access_tokens_controller'),
+  AgregarMaterialLm: () => import('#controllers/agregar_material_lm_controller'),
   Alertas: () => import('#controllers/alertas_controller'),
   Bodega: () => import('#controllers/bodega_controller'),
   Categorias: () => import('#controllers/categorias_controller'),

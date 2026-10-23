@@ -762,6 +762,36 @@ const routes = {
     tokens: [{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"listas-maestras-material","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.eliminar']['types'],
   },
+  'agregarMaterialLm.agregar_material_lm.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/agregar-material-lm',
+    tokens: [{"old":"/api/v1/agregar-material-lm","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm","type":0,"val":"agregar-material-lm","end":""}],
+    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.index']['types'],
+  },
+  'agregarMaterialLm.agregar_material_lm.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/agregar-material-lm',
+    tokens: [{"old":"/api/v1/agregar-material-lm","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm","type":0,"val":"agregar-material-lm","end":""}],
+    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.store']['types'],
+  },
+  'agregarMaterialLm.agregar_material_lm.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/agregar-material-lm/:id',
+    tokens: [{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"agregar-material-lm","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.show']['types'],
+  },
+  'agregarMaterialLm.agregar_material_lm.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/agregar-material-lm/:id',
+    tokens: [{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"agregar-material-lm","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.update']['types'],
+  },
+  'agregarMaterialLm.agregar_material_lm.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/agregar-material-lm/:id',
+    tokens: [{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"agregar-material-lm","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.destroy']['types'],
+  },
   'fichas.fichas.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/fichas',
