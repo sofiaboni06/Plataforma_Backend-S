@@ -1,10 +1,11 @@
 import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import CargaListaMaestra from '#models/carga_lista_maestra'
 import ProgramaFormacion from '#models/programa_formacion'
-import TrainingCenter from '#models/training_center'
-import Elemento from '#models/elemento'
 import User from '#models/usuario'
+
+export type CaracterListaMaestra = 'consumo' | 'devolutivo' | 'software'
 
 export default class ListaMaestraMaterial extends BaseModel {
   static table = 'lista_maestra_material'
@@ -15,17 +16,32 @@ export default class ListaMaestraMaterial extends BaseModel {
   @column({ columnName: 'id_programa_formacion' })
   declare programaId: number
 
-  @column({ columnName: 'id_cformacion' })
-  declare centroId: number | null
+  @column({ columnName: 'codigo_unspsc' })
+  declare codigoUnspsc: string
 
-  @column({ columnName: 'id_elemento' })
-  declare elementoId: number
+  @column()
+  declare producto: string
 
-  @column({ columnName: 'cantidad_base' })
+  @column({ columnName: 'descripcion_tecnica' })
+  declare descripcionTecnica: string | null
+
+  @column({ columnName: 'unidad_medida' })
+  declare unidadMedida: string | null
+
+  @column({
+    columnName: 'cantidad_base',
+    consume: (value) => (value === null || value === undefined ? 0 : Number(value)),
+  })
   declare cantidadBase: number
 
   @column()
+  declare caracter: CaracterListaMaestra | null
+
+  @column()
   declare observaciones: string | null
+
+  @column({ columnName: 'id_carga' })
+  declare cargaId: number | null
 
   @column({ columnName: 'id_usuario_registro' })
   declare usuarioRegistroId: number | null
@@ -42,12 +58,9 @@ export default class ListaMaestraMaterial extends BaseModel {
   @belongsTo(() => ProgramaFormacion, { foreignKey: 'programaId' })
   declare programa: BelongsTo<typeof ProgramaFormacion>
 
-  @belongsTo(() => TrainingCenter, { foreignKey: 'centroId' })
-  declare centro: BelongsTo<typeof TrainingCenter>
-
-  @belongsTo(() => Elemento, { foreignKey: 'elementoId' })
-  declare elemento: BelongsTo<typeof Elemento>
-
   @belongsTo(() => User, { foreignKey: 'usuarioRegistroId' })
   declare usuarioRegistro: BelongsTo<typeof User>
+
+  @belongsTo(() => CargaListaMaestra, { foreignKey: 'cargaId' })
+  declare carga: BelongsTo<typeof CargaListaMaestra>
 }

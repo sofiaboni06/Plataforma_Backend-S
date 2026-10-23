@@ -17,6 +17,7 @@ import type FichaTransformer from '#transformers/ficha_transformer'
 import type ItemTransformer from '#transformers/item_transformer'
 import type JornadaTransformer from '#transformers/jornada_transformer'
 import type LineaTematicaTransformer from '#transformers/linea_tematica_transformer'
+import type ListaMaestraMaterialTransformer from '#transformers/lista_maestra_material_transformer'
 import type ModuleTransformer from '#transformers/module_transformer'
 import type NivelProgramaTransformer from '#transformers/nivel_programa_transformer'
 import type NotificacionTransformer from '#transformers/notificacion_transformer'
@@ -27,6 +28,7 @@ import type RoleTransformer from '#transformers/role_transformer'
 import type SolicitanteTransformer from '#transformers/solicitante_transformer'
 import type SolicitudEquipoTransformer from '#transformers/solicitud_equipo_transformer'
 import type SolicitudMaterialTransformer from '#transformers/solicitud_material_transformer'
+import type SolicitudProgramaTransformer from '#transformers/solicitud_programa_transformer'
 import type SolicitudTransformer from '#transformers/solicitud_transformer'
 import type StandTransformer from '#transformers/stand_transformer'
 import type SubBodegaTransformer from '#transformers/sub_bodega_transformer'
@@ -34,6 +36,7 @@ import type SubcategoriaTransformer from '#transformers/subcategoria_transformer
 import type UnidadMedidaTransformer from '#transformers/unidad_medida_transformer'
 import type UserTransformer from '#transformers/user_transformer'
 import type UsoPresupuestalTransformer from '#transformers/uso_presupuestal_transformer'
+import type VigenciaTransformer from '#transformers/vigencia_transformer'
 
 export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
@@ -84,6 +87,10 @@ export namespace Data {
   export namespace LineaTematica {
     export type Variants = InferVariants<LineaTematicaTransformer>
   }
+  export type ListaMaestraMaterial = InferData<ListaMaestraMaterialTransformer>
+  export namespace ListaMaestraMaterial {
+    export type Variants = InferVariants<ListaMaestraMaterialTransformer>
+  }
   export type Module = InferData<ModuleTransformer>
   export namespace Module {
     export type Variants = InferVariants<ModuleTransformer>
@@ -124,6 +131,10 @@ export namespace Data {
   export namespace SolicitudMaterial {
     export type Variants = InferVariants<SolicitudMaterialTransformer>
   }
+  export type SolicitudPrograma = InferData<SolicitudProgramaTransformer>
+  export namespace SolicitudPrograma {
+    export type Variants = InferVariants<SolicitudProgramaTransformer>
+  }
   export type Solicitud = InferData<SolicitudTransformer>
   export namespace Solicitud {
     export type Variants = InferVariants<SolicitudTransformer>
@@ -151,5 +162,9 @@ export namespace Data {
   export type UsoPresupuestal = InferData<UsoPresupuestalTransformer>
   export namespace UsoPresupuestal {
     export type Variants = InferVariants<UsoPresupuestalTransformer>
+  }
+  export type Vigencia = InferData<VigenciaTransformer>
+  export namespace Vigencia {
+    export type Variants = InferVariants<VigenciaTransformer>
   }
 }

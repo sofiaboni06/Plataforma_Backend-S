@@ -35,6 +35,7 @@ export interface ApiDefinition {
     }
     notificaciones: {
       index: typeof routes['account.notificaciones.index']
+      show: typeof routes['account.notificaciones.show']
       updateAll: typeof routes['account.notificaciones.update_all']
       update: typeof routes['account.notificaciones.update']
     }
@@ -223,9 +224,36 @@ export interface ApiDefinition {
     listasMaestrasMaterial: {
       listar: typeof routes['listasMaestrasMaterial.listas_maestras_material.listar']
       crear: typeof routes['listasMaestrasMaterial.listas_maestras_material.crear']
+      plantilla: typeof routes['listasMaestrasMaterial.listas_maestras_material.plantilla']
       importar: typeof routes['listasMaestrasMaterial.listas_maestras_material.importar']
       actualizar: typeof routes['listasMaestrasMaterial.listas_maestras_material.actualizar']
       eliminar: typeof routes['listasMaestrasMaterial.listas_maestras_material.eliminar']
+    }
+  }
+  vigencias: {
+    vigencias: {
+      index: typeof routes['vigencias.vigencias.index']
+      activa: typeof routes['vigencias.vigencias.activa']
+      store: typeof routes['vigencias.vigencias.store']
+      update: typeof routes['vigencias.vigencias.update']
+      destroy: typeof routes['vigencias.vigencias.destroy']
+    }
+  }
+  solicitudesPrograma: {
+    solicitudesPrograma: {
+      index: typeof routes['solicitudesPrograma.solicitudes_programa.index']
+      store: typeof routes['solicitudesPrograma.solicitudes_programa.store']
+      show: typeof routes['solicitudesPrograma.solicitudes_programa.show']
+      update: typeof routes['solicitudesPrograma.solicitudes_programa.update']
+      enviar: typeof routes['solicitudesPrograma.solicitudes_programa.enviar']
+      decidir: typeof routes['solicitudesPrograma.solicitudes_programa.decidir']
+      destroy: typeof routes['solicitudesPrograma.solicitudes_programa.destroy']
+    }
+  }
+  procesosCompra: {
+    procesosCompra: {
+      consolidado: typeof routes['procesosCompra.procesos_compra.consolidado']
+      store: typeof routes['procesosCompra.procesos_compra.store']
     }
   }
   fichas: {

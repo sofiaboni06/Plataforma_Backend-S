@@ -16,6 +16,7 @@ export function notificacionJson(row: Notificacion) {
     recurso: row.recurso,
     idReferencia: row.idReferencia,
     fecha: fechaIso(row.fecha),
+    detalle: row.detalle ?? null,
   }
 }
 

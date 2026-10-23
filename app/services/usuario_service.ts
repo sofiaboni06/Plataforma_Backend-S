@@ -253,6 +253,9 @@ export default class UsuarioService {
     await this.assertProgramas(uniqueIds)
     await this.assertProgramasInCenter(user.idCformacion, uniqueIds)
     await this.syncProgramaPivot(user, uniqueIds)
+    if (/^coordinador/i.test(user.perfil?.nombre ?? '')) {
+      await this.syncRedAlcance(user.id, uniqueIds)
+    }
 
     return this.programas(user.id)
   }
@@ -282,6 +285,54 @@ export default class UsuarioService {
   private async syncBodegaPivot(user: User, bodegaIds: number[]) {
     const pivot = Object.fromEntries(bodegaIds.map((bodegaId) => [bodegaId, { estado: true }]))
     await user.related('bodegas').sync(pivot)
+  }
+
+  /**
+   * El coordinador cubre la red y la línea de los programas que le asignan:
+   * Informática → Software cubre ADSO y el resto de programas de esa línea,
+   * no los de Deportes.
+   */
+  private async syncRedAlcance(usuarioId: number, programIds: number[]) {
+    await db.from('usuario_red_conocimiento').where('id_usuario', usuarioId).update({ estado: false })
+
+    if (!programIds.length) return
+
+    const programas = await ProgramaFormacion.query().whereIn('id', programIds)
+    const vistos = new Set<string>()
+
+    for (const programa of programas) {
+      const clave = `${programa.idRedConocimiento}:${programa.idLineaTematica}`
+      if (vistos.has(clave)) continue
+      vistos.add(clave)
+
+      const existing = await db
+        .from('usuario_red_conocimiento')
+        .where('id_usuario', usuarioId)
+        .where('id_red_conocimiento', programa.idRedConocimiento)
+        .where('id_linea_tematica', programa.idLineaTematica)
+        .first()
+
+      if (existing) {
+        await db
+          .from('usuario_red_conocimiento')
+          .where('id_usuario', usuarioId)
+          .where('id_red_conocimiento', programa.idRedConocimiento)
+          .where('id_linea_tematica', programa.idLineaTematica)
+          .update({ estado: true })
+        continue
+      }
+
+      try {
+        await db.table('usuario_red_conocimiento').insert({
+          id_usuario: usuarioId,
+          id_red_conocimiento: programa.idRedConocimiento,
+          id_linea_tematica: programa.idLineaTematica,
+          estado: true,
+        })
+      } catch (error) {
+        rethrowDatabaseError(error, 'No se pudo asignar la red de conocimiento al coordinador')
+      }
+    }
   }
 
   private async syncProgramaPivot(user: User, programIds: number[]) {

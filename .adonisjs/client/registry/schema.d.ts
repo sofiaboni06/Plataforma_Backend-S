@@ -211,6 +211,18 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'account.notificaciones.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/notifications/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'account.notificaciones.update_all': {
     methods: ["PATCH"]
     pattern: '/api/v1/account/notifications'
@@ -1475,36 +1487,48 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/api/v1/listas-maestras-material'
     types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/lista_maestra').createListaMaestraValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/lista_maestra').createListaMaestraValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['crear']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['crear']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'listasMaestrasMaterial.listas_maestras_material.plantilla': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/listas-maestras-material/plantilla'
+    types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['crear']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['crear']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['plantilla']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['plantilla']>>>
     }
   }
   'listasMaestrasMaterial.listas_maestras_material.importar': {
     methods: ["POST"]
     pattern: '/api/v1/listas-maestras-material/importar'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/lista_maestra').importListaMaestraValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/lista_maestra').importListaMaestraValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['importar']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['importar']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['importar']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'listasMaestrasMaterial.listas_maestras_material.actualizar': {
     methods: ["PATCH"]
     pattern: '/api/v1/listas-maestras-material/:id'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/lista_maestra').updateListaMaestraValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/lista_maestra').updateListaMaestraValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['actualizar']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['actualizar']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['actualizar']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'listasMaestrasMaterial.listas_maestras_material.eliminar': {
@@ -1517,6 +1541,174 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['eliminar']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/listas_maestras_material_controller').default['eliminar']>>>
+    }
+  }
+  'vigencias.vigencias.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/vigencias'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.activa': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/vigencias/activa'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/vigencias'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/vigencias/:anio'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { anio: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/vigencias/:anio'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { anio: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesPrograma.solicitudes_programa.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-programa'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesPrograma.solicitudes_programa.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes-programa'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesPrograma.solicitudes_programa.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/solicitudes-programa/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesPrograma.solicitudes_programa.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/solicitudes-programa/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesPrograma.solicitudes_programa.enviar': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes-programa/:id/enviar'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesPrograma.solicitudes_programa.decidir': {
+    methods: ["POST"]
+    pattern: '/api/v1/solicitudes-programa/:id/decidir'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'solicitudesPrograma.solicitudes_programa.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/solicitudes-programa/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'procesosCompra.procesos_compra.consolidado': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/procesos-compra/consolidado'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'procesosCompra.procesos_compra.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/procesos-compra'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
     }
   }
   'fichas.fichas.index': {

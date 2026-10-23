@@ -26,9 +26,16 @@ export function slugifyModuleName(nombre: string) {
 }
 
 export function presentModule(nombre: string): ModulePresentation & { code: string } {
-  const extras = MODULE_PRESENTATION[nombre] ?? { icon: 'home', to: null }
+  const slug = slugifyModuleName(nombre)
+  const extras =
+    MODULE_PRESENTATION[nombre] ??
+    Object.entries(MODULE_PRESENTATION).find(([key]) => slugifyModuleName(key) === slug)?.[1] ?? {
+      icon: 'home',
+      to: null,
+    }
+
   return {
-    code: slugifyModuleName(nombre),
+    code: slug,
     ...extras,
   }
 }

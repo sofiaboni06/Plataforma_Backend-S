@@ -1,58 +1,75 @@
-import { Exception } from '@adonisjs/core/exceptions'
 import type { HttpContext } from '@adonisjs/core/http'
 import ListaMaestraMaterialService from '#services/lista_maestra_material_service'
+import ListaMaestraMaterialTransformer from '#transformers/lista_maestra_material_transformer'
+import { resolveScope } from '#services/access_control'
+import { Exception } from '@adonisjs/core/exceptions'
+import { parseOptionalPositiveInt } from '#services/query_params'
+import {
+  createListaMaestraValidator,
+  importListaMaestraValidator,
+  updateListaMaestraValidator,
+} from '#validators/lista_maestra'
 
 export default class ListasMaestrasMaterialController {
-  async listar({ request, response }: HttpContext) {
-    const programaId = Number(request.input('programaId'))
-    const centroId = request.input('centroId') ? Number(request.input('centroId')) : null
+  private service = new ListaMaestraMaterialService()
+
+  async listar({ auth, request, serialize }: HttpContext) {
+    const programaId = parseOptionalPositiveInt(request.input('programaId'))
     if (!programaId) {
       throw new Exception('programaId es requerido', { status: 422, code: 'E_VALIDATION_ERROR' })
     }
-    const service = new ListaMaestraMaterialService()
-    const items = await service.listar(programaId, centroId)
-    return response.ok({ data: items })
+    const scope = await resolveScope(auth.getUserOrFail())
+    const items = await this.service.listar(scope, programaId)
+    return serialize(ListaMaestraMaterialTransformer.transform(items))
   }
 
-  async crear({ request, response, auth }: HttpContext) {
-    const programaId = Number(request.input('programaId'))
-    const centroId = request.input('centroId') ? Number(request.input('centroId')) : null
-    const elementoId = Number(request.input('elementoId'))
-    const cantidadBase = Number(request.input('cantidadBase') ?? 1)
-    const observaciones = request.input('observaciones') ?? null
-    if (!programaId || !elementoId) {
-      throw new Exception('programaId y elementoId son requeridos', { status: 422, code: 'E_VALIDATION_ERROR' })
-    }
-    const service = new ListaMaestraMaterialService()
-    const item = await service.agregar(programaId, centroId, elementoId, cantidadBase, observaciones, auth.user?.id ?? null)
-    return response.created({ data: item })
+  async crear({ auth, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(createListaMaestraValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    const item = await this.service.agregar(scope, payload)
+    return serialize(ListaMaestraMaterialTransformer.transform(item))
   }
 
-  async importar({ request, response, auth }: HttpContext) {
-    const programaId = Number(request.input('programaId'))
-    const centroId = request.input('centroId') ? Number(request.input('centroId')) : null
-    const archivo = request.file('archivo')
-    if (!programaId || !archivo) {
-      throw new Exception('programaId y archivo son requeridos', { status: 422, code: 'E_VALIDATION_ERROR' })
-    }
-    await archivo.move('/tmp')
-    const service = new ListaMaestraMaterialService()
-    const result = await service.importarExcel(programaId, centroId, archivo.tmpPath!, auth.user?.id ?? null)
-    return response.created({ data: result })
+  async plantilla({ auth, request, response }: HttpContext) {
+    const programaId = parseOptionalPositiveInt(request.input('programaId'))
+    const scope = await resolveScope(auth.getUserOrFail())
+    const archivo = await this.service.plantilla(scope, programaId)
+    const nombre = 'plantilla-lista-maestra.xlsx'
+    response.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response.header('Content-Disposition', `attachment; filename="${nombre}"`)
+    return response.send(archivo)
   }
 
-  async actualizar({ request, response }: HttpContext) {
-    const id = Number(request.param('id'))
-    const payload = request.only(['cantidadBase', 'observaciones', 'estado'])
-    const service = new ListaMaestraMaterialService()
-    const item = await service.actualizar(id, payload)
-    return response.ok({ data: item })
+  async importar({ auth, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(importListaMaestraValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    const result = await this.service.importarExcel(
+      scope,
+      payload.programaId,
+      payload.archivo.tmpPath!,
+      payload.archivo.clientName
+    )
+
+    return serialize({
+      carga: result.carga,
+      errores: result.errores,
+      items: ListaMaestraMaterialTransformer.transform(result.items),
+    })
   }
 
-  async eliminar({ response }: HttpContext) {
-    const id = Number((response as any).request?.param?.('id'))
-    const service = new ListaMaestraMaterialService()
-    await service.eliminar(id)
-    return response.noContent()
+  async actualizar({ auth, params, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(updateListaMaestraValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    const item = await this.service.actualizar(scope, Number(params.id), payload)
+    return serialize(ListaMaestraMaterialTransformer.transform(item))
+  }
+
+  async eliminar({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const result = await this.service.eliminar(scope, Number(params.id))
+    return serialize(result)
   }
 }

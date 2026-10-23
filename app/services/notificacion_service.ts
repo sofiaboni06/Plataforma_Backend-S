@@ -7,7 +7,11 @@ import AlertaService, { type ResultadoAlerta } from '#services/alerta_service'
 import { rethrowDatabaseError } from '#services/database_error'
 import type Elemento from '#models/elemento'
 import Notificacion from '#models/notificacion'
-import type { RecursoNotificacion, TipoNotificacion } from '#models/notificacion'
+import type {
+  DetalleNotificacion,
+  RecursoNotificacion,
+  TipoNotificacion,
+} from '#models/notificacion'
 import User from '#models/usuario'
 import type { EstadoElementoEquipo } from '#models/solicitud_equipo'
 import type { SolicitudPendiente } from '#services/disponibilidad_service'
@@ -15,6 +19,7 @@ import { notificacionJson } from '#transformers/notificacion_transformer'
 import { diasEntre, fechaCorta, inicioDeHoy, type FechaDia } from '#services/plazo'
 import type { PermissionCode } from '#data/permission_catalog'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import ProgramaFormacion from '#models/programa_formacion'
 
 type Borrador = {
   idUsuario: number
@@ -23,6 +28,7 @@ type Borrador = {
   mensaje: string
   recurso: RecursoNotificacion | null
   idReferencia: number | null
+  detalle?: DetalleNotificacion | null
 }
 
 const ESTADO_EQUIPO: Record<EstadoElementoEquipo, string> = {
@@ -121,6 +127,22 @@ export default class NotificacionService {
     }
 
     return query.paginate(options.page, options.perPage)
+  }
+
+  async show(idUsuario: number, id: number) {
+    const row = await Notificacion.query()
+      .where('id_notificacion', id)
+      .where('id_usuario', idUsuario)
+      .first()
+
+    if (!row) {
+      throw new Exception('La notificación indicada no existe', {
+        status: 404,
+        code: 'E_NOT_FOUND',
+      })
+    }
+
+    return row
   }
 
   async marcar(idUsuario: number, id: number, leida: boolean) {
@@ -311,6 +333,140 @@ export default class NotificacionService {
         }
       })
     )
+  }
+
+  /**
+   * El instructor envió el carrito de materiales de formación: avisa a los
+   * coordinadores de esa red.
+   */
+  async pedidoFormacion(
+    trx: TransactionClientContract,
+    input: {
+      solicitudId: number
+      instructorId: number
+      programaId: number
+      programa: string
+      ficha: string
+      red?: string | null
+      linea?: string | null
+      items: { producto: string; cantidad: number }[]
+    }
+  ) {
+    const destinos = await this.coordinadoresDePrograma(trx, {
+      programaId: input.programaId,
+      instructorId: input.instructorId,
+    })
+    if (!destinos.length) return []
+
+    const solicitante = await this.nombreDe(input.instructorId, trx)
+    const detalle = enLista(input.items.map((row) => `${row.cantidad} de ${row.producto}`))
+    const alcance = [input.red && `Red ${input.red}`, input.linea && `Línea ${input.linea}`]
+      .filter(Boolean)
+      .join(' · ')
+    const donde = alcance ? `${alcance} · ` : ''
+
+    return this.crear(
+      trx,
+      destinos.map((idUsuario) => ({
+        idUsuario,
+        tipo: 'solicitud_programa' as const,
+        titulo: `${solicitante} pidió materiales de ${input.programa}`,
+        mensaje: `${donde}Ficha ${input.ficha}: ${detalle}. Revisa ítem por ítem: puedes aprobar, ajustar o dejar pendiente.`,
+        recurso: 'solicitud_programa' as const,
+        idReferencia: input.solicitudId,
+      }))
+    )
+  }
+
+  /**
+   * El coordinador decidió (o ajustó) líneas del carrito: avisa al instructor
+   * qué se aprobó, qué se recortó y qué sigue pendiente.
+   */
+  async decisionFormacion(
+    trx: TransactionClientContract,
+    input: {
+      solicitudId: number
+      instructorId: number
+      coordinadorId: number
+      programa: string
+      ficha?: string | null
+      observacion?: string | null
+      entregados: { producto: string; cantidad: number; queda: number; motivo: string | null }[]
+      ajustados: {
+        producto: string
+        pedida: number
+        autorizada: number
+        queda: number
+        motivo: string | null
+      }[]
+      rechazados: { producto: string; cantidad: number; motivo: string | null }[]
+      pendientes: { producto: string; cantidad: number }[]
+    }
+  ) {
+    const partes: string[] = []
+    if (input.ficha) partes.push(`Ficha ${input.ficha}.`)
+    if (input.entregados.length) {
+      partes.push(
+        `Se autorizó ${enLista(
+          input.entregados.map((row) => {
+            const motivo = row.motivo ? ` (${row.motivo})` : ''
+            return `${row.cantidad} de ${row.producto}${motivo}`
+          })
+        )}.`
+      )
+    }
+    if (input.ajustados.length) {
+      partes.push(
+        `Se ajustó ${enLista(
+          input.ajustados.map((row) => {
+            const motivo = row.motivo ? `. Motivo: ${row.motivo}` : ''
+            const resto =
+              row.queda > 0 ? ` Quedan ${row.queda} pendientes` : ''
+            return `${row.producto}: pediste ${row.pedida} y se autorizaron ${row.autorizada}${resto}${motivo}`
+          })
+        )}.`
+      )
+    }
+    if (input.rechazados.length) {
+      partes.push(
+        `No se autorizó ${enLista(
+          input.rechazados.map((row) => {
+            const motivo = row.motivo ? ` (${row.motivo})` : ''
+            return `${row.producto}${motivo}`
+          })
+        )}.`
+      )
+    }
+    if (input.pendientes.length) {
+      partes.push(
+        `Sigue pendiente ${enLista(input.pendientes.map((row) => `${row.cantidad} de ${row.producto}`))}. Cuando haya más, coordinación lo autoriza igual que en inventario.`
+      )
+    }
+
+    if (input.observacion) partes.push(input.observacion)
+
+    const siguePendiente =
+      input.pendientes.length > 0 || input.ajustados.some((row) => row.queda > 0)
+    const titulo = siguePendiente
+      ? `Coordinación autorizó parte de tu pedido de ${input.programa}`
+      : `Coordinación respondió tu pedido de ${input.programa}`
+
+    return this.paraUno(trx, input.instructorId, input.coordinadorId, {
+      tipo: 'decision_solicitud_programa',
+      titulo,
+      mensaje: partes.join(' ') || 'Coordinación revisó tu solicitud de materiales de formación.',
+      recurso: 'solicitud_programa',
+      idReferencia: input.solicitudId,
+      detalle: {
+        ficha: input.ficha ?? null,
+        programa: input.programa,
+        observacion: input.observacion ?? null,
+        entregados: input.entregados,
+        ajustados: input.ajustados,
+        rechazados: input.rechazados,
+        pendientes: input.pendientes,
+      },
+    })
   }
 
   /**
@@ -831,6 +987,54 @@ export default class NotificacionService {
       idBodega: Number(row.id_bodega),
       idCformacion: Number(row.id_cformacion),
     }
+  }
+
+  private async coordinadoresDePrograma(
+    trx: TransactionClientContract,
+    input: { programaId: number; instructorId: number }
+  ) {
+    const programa = await ProgramaFormacion.query({ client: trx })
+      .where('id', input.programaId)
+      .first()
+    if (!programa) return []
+
+    const instructor = await User.query({ client: trx }).where('id', input.instructorId).first()
+    if (!instructor) return []
+
+    const query = db
+      .from('usuario as u')
+      .join('perfil as pf', 'pf.id_perfil', 'u.id_perfil')
+      .where('u.estado', true)
+      .where('pf.estado', true)
+      .where('u.id_cformacion', instructor.idCformacion)
+      .whereNot('u.id_usuario', input.instructorId)
+      .whereNot('pf.nombre', ADMIN_PROFILE_NAME)
+      .whereExists((permiso) => {
+        permiso
+          .from('perfil_permiso as pp')
+          .join('permiso as p', 'p.codigo', 'pp.codigo')
+          .whereRaw('pp.id_perfil = pf.id_perfil')
+          .where('pp.estado', true)
+          .where('p.estado', true)
+          .where('pp.codigo', 'solicitud_programa.editar')
+      })
+      .whereExists((red) => {
+        red
+          .from('usuario_red_conocimiento as ur')
+          .whereRaw('ur.id_usuario = u.id_usuario')
+          .where('ur.id_red_conocimiento', programa.idRedConocimiento)
+          .where('ur.estado', true)
+          .where((linea) => {
+            linea
+              .whereNull('ur.id_linea_tematica')
+              .orWhere('ur.id_linea_tematica', programa.idLineaTematica)
+          })
+      })
+      .distinct('u.id_usuario')
+      .useTransaction(trx)
+
+    const rows = await query
+    return rows.map((row) => Number(row.id_usuario))
   }
 
   private async nombreDe(idUsuario: number, trx: TransactionClientContract) {
