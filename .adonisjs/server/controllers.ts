@@ -24,6 +24,7 @@ export const controllers = {
   Obras: () => import('#controllers/obras_controller'),
   PasswordRecovery: () => import('#controllers/password_recovery_controller'),
   Permissions: () => import('#controllers/permissions_controller'),
+  PresupuestoFormacion: () => import('#controllers/presupuesto_formacion_controller'),
   ProcesosCompra: () => import('#controllers/procesos_compra_controller'),
   Profile: () => import('#controllers/profile_controller'),
   ProgramasFormacion: () => import('#controllers/programas_formacion_controller'),

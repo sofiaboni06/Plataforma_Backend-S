@@ -1,9 +1,11 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
+import logger from '@adonisjs/core/services/logger'
 import transmit from '@adonisjs/transmit/services/main'
 import { DateTime } from 'luxon'
 import { ADMIN_PROFILE_NAME } from '#services/access_control'
 import AlertaService, { type ResultadoAlerta } from '#services/alerta_service'
+import { correoConfigurado, enviarCorreo } from '#services/correo_service'
 import { rethrowDatabaseError } from '#services/database_error'
 import type Elemento from '#models/elemento'
 import Notificacion from '#models/notificacion'
@@ -805,6 +807,31 @@ export default class NotificacionService {
   emitir(filas: Notificacion[]) {
     for (const fila of filas) {
       transmit.broadcast(`notificaciones/${fila.idUsuario}`, notificacionJson(fila))
+    }
+
+    void this.enviarPorCorreo(filas)
+  }
+
+  private async enviarPorCorreo(filas: Notificacion[]) {
+    if (!filas.length || !correoConfigurado()) return
+
+    const ids = [...new Set(filas.map((fila) => fila.idUsuario))]
+    const usuarios = await User.query().whereIn('id', ids).where('estado', true)
+    const correos = new Map(usuarios.map((usuario) => [usuario.id, usuario.email]))
+
+    for (const fila of filas) {
+      const destino = correos.get(fila.idUsuario)?.trim()
+      if (!destino) continue
+
+      try {
+        await enviarCorreo({
+          to: destino,
+          subject: fila.titulo,
+          text: fila.mensaje,
+        })
+      } catch {
+        logger.error('No se pudo enviar la notificación por correo')
+      }
     }
   }
 

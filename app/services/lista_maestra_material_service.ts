@@ -2,11 +2,14 @@ import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
 import CargaListaMaestra from '#models/carga_lista_maestra'
 import ListaMaestraMaterial from '#models/lista_maestra_material'
+import LoteVigencia from '#models/lote_vigencia'
 import ProgramaFormacion from '#models/programa_formacion'
+import UnidadMedida from '#models/unidad_medida'
 import { assertCan, can, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 import {
   leerListaMaestraExcel,
+  etiquetaUnidadMedida,
   plantillaListaMaestra,
   type FilaListaMaestraExcel,
 } from '#services/lista_maestra_excel'
@@ -17,6 +20,8 @@ type ListaMaestraPayload = {
   producto: string
   descripcionTecnica?: string | null
   unidadMedida?: string | null
+  valorUnitario?: number | null
+  loteId?: number | null
   cantidadBase: number
   caracter?: ListaMaestraMaterial['caracter']
   observaciones?: string | null
@@ -25,9 +30,36 @@ type ListaMaestraPayload = {
 export default class ListaMaestraMaterialService {
   async plantilla(scope: AccessScope, programaId?: number) {
     assertCan(scope, 'lista_maestra.ver')
-    if (!programaId) return plantillaListaMaestra()
+    const unidades = await this.etiquetasUnidad()
+    const lotes = await this.nombresLote(scope.idCformacion)
+    if (!programaId) return plantillaListaMaestra({ unidades, lotes })
     const programa = await this.assertProgramaVisible(scope, programaId)
-    return plantillaListaMaestra({ codigo: programa.codigo, nombre: programa.nombre })
+    return plantillaListaMaestra({
+      codigo: programa.codigo,
+      nombre: programa.nombre,
+      unidades,
+      lotes,
+    })
+  }
+
+  private async nombresLote(idCformacion: number) {
+    const filas = await LoteVigencia.query()
+      .where('idCformacion', idCformacion)
+      .where('estado', true)
+      .whereIn('anio', (query) => {
+        query.from('vigencia').select('anio').where('activa', true)
+      })
+      .orderBy('nombre', 'asc')
+
+    return filas.map((fila) => fila.nombre)
+  }
+
+  private async etiquetasUnidad() {
+    const filas = await UnidadMedida.query()
+      .where((builder) => builder.where('estado', true).orWhereNull('estado'))
+      .orderBy('nombre', 'asc')
+
+    return filas.map((fila) => etiquetaUnidadMedida(fila.nombre, fila.abreviatura))
   }
 
   async listar(scope: AccessScope, programaId: number) {
@@ -38,6 +70,7 @@ export default class ListaMaestraMaterialService {
       .where('programaId', programaId)
       .where('estado', true)
       .preload('programa')
+      .preload('lote')
       .orderBy('producto', 'asc')
   }
 
@@ -46,16 +79,25 @@ export default class ListaMaestraMaterialService {
     await this.assertProgramaVisible(scope, payload.programaId)
 
     try {
-      const item = await this.upsertFila(payload.programaId, {
-        fila: 0,
-        codigoUnspsc: payload.codigoUnspsc,
-        producto: payload.producto,
-        descripcionTecnica: payload.descripcionTecnica ?? null,
-        unidadMedida: payload.unidadMedida ?? null,
-        cantidadBase: payload.cantidadBase,
-        caracter: payload.caracter ?? null,
-        observaciones: payload.observaciones ?? null,
-      }, scope.idUsuario, null)
+      if (payload.loteId) await this.assertLote(payload.loteId, scope.idCformacion)
+      const item = await this.upsertFila(
+        payload.programaId,
+        {
+          fila: 0,
+          codigoUnspsc: payload.codigoUnspsc,
+          producto: payload.producto,
+          descripcionTecnica: payload.descripcionTecnica ?? null,
+          unidadMedida: payload.unidadMedida ?? null,
+          valorUnitario: payload.valorUnitario ?? null,
+          loteNombre: null,
+          cantidadBase: payload.cantidadBase,
+          caracter: payload.caracter ?? null,
+          observaciones: payload.observaciones ?? null,
+        },
+        scope.idUsuario,
+        null,
+        payload.loteId ?? null
+      )
 
       return this.show(item.id)
     } catch (error) {
@@ -72,6 +114,8 @@ export default class ListaMaestraMaterialService {
     const item = await ListaMaestraMaterial.findOrFail(id)
     await this.assertProgramaVisible(scope, item.programaId)
 
+    if (payload.loteId) await this.assertLote(payload.loteId, scope.idCformacion)
+
     item.merge({
       ...(payload.codigoUnspsc !== undefined ? { codigoUnspsc: payload.codigoUnspsc } : {}),
       ...(payload.producto !== undefined ? { producto: payload.producto } : {}),
@@ -79,6 +123,8 @@ export default class ListaMaestraMaterialService {
         ? { descripcionTecnica: payload.descripcionTecnica }
         : {}),
       ...(payload.unidadMedida !== undefined ? { unidadMedida: payload.unidadMedida } : {}),
+      ...(payload.valorUnitario !== undefined ? { valorUnitario: payload.valorUnitario } : {}),
+      ...(payload.loteId !== undefined ? { loteId: payload.loteId } : {}),
       ...(payload.cantidadBase !== undefined ? { cantidadBase: payload.cantidadBase } : {}),
       ...(payload.caracter !== undefined ? { caracter: payload.caracter } : {}),
       ...(payload.observaciones !== undefined ? { observaciones: payload.observaciones } : {}),
@@ -154,7 +200,8 @@ export default class ListaMaestraMaterialService {
 
     for (const fila of lectura.filas) {
       try {
-        items.push(await this.upsertFila(programaId, fila, scope.idUsuario, carga.id))
+        const loteId = await this.lotePorNombre(scope.idCformacion, fila.loteNombre)
+        items.push(await this.upsertFila(programaId, fila, scope.idUsuario, carga.id, loteId))
       } catch (error) {
         errores.push(
           `Fila ${fila.fila}: ${error instanceof Error ? error.message : 'no se pudo guardar'}`
@@ -182,14 +229,15 @@ export default class ListaMaestraMaterialService {
   }
 
   async show(id: number) {
-    return ListaMaestraMaterial.query().where('id', id).preload('programa').firstOrFail()
+    return ListaMaestraMaterial.query().where('id', id).preload('programa').preload('lote').firstOrFail()
   }
 
   private async upsertFila(
     programaId: number,
     fila: FilaListaMaestraExcel,
     usuarioId: number,
-    cargaId: number | null
+    cargaId: number | null,
+    loteId: number | null
   ) {
     const existing = await ListaMaestraMaterial.query()
       .where('programaId', programaId)
@@ -201,6 +249,8 @@ export default class ListaMaestraMaterialService {
       existing.merge({
         descripcionTecnica: fila.descripcionTecnica,
         unidadMedida: fila.unidadMedida,
+        valorUnitario: fila.valorUnitario,
+        loteId,
         cantidadBase: fila.cantidadBase,
         caracter: fila.caracter,
         observaciones: fila.observaciones,
@@ -218,6 +268,8 @@ export default class ListaMaestraMaterialService {
       producto: fila.producto,
       descripcionTecnica: fila.descripcionTecnica,
       unidadMedida: fila.unidadMedida,
+      valorUnitario: fila.valorUnitario,
+      loteId,
       cantidadBase: fila.cantidadBase,
       caracter: fila.caracter,
       observaciones: fila.observaciones,
@@ -225,6 +277,40 @@ export default class ListaMaestraMaterialService {
       usuarioRegistroId: usuarioId,
       estado: true,
     })
+  }
+
+  private async lotePorNombre(idCformacion: number, nombre: string | null) {
+    const limpio = nombre?.trim()
+    if (!limpio) return null
+    const lote = await LoteVigencia.query()
+      .where('idCformacion', idCformacion)
+      .where('estado', true)
+      .whereRaw('lower(nombre) = ?', [limpio.toLowerCase()])
+      .whereIn('anio', (query) => {
+        query.from('vigencia').select('anio').where('activa', true)
+      })
+      .first()
+    if (!lote) {
+      throw new Exception(`El lote "${limpio}" no existe en la vigencia activa`, {
+        status: 422,
+        code: 'E_VALIDATION_ERROR',
+      })
+    }
+    return lote.id
+  }
+
+  private async assertLote(loteId: number, idCformacion: number) {
+    const lote = await LoteVigencia.query()
+      .where('id', loteId)
+      .where('idCformacion', idCformacion)
+      .where('estado', true)
+      .first()
+    if (!lote) {
+      throw new Exception('El lote no pertenece a tu centro en una vigencia activa', {
+        status: 422,
+        code: 'E_VALIDATION_ERROR',
+      })
+    }
   }
 
   private async assertProgramaVisible(scope: AccessScope, programaId: number) {

@@ -69,7 +69,7 @@ export default class PasswordRecoveryService {
 
   private async deliver(transporter: Mailer, email: string, code: string) {
     await transporter.sendMail({
-      from: `"${env.get('MAIL_FROM_NAME') ?? 'Plataforma SENA'}" <${env.get('MAIL_FROM') ?? env.get('MAIL_USERNAME')}>`,
+      from: `"${env.get('MAIL_FROM_NAME') ?? 'Sigma'}" <${env.get('MAIL_FROM') ?? env.get('MAIL_USERNAME')}>`,
       to: email,
       subject: 'Código para recuperar tu contraseña',
       text: `Tu código de recuperación es ${code}. Este código vence en ${CODE_MINUTES} minutos. Si no solicitaste este cambio, ignora este mensaje.`,

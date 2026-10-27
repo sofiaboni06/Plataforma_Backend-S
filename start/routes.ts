@@ -11,6 +11,7 @@ import SolicitudesController from '#controllers/solicitudes_controller'
 import PasswordRecoveryController from '#controllers/password_recovery_controller'
 import ReportesController from '#controllers/reportes_controller'
 import VigenciasController from '#controllers/vigencias_controller'
+import PresupuestoFormacionController from '#controllers/presupuesto_formacion_controller'
 import SolicitudesProgramaController from '#controllers/solicitudes_programa_controller'
 import ProcesosCompraController from '#controllers/procesos_compra_controller'
 import transmit from '@adonisjs/transmit/services/main'
@@ -535,6 +536,32 @@ router
       })
       .prefix('solicitudes-programa')
       .as('solicitudesPrograma')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('/', [PresupuestoFormacionController, 'resumen'])
+          .use(middleware.permission('solicitud_programa.ver'))
+        router
+          .put('monto', [PresupuestoFormacionController, 'guardarMonto'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .put('fichas', [PresupuestoFormacionController, 'repartir'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .get('lotes', [PresupuestoFormacionController, 'lotes'])
+          .use(middleware.permission('solicitud_programa.ver'))
+        router
+          .post('lotes', [PresupuestoFormacionController, 'crearLote'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .get('descargar', [PresupuestoFormacionController, 'descargar'])
+          .use(middleware.permission('solicitud_programa.ver'))
+      })
+      .prefix('presupuesto-formacion')
+      .as('presupuestoFormacion')
       .use(middleware.auth())
       .use(middleware.account())
 

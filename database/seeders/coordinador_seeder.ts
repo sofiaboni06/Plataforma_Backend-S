@@ -15,7 +15,11 @@ export const COORDINADOR_PERMISSIONS = [
   'red_conocimiento.ver',
   'linea_tematica.ver',
   'lista_maestra.ver',
+  'lista_maestra.crear',
+  'lista_maestra.editar',
   'vigencia.ver',
+  'vigencia.crear',
+  'vigencia.editar',
   'solicitud_programa.ver',
   'solicitud_programa.editar',
 ] as const
@@ -35,12 +39,18 @@ export default class extends BaseSeeder {
     await new PermissionSeeder(this.client).run()
 
     let perfil = await Perfil.query().where('nombre', COORDINADOR_PROFILE_NAME).first()
+    const descripcion =
+      'Aprueba solicitudes de formación, reparte el presupuesto de la vigencia y arma los lotes'
+
     if (!perfil) {
       perfil = await Perfil.create({
         nombre: COORDINADOR_PROFILE_NAME,
-        descripcion: 'Aprueba las solicitudes de materiales de formación de su red',
+        descripcion,
         estado: true,
       })
+    } else if (perfil.descripcion !== descripcion) {
+      perfil.descripcion = descripcion
+      await perfil.save()
     }
 
     const formacion = await Modulo.query().where('nombre', 'Materiales de Formación').firstOrFail()

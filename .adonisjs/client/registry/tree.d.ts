@@ -250,6 +250,16 @@ export interface ApiDefinition {
       destroy: typeof routes['solicitudesPrograma.solicitudes_programa.destroy']
     }
   }
+  presupuestoFormacion: {
+    presupuestoFormacion: {
+      resumen: typeof routes['presupuestoFormacion.presupuesto_formacion.resumen']
+      guardarMonto: typeof routes['presupuestoFormacion.presupuesto_formacion.guardar_monto']
+      repartir: typeof routes['presupuestoFormacion.presupuesto_formacion.repartir']
+      lotes: typeof routes['presupuestoFormacion.presupuesto_formacion.lotes']
+      crearLote: typeof routes['presupuestoFormacion.presupuesto_formacion.crear_lote']
+      descargar: typeof routes['presupuestoFormacion.presupuesto_formacion.descargar']
+    }
+  }
   procesosCompra: {
     procesosCompra: {
       consolidado: typeof routes['procesosCompra.procesos_compra.consolidado']

@@ -7,6 +7,8 @@ export type FilaListaMaestraExcel = {
   producto: string
   descripcionTecnica: string | null
   unidadMedida: string | null
+  valorUnitario: number | null
+  loteNombre: string | null
   cantidadBase: number
   caracter: CaracterListaMaestra | null
   observaciones: string | null
@@ -49,6 +51,14 @@ function normalizeHeader(value: string) {
     .trim()
 }
 
+function asMoney(value: string) {
+  if (!value) return null
+  let raw = value.replace(/[^\d,.-]/g, '')
+  if (raw.includes(',')) raw = raw.replace(/\./g, '').replace(',', '.')
+  const parsed = Number(raw)
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null
+}
+
 function asQuantity(value: string) {
   const parsed = Number(value.replace(',', '.').replace(/[^\d.-]/g, ''))
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null
@@ -71,6 +81,8 @@ type ColumnMap = {
   producto?: number
   descripcion?: number
   unidad?: number
+  valor?: number
+  lote?: number
   cantidad?: number
   observaciones?: number
   consumo?: number
@@ -88,6 +100,10 @@ function mapFromHeaders(headers: Map<number, string>): ColumnMap {
       map.producto = index
     } else if (header.includes('descripcion')) {
       map.descripcion = index
+    } else if (header.includes('valor')) {
+      map.valor = index
+    } else if (header === 'lote' || header.includes('lote')) {
+      map.lote = index
     } else if (header.includes('unidad')) {
       map.unidad = index
     } else if (header.includes('cantidad')) {
@@ -178,6 +194,8 @@ function readMappedRow(
       ? cellText(row.getCell(columns.descripcion).value) || null
       : null,
     unidadMedida: columns.unidad ? cellText(row.getCell(columns.unidad).value) || null : null,
+    valorUnitario: columns.valor ? asMoney(cellText(row.getCell(columns.valor).value)) : null,
+    loteNombre: columns.lote ? cellText(row.getCell(columns.lote).value) || null : null,
     cantidadBase: cantidad,
     caracter: caracterDe(
       columns.consumo ? cellText(row.getCell(columns.consumo).value) : '',
@@ -256,9 +274,31 @@ function thinBorder(): Partial<ExcelJS.Borders> {
   return { top: edge, left: edge, bottom: edge, right: edge }
 }
 
+const UNIDADES_POR_DEFECTO = [
+  'Unidad (und)',
+  'Galón (gl)',
+  'Bulto (bult)',
+  'Caja (cja)',
+  'Resma (rma)',
+  'Litro (l)',
+  'Kilogramo (kg)',
+  'Metro (m)',
+]
+
+export function etiquetaUnidadMedida(nombre: string, abreviatura: string) {
+  const limpio = nombre.trim()
+  const corta = abreviatura.trim()
+  if (!limpio) return corta.slice(0, 50)
+  if (!corta || limpio.toLowerCase() === corta.toLowerCase()) return limpio.slice(0, 50)
+  const etiqueta = `${limpio} (${corta})`
+  return etiqueta.length <= 50 ? etiqueta : limpio.slice(0, 50)
+}
+
 export async function plantillaListaMaestra(meta: {
   codigo?: string | null
   nombre?: string | null
+  unidades?: string[]
+  lotes?: string[]
 } = {}) {
   const workbook = new ExcelJS.Workbook()
   workbook.creator = 'Plataforma SENA'
@@ -275,6 +315,8 @@ export async function plantillaListaMaestra(meta: {
     { key: 'producto', width: 38 },
     { key: 'descripcion', width: 44 },
     { key: 'unidad', width: 18 },
+    { key: 'valor', width: 16 },
+    { key: 'lote', width: 18 },
     { key: 'cantidad', width: 24 },
     { key: 'observaciones', width: 28 },
     { key: 'consumo', width: 14 },
@@ -282,7 +324,7 @@ export async function plantillaListaMaestra(meta: {
     { key: 'software', width: 14 },
   ]
 
-  sheet.mergeCells('A1:J1')
+  sheet.mergeCells('A1:L1')
   const title = sheet.getCell('A1')
   title.value = 'Lista maestra de materiales de formación'
   title.font = { name: 'Calibri', size: 18, bold: true, color: { argb: SENA.white } }
@@ -290,7 +332,7 @@ export async function plantillaListaMaestra(meta: {
   title.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 }
   sheet.getRow(1).height = 36
 
-  sheet.mergeCells('A2:J2')
+  sheet.mergeCells('A2:L2')
   const subtitle = sheet.getCell('A2')
   subtitle.value =
     'Complete una fila por material. Marque con una X el carácter (consumo, devolutivo o software). La cantidad es para formar 30 aprendices.'
@@ -320,7 +362,7 @@ export async function plantillaListaMaestra(meta: {
   sheet.mergeCells('A4:B4')
   sheet.mergeCells('C4:D4')
   sheet.mergeCells('E4:F4')
-  sheet.mergeCells('G4:J4')
+  sheet.mergeCells('G4:L4')
   sheet.getRow(4).height = 28
   sheet.getRow(5).height = 8
   sheet.getRow(6).height = 8
@@ -331,6 +373,8 @@ export async function plantillaListaMaestra(meta: {
     'PRODUCTO',
     'DESCRIPCIÓN TÉCNICA MÍNIMA REQUERIDA DEL BIEN',
     'UNIDAD DE MEDIDA',
+    'VALOR UNITARIO',
+    'LOTE',
     'CANTIDAD REQUERIDA PARA FORMAR 30 APRENDICES',
     'OBSERVACIONES',
     'Consumo',
@@ -353,7 +397,7 @@ export async function plantillaListaMaestra(meta: {
     const row = sheet.getRow(rowNumber)
     row.height = 24
     row.getCell(1).value = index + 1
-    for (let col = 1; col <= 10; col++) {
+    for (let col = 1; col <= 12; col++) {
       const cell = row.getCell(col)
       cell.border = thinBorder()
       cell.font = { name: 'Calibri', size: 11, color: { argb: SENA.text } }
@@ -361,8 +405,60 @@ export async function plantillaListaMaestra(meta: {
       cell.fill = fill(index % 2 === 0 ? SENA.white : SENA.soft)
     }
     row.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' }
-    for (const col of [8, 9, 10]) {
+    for (const col of [10, 11, 12]) {
       row.getCell(col).alignment = { vertical: 'middle', horizontal: 'center' }
+    }
+  }
+
+  const unidades = [
+    ...new Set(
+      (meta.unidades?.length ? meta.unidades : UNIDADES_POR_DEFECTO)
+        .map((item) => item.trim())
+        .filter(Boolean)
+    ),
+  ]
+  const catalogo = workbook.addWorksheet('Unidades', { state: 'hidden' })
+  unidades.forEach((etiqueta, index) => {
+    catalogo.getCell(index + 1, 1).value = etiqueta
+  })
+  const lista = `Unidades!$A$1:$A$${unidades.length}`
+  const lotes = [
+    ...new Set((meta.lotes ?? []).map((item) => item.trim()).filter(Boolean)),
+  ]
+  if (lotes.length) {
+    const hojaLotes = workbook.addWorksheet('Lotes', { state: 'hidden' })
+    lotes.forEach((etiqueta, index) => {
+      hojaLotes.getCell(index + 1, 1).value = etiqueta
+    })
+    const listaLotes = `Lotes!$A$1:$A$${lotes.length}`
+    for (let rowNumber = 9; rowNumber <= 200; rowNumber++) {
+      sheet.getCell(rowNumber, 7).dataValidation = {
+        type: 'list',
+        allowBlank: true,
+        formulae: [listaLotes],
+        showErrorMessage: true,
+        errorStyle: 'warning',
+        errorTitle: 'Lote',
+        error: 'Elija el tipo de producto de la lista.',
+        showInputMessage: true,
+        promptTitle: 'Lote',
+        prompt: 'Tipo de producto, por ejemplo Informática.',
+      }
+    }
+  }
+
+  for (let rowNumber = 9; rowNumber <= 200; rowNumber++) {
+    sheet.getCell(rowNumber, 5).dataValidation = {
+      type: 'list',
+      allowBlank: true,
+      formulae: [lista],
+      showErrorMessage: true,
+      errorStyle: 'warning',
+      errorTitle: 'Unidad de medida',
+      error: 'Elija una unidad de la lista para que todos usen la misma abreviatura.',
+      showInputMessage: true,
+      promptTitle: 'Unidad de medida',
+      prompt: 'Despliegue la lista. Ejemplo: Galón (gl) o Bulto (bult).',
     }
   }
 
@@ -380,6 +476,8 @@ export async function plantillaListaMaestra(meta: {
     'Escriba el código y el nombre del programa en la fila 4 si no vinieron diligenciados.',
     'Una fila = un material. Código UNSPSC y producto son obligatorios.',
     'La cantidad es la requerida para formar 30 aprendices.',
+    'En Unidad de medida despliegue la lista y elija una opción, por ejemplo Galón (gl) o Bulto (bult). No invente abreviaturas.',
+    'Valor unitario es el precio de una unidad. Lote es el tipo de producto: elíjalo de la lista.',
     'Marque con una X una sola columna de carácter: Consumo, Devolutivo o Software.',
     'Deje en blanco las filas que no use. No combine celdas en la zona de datos.',
     'Guarde el archivo en .xlsx y súbalo con el botón Subir Excel. También puede agregar o editar materiales uno a uno en la plataforma.',

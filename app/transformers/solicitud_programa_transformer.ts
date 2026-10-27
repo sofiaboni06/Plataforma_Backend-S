@@ -54,6 +54,10 @@ export default class SolicitudProgramaTransformer extends BaseTransformer<Solici
               unidadMedida: detalle.listaMaestra.unidadMedida,
               cantidadBase: detalle.listaMaestra.cantidadBase,
               caracter: detalle.listaMaestra.caracter,
+              valorUnitario: detalle.listaMaestra.valorUnitario,
+              lote: detalle.listaMaestra.lote
+                ? { id: detalle.listaMaestra.lote.id, nombre: detalle.listaMaestra.lote.nombre }
+                : null,
             }
           : null,
       })),

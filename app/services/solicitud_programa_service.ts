@@ -12,6 +12,7 @@ import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import { assertCan, assertOwnedByCenter, can, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 import NotificacionService from '#services/notificacion_service'
+import PresupuestoFormacionService from '#services/presupuesto_formacion_service'
 
 type ItemPayload = { listaMaestraId: number; cantidadSolicitada: number }
 
@@ -237,6 +238,8 @@ export default class SolicitudProgramaService {
     }> = []
     const rechazadosAhora: Array<{ producto: string; cantidad: number; motivo: string | null }> = []
     const tocados = new Set<number>()
+    let costoConsumo = 0
+    const presupuesto = new PresupuestoFormacionService()
 
     try {
       solicitud.useTransaction(trx)
@@ -278,6 +281,24 @@ export default class SolicitudProgramaService {
           throw new Exception(`No puedes autorizar más de ${restante} de ${producto}`, {
             status: 422,
             code: 'E_VALIDATION_ERROR',
+          })
+        }
+
+        if (detalle.listaMaestra?.caracter === 'consumo') {
+          const valor = detalle.listaMaestra.valorUnitario
+          if (valor === null || valor === undefined) {
+            throw new Exception(`Indica el valor unitario de ${producto} antes de aprobarlo`, {
+              status: 422,
+              code: 'E_PRESUPUESTO',
+            })
+          }
+          costoConsumo += cantidad * Number(valor)
+          await presupuesto.assertCabe({
+            idUsuario: scope.idUsuario,
+            anio: solicitud.vigencia,
+            fichaId: solicitud.fichaId,
+            costoNuevo: costoConsumo,
+            producto,
           })
         }
 
@@ -423,7 +444,9 @@ export default class SolicitudProgramaService {
         programa.preload('redConocimiento').preload('lineaTematica')
       })
       .preload('ficha')
-      .preload('detalles', (detalles) => detalles.preload('listaMaestra'))
+      .preload('detalles', (detalles) =>
+        detalles.preload('listaMaestra', (lista) => lista.preload('lote'))
+      )
   }
 
   private async vigenciaObjetivo(anio?: number) {

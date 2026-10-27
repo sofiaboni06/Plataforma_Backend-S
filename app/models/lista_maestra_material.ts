@@ -2,6 +2,7 @@ import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import CargaListaMaestra from '#models/carga_lista_maestra'
+import LoteVigencia from '#models/lote_vigencia'
 import ProgramaFormacion from '#models/programa_formacion'
 import User from '#models/usuario'
 
@@ -27,6 +28,15 @@ export default class ListaMaestraMaterial extends BaseModel {
 
   @column({ columnName: 'unidad_medida' })
   declare unidadMedida: string | null
+
+  @column({
+    columnName: 'valor_unitario',
+    consume: (value) => (value === null || value === undefined ? null : Number(value)),
+  })
+  declare valorUnitario: number | null
+
+  @column({ columnName: 'id_lote' })
+  declare loteId: number | null
 
   @column({
     columnName: 'cantidad_base',
@@ -63,4 +73,7 @@ export default class ListaMaestraMaterial extends BaseModel {
 
   @belongsTo(() => CargaListaMaestra, { foreignKey: 'cargaId' })
   declare carga: BelongsTo<typeof CargaListaMaestra>
+
+  @belongsTo(() => LoteVigencia, { foreignKey: 'loteId' })
+  declare lote: BelongsTo<typeof LoteVigencia>
 }

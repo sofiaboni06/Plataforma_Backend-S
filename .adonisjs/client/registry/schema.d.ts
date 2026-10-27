@@ -1687,6 +1687,78 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'presupuestoFormacion.presupuesto_formacion.resumen': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/presupuesto-formacion'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.guardar_monto': {
+    methods: ["PUT"]
+    pattern: '/api/v1/presupuesto-formacion/monto'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.repartir': {
+    methods: ["PUT"]
+    pattern: '/api/v1/presupuesto-formacion/fichas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.lotes': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/presupuesto-formacion/lotes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.crear_lote': {
+    methods: ["POST"]
+    pattern: '/api/v1/presupuesto-formacion/lotes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.descargar': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/presupuesto-formacion/descargar'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'procesosCompra.procesos_compra.consolidado': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/procesos-compra/consolidado'
