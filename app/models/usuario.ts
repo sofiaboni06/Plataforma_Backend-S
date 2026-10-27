@@ -57,6 +57,9 @@ export default class User extends AuthFinder(BaseModel) {
 
   @column()
   declare estado: boolean
+  
+  @column()
+  declare fotografia: string | null
 
   @column({ columnName: 'google_authenticator_enabled' })
   declare googleAuthenticatorEnabled: boolean

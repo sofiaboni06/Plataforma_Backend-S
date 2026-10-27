@@ -54,6 +54,9 @@ router
       .group(() => {
         router.get('profile', [controllers.Profile, 'show'])
         router.patch('profile', [controllers.Profile, 'update'])
+        router.get('profile/foto', [controllers.Profile, 'showFoto'])
+        router.post('profile/foto', [controllers.Profile, 'storeFoto'])
+        router.delete('profile/foto', [controllers.Profile, 'destroyFoto'])
         router.patch('password', [controllers.Profile, 'changePassword'])
         router.get('programas', [controllers.Profile, 'programas'])
         router.get('notifications', [NotificacionesController, 'index'])

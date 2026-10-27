@@ -21,7 +21,7 @@ export default class AgregarMaterialLm extends BaseModel {
   @column({ columnName: 'id_elemento' })
   declare elementoId: number
 
-  @column({ columnName: 'cantidad_base' })
+  @column({ columnName: 'cantidad_base', consume: (value) => Number(value) })
   declare cantidadBase: number
 
   @column()

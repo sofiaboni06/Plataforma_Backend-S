@@ -90,6 +90,24 @@ const routes = {
     tokens: [{"old":"/api/v1/account/profile","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile","type":0,"val":"profile","end":""}],
     types: placeholder as Registry['account.profile.update']['types'],
   },
+  'account.profile.show_foto': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/account/profile/foto',
+    tokens: [{"old":"/api/v1/account/profile/foto","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"profile","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"foto","end":""}],
+    types: placeholder as Registry['account.profile.show_foto']['types'],
+  },
+  'account.profile.store_foto': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/profile/foto',
+    tokens: [{"old":"/api/v1/account/profile/foto","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"profile","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"foto","end":""}],
+    types: placeholder as Registry['account.profile.store_foto']['types'],
+  },
+  'account.profile.destroy_foto': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/account/profile/foto',
+    tokens: [{"old":"/api/v1/account/profile/foto","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"profile","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"foto","end":""}],
+    types: placeholder as Registry['account.profile.destroy_foto']['types'],
+  },
   'account.profile.change_password': {
     methods: ["PATCH"],
     pattern: '/api/v1/account/password',

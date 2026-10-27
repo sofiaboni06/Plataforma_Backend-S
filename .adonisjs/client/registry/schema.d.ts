@@ -175,6 +175,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'account.profile.show_foto': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/profile/foto'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['showFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['showFoto']>>>
+    }
+  }
+  'account.profile.store_foto': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/profile/foto'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['storeFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['storeFoto']>>>
+    }
+  }
+  'account.profile.destroy_foto': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/account/profile/foto'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['destroyFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['destroyFoto']>>>
+    }
+  }
   'account.profile.change_password': {
     methods: ["PATCH"]
     pattern: '/api/v1/account/password'

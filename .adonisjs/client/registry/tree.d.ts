@@ -30,6 +30,9 @@ export interface ApiDefinition {
     profile: {
       show: typeof routes['account.profile.show']
       update: typeof routes['account.profile.update']
+      showFoto: typeof routes['account.profile.show_foto']
+      storeFoto: typeof routes['account.profile.store_foto']
+      destroyFoto: typeof routes['account.profile.destroy_foto']
       changePassword: typeof routes['account.profile.change_password']
       programas: typeof routes['account.profile.programas']
     }
