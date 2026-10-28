@@ -1,7 +1,9 @@
+import Modulo from '#models/modulo'
 import Permiso from '#models/permiso'
 import {
   ACTION_LABELS,
   PERMISSION_RESOURCES,
+  buildPermissionCatalog,
   type PermissionResource,
 } from '#data/permission_catalog'
 
@@ -75,6 +77,51 @@ export default class PermissionService {
     }
 
     return [...modules.values()]
+  }
+
+  /**
+   * Crea los módulos que falten y deja `permiso` al día con el catálogo.
+   * Así Perfiles muestra lista maestra, solicitudes y compras sin depender
+   * de que alguien recuerde correr el seeder.
+   */
+  async syncFromCatalog() {
+    const catalog = buildPermissionCatalog()
+    const moduleIdByName = new Map<string, number>()
+
+    for (const nombre of new Set(catalog.map((item) => item.module))) {
+      const existing = await Modulo.query().whereILike('nombre', nombre).first()
+      const modulo =
+        existing ??
+        (await Modulo.create({
+          nombre,
+          descripcion: `Permisos de ${nombre}`,
+          estado: true,
+        }))
+      moduleIdByName.set(nombre, modulo.id)
+    }
+
+    const existing = await Permiso.all()
+    const existingByCode = new Map(existing.map((permiso) => [permiso.code, permiso]))
+
+    for (const definition of catalog) {
+      const current = existingByCode.get(definition.code)
+      const attributes = {
+        idModulo: moduleIdByName.get(definition.module)!,
+        code: definition.code,
+        recurso: definition.resource,
+        accion: definition.action,
+        nombre: definition.name,
+        estado: true,
+      }
+
+      if (current) {
+        current.merge(attributes)
+        await current.save()
+        continue
+      }
+
+      await Permiso.create(attributes)
+    }
   }
 }
 

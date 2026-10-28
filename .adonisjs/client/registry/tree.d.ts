@@ -29,15 +29,16 @@ export interface ApiDefinition {
   account: {
     profile: {
       show: typeof routes['account.profile.show']
-      update: typeof routes['account.profile.update']
       showFoto: typeof routes['account.profile.show_foto']
       storeFoto: typeof routes['account.profile.store_foto']
       destroyFoto: typeof routes['account.profile.destroy_foto']
+      update: typeof routes['account.profile.update']
       changePassword: typeof routes['account.profile.change_password']
       programas: typeof routes['account.profile.programas']
     }
     notificaciones: {
       index: typeof routes['account.notificaciones.index']
+      show: typeof routes['account.notificaciones.show']
       updateAll: typeof routes['account.notificaciones.update_all']
       update: typeof routes['account.notificaciones.update']
     }
@@ -226,18 +227,46 @@ export interface ApiDefinition {
     listasMaestrasMaterial: {
       listar: typeof routes['listasMaestrasMaterial.listas_maestras_material.listar']
       crear: typeof routes['listasMaestrasMaterial.listas_maestras_material.crear']
+      plantilla: typeof routes['listasMaestrasMaterial.listas_maestras_material.plantilla']
       importar: typeof routes['listasMaestrasMaterial.listas_maestras_material.importar']
       actualizar: typeof routes['listasMaestrasMaterial.listas_maestras_material.actualizar']
       eliminar: typeof routes['listasMaestrasMaterial.listas_maestras_material.eliminar']
     }
   }
-  agregarMaterialLm: {
-    agregarMaterialLm: {
-      index: typeof routes['agregarMaterialLm.agregar_material_lm.index']
-      store: typeof routes['agregarMaterialLm.agregar_material_lm.store']
-      show: typeof routes['agregarMaterialLm.agregar_material_lm.show']
-      update: typeof routes['agregarMaterialLm.agregar_material_lm.update']
-      destroy: typeof routes['agregarMaterialLm.agregar_material_lm.destroy']
+  vigencias: {
+    vigencias: {
+      index: typeof routes['vigencias.vigencias.index']
+      activa: typeof routes['vigencias.vigencias.activa']
+      store: typeof routes['vigencias.vigencias.store']
+      update: typeof routes['vigencias.vigencias.update']
+      destroy: typeof routes['vigencias.vigencias.destroy']
+    }
+  }
+  solicitudesPrograma: {
+    solicitudesPrograma: {
+      index: typeof routes['solicitudesPrograma.solicitudes_programa.index']
+      store: typeof routes['solicitudesPrograma.solicitudes_programa.store']
+      show: typeof routes['solicitudesPrograma.solicitudes_programa.show']
+      update: typeof routes['solicitudesPrograma.solicitudes_programa.update']
+      enviar: typeof routes['solicitudesPrograma.solicitudes_programa.enviar']
+      decidir: typeof routes['solicitudesPrograma.solicitudes_programa.decidir']
+      destroy: typeof routes['solicitudesPrograma.solicitudes_programa.destroy']
+    }
+  }
+  presupuestoFormacion: {
+    presupuestoFormacion: {
+      resumen: typeof routes['presupuestoFormacion.presupuesto_formacion.resumen']
+      guardarMonto: typeof routes['presupuestoFormacion.presupuesto_formacion.guardar_monto']
+      repartir: typeof routes['presupuestoFormacion.presupuesto_formacion.repartir']
+      lotes: typeof routes['presupuestoFormacion.presupuesto_formacion.lotes']
+      crearLote: typeof routes['presupuestoFormacion.presupuesto_formacion.crear_lote']
+      descargar: typeof routes['presupuestoFormacion.presupuesto_formacion.descargar']
+    }
+  }
+  procesosCompra: {
+    procesosCompra: {
+      consolidado: typeof routes['procesosCompra.procesos_compra.consolidado']
+      store: typeof routes['procesosCompra.procesos_compra.store']
     }
   }
   fichas: {
@@ -302,14 +331,6 @@ export interface ApiDefinition {
     reportes: {
       elementos: typeof routes['reportes.reportes.elementos']
       bodega: typeof routes['reportes.reportes.bodega']
-    }
-  }
-  vigencias: {
-    vigencias: {
-      index: typeof routes['vigencias.vigencias.index']
-      store: typeof routes['vigencias.vigencias.store']
-      update: typeof routes['vigencias.vigencias.update']
-      destroy: typeof routes['vigencias.vigencias.destroy']
     }
   }
 }

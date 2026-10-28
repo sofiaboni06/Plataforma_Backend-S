@@ -20,6 +20,16 @@ export const INSTRUCTOR_PERMISSIONS = [
   'solicitud_material.crear',
   'solicitud_equipo.ver',
   'solicitud_equipo.crear',
+  'programa_formacion.ver',
+  'ficha.ver',
+  'lista_maestra.ver',
+  'lista_maestra.crear',
+  'lista_maestra.editar',
+  'lista_maestra.eliminar',
+  'vigencia.ver',
+  'solicitud_programa.ver',
+  'solicitud_programa.crear',
+  'solicitud_programa.eliminar',
 ] as const
 
 const DEMO_USER = {
@@ -59,8 +69,12 @@ export default class extends BaseSeeder {
     }
 
     const inventario = await Modulo.query().where('nombre', 'Inventario').firstOrFail()
+    const formacion = await Modulo.query().where('nombre', 'Materiales de Formación').first()
     const roles = new RoleService()
-    await roles.assignModules(perfil.id, [inventario.id])
+    await roles.assignModules(
+      perfil.id,
+      formacion ? [inventario.id, formacion.id] : [inventario.id]
+    )
     await roles.assignPermissions(perfil.id, [...INSTRUCTOR_PERMISSIONS])
 
     return perfil

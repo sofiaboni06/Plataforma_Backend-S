@@ -1,28 +1,13 @@
-import Vigencia from '#models/vigencia'
-import { DateTime } from 'luxon'
+import { BaseTransformer } from '@adonisjs/core/transformers'
+import type Vigencia from '#models/vigencia'
 
-export default class VigenciaTransformer {
-  static transform(vigencia: Vigencia) {
-    const formatDate = (date: any) => {
-      if (!date) return null
-      if (date instanceof DateTime) {
-        return date.toISODate()
-      }
-      if (typeof date === 'string') {
-        return date.split('T')[0]
-      }
-      return date
-    }
-
+export default class VigenciaTransformer extends BaseTransformer<Vigencia> {
+  toObject() {
     return {
-      anio: vigencia.anio,
-      activa: vigencia.activa,
-      fechaApertura: formatDate(vigencia.fecha_apertura),
-      fechaCierre: formatDate(vigencia.fecha_cierre),
+      anio: this.resource.anio,
+      activa: this.resource.activa,
+      fechaApertura: this.resource.fechaApertura?.toISODate() ?? null,
+      fechaCierre: this.resource.fechaCierre?.toISODate() ?? null,
     }
-  }
-
-  static transformList(vigencias: Vigencia[]) {
-    return vigencias.map((v) => this.transform(v))
   }
 }

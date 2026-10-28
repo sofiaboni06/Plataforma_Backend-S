@@ -16,6 +16,11 @@ export default class NotificacionesController {
     return serialize(NotificacionTransformer.paginate(result.all(), result.getMeta()))
   }
 
+  async show({ auth, params, serialize }: HttpContext) {
+    const row = await this.service.show(auth.getUserOrFail().id, Number(params.id))
+    return serialize(NotificacionTransformer.transform(row))
+  }
+
   async updateAll({ auth, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(updateNotificacionValidator)
     const total = await this.service.marcarTodas(auth.getUserOrFail().id, payload.leida)

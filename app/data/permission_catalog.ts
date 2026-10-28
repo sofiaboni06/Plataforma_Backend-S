@@ -126,6 +126,26 @@ export const PERMISSION_RESOURCES = {
     label: 'Instructores por programa',
     actions: ['ver', 'crear', 'editar', 'eliminar'],
   },
+  lista_maestra: {
+    module: 'Materiales de Formación',
+    label: 'Lista maestra de materiales',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  vigencia: {
+    module: 'Materiales de Formación',
+    label: 'Vigencias',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  solicitud_programa: {
+    module: 'Materiales de Formación',
+    label: 'Solicitudes de materiales de formación',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
+  proceso_compra: {
+    module: 'Materiales de Formación',
+    label: 'Procesos de compra',
+    actions: ['ver', 'crear', 'editar', 'eliminar'],
+  },
 } as const
 
 type PermissionResources = typeof PERMISSION_RESOURCES

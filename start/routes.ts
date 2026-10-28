@@ -10,6 +10,10 @@ import SolicitudMaterialController from '#controllers/solicitud_material_control
 import SolicitudesController from '#controllers/solicitudes_controller'
 import PasswordRecoveryController from '#controllers/password_recovery_controller'
 import ReportesController from '#controllers/reportes_controller'
+import VigenciasController from '#controllers/vigencias_controller'
+import PresupuestoFormacionController from '#controllers/presupuesto_formacion_controller'
+import SolicitudesProgramaController from '#controllers/solicitudes_programa_controller'
+import ProcesosCompraController from '#controllers/procesos_compra_controller'
 import transmit from '@adonisjs/transmit/services/main'
 
 router.get('/', () => {
@@ -60,6 +64,7 @@ router
         router.patch('password', [controllers.Profile, 'changePassword'])
         router.get('programas', [controllers.Profile, 'programas'])
         router.get('notifications', [NotificacionesController, 'index'])
+        router.get('notifications/:id', [NotificacionesController, 'show'])
         router.patch('notifications', [NotificacionesController, 'updateAll'])
         router.patch('notifications/:id', [NotificacionesController, 'update'])
         router.post('logout', [controllers.AccessTokens, 'destroy'])
@@ -465,11 +470,24 @@ router
 
     router
       .group(() => {
-        router.get('/', [controllers.ListasMaestrasMaterial, 'listar'])
-        router.post('/', [controllers.ListasMaestrasMaterial, 'crear'])
-        router.post('/importar', [controllers.ListasMaestrasMaterial, 'importar'])
-        router.patch('/:id', [controllers.ListasMaestrasMaterial, 'actualizar'])
-        router.delete('/:id', [controllers.ListasMaestrasMaterial, 'eliminar'])
+        router
+          .get('/', [controllers.ListasMaestrasMaterial, 'listar'])
+          .use(middleware.permission('lista_maestra.ver'))
+        router
+          .post('/', [controllers.ListasMaestrasMaterial, 'crear'])
+          .use(middleware.permission('lista_maestra.crear'))
+        router
+          .get('plantilla', [controllers.ListasMaestrasMaterial, 'plantilla'])
+          .use(middleware.permission('lista_maestra.ver'))
+        router
+          .post('importar', [controllers.ListasMaestrasMaterial, 'importar'])
+          .use(middleware.permission('lista_maestra.crear'))
+        router
+          .patch(':id', [controllers.ListasMaestrasMaterial, 'actualizar'])
+          .use(middleware.permission('lista_maestra.editar'))
+        router
+          .delete(':id', [controllers.ListasMaestrasMaterial, 'eliminar'])
+          .use(middleware.permission('lista_maestra.eliminar'))
       })
       .prefix('listas-maestras-material')
       .as('listasMaestrasMaterial')
@@ -478,19 +496,89 @@ router
 
     router
       .group(() => {
+        router.get('/', [VigenciasController, 'index']).use(middleware.permission('vigencia.ver'))
         router
-          .get('/', [controllers.AgregarMaterialLm, 'index'])
+          .get('activa', [VigenciasController, 'activa'])
+          .use(middleware.permission('vigencia.ver'))
+        router.post('/', [VigenciasController, 'store']).use(middleware.permission('vigencia.crear'))
         router
-          .post('/', [controllers.AgregarMaterialLm, 'store'])
+          .put(':anio', [VigenciasController, 'update'])
+          .use(middleware.permission('vigencia.editar'))
         router
-          .get(':id', [controllers.AgregarMaterialLm, 'show'])
-        router
-          .patch(':id', [controllers.AgregarMaterialLm, 'update'])
-        router
-          .delete(':id', [controllers.AgregarMaterialLm, 'destroy'])
+          .delete(':anio', [VigenciasController, 'destroy'])
+          .use(middleware.permission('vigencia.eliminar'))
       })
-      .prefix('agregar-material-lm')
-      .as('agregarMaterialLm')
+      .prefix('vigencias')
+      .as('vigencias')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('/', [SolicitudesProgramaController, 'index'])
+          .use(middleware.permission('solicitud_programa.ver'))
+        router
+          .post('/', [SolicitudesProgramaController, 'store'])
+          .use(middleware.permission('solicitud_programa.crear'))
+        router
+          .get(':id', [SolicitudesProgramaController, 'show'])
+          .use(middleware.permission('solicitud_programa.ver'))
+        router
+          .patch(':id', [SolicitudesProgramaController, 'update'])
+          .use(middleware.permission('solicitud_programa.crear'))
+        router
+          .post(':id/enviar', [SolicitudesProgramaController, 'enviar'])
+          .use(middleware.permission('solicitud_programa.crear'))
+        router
+          .post(':id/decidir', [SolicitudesProgramaController, 'decidir'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .delete(':id', [SolicitudesProgramaController, 'destroy'])
+          .use(middleware.permission('solicitud_programa.eliminar'))
+      })
+      .prefix('solicitudes-programa')
+      .as('solicitudesPrograma')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('/', [PresupuestoFormacionController, 'resumen'])
+          .use(middleware.permission('solicitud_programa.ver'))
+        router
+          .put('monto', [PresupuestoFormacionController, 'guardarMonto'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .put('fichas', [PresupuestoFormacionController, 'repartir'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .get('lotes', [PresupuestoFormacionController, 'lotes'])
+          .use(middleware.permission('solicitud_programa.ver'))
+        router
+          .post('lotes', [PresupuestoFormacionController, 'crearLote'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .get('descargar', [PresupuestoFormacionController, 'descargar'])
+          .use(middleware.permission('solicitud_programa.ver'))
+      })
+      .prefix('presupuesto-formacion')
+      .as('presupuestoFormacion')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router
+          .get('consolidado', [ProcesosCompraController, 'consolidado'])
+          .use(middleware.permission('proceso_compra.ver'))
+        router
+          .post('/', [ProcesosCompraController, 'store'])
+          .use(middleware.permission('proceso_compra.crear'))
+      })
+      .prefix('procesos-compra')
+      .as('procesosCompra')
       .use(middleware.auth())
       .use(middleware.account())
 

@@ -199,7 +199,7 @@ export default class UsuarioService {
     }
 
     if (nextRole && !this.isProgramasPerfil(nextRole)) {
-      await user.related('programasFormacion').detach()
+      await db.from('usuario_programa_formacion').where('id_usuario', user.id).update({ estado: false })
     }
 
     return this.show(user.id)
@@ -253,6 +253,9 @@ export default class UsuarioService {
     await this.assertProgramas(uniqueIds)
     await this.assertProgramasInCenter(user.idCformacion, uniqueIds)
     await this.syncProgramaPivot(user, uniqueIds)
+    if (/^coordinador/i.test(user.perfil?.nombre ?? '')) {
+      await this.syncRedAlcance(user.id, uniqueIds)
+    }
 
     return this.programas(user.id)
   }
@@ -284,11 +287,86 @@ export default class UsuarioService {
     await user.related('bodegas').sync(pivot)
   }
 
+  /**
+   * El coordinador cubre la red y la línea de los programas que le asignan:
+   * Informática → Software cubre ADSO y el resto de programas de esa línea,
+   * no los de Deportes.
+   */
+  private async syncRedAlcance(usuarioId: number, programIds: number[]) {
+    await db.from('usuario_red_conocimiento').where('id_usuario', usuarioId).update({ estado: false })
+
+    if (!programIds.length) return
+
+    const programas = await ProgramaFormacion.query().whereIn('id', programIds)
+    const vistos = new Set<string>()
+
+    for (const programa of programas) {
+      const clave = `${programa.idRedConocimiento}:${programa.idLineaTematica}`
+      if (vistos.has(clave)) continue
+      vistos.add(clave)
+
+      const existing = await db
+        .from('usuario_red_conocimiento')
+        .where('id_usuario', usuarioId)
+        .where('id_red_conocimiento', programa.idRedConocimiento)
+        .where('id_linea_tematica', programa.idLineaTematica)
+        .first()
+
+      if (existing) {
+        await db
+          .from('usuario_red_conocimiento')
+          .where('id_usuario', usuarioId)
+          .where('id_red_conocimiento', programa.idRedConocimiento)
+          .where('id_linea_tematica', programa.idLineaTematica)
+          .update({ estado: true })
+        continue
+      }
+
+      try {
+        await db.table('usuario_red_conocimiento').insert({
+          id_usuario: usuarioId,
+          id_red_conocimiento: programa.idRedConocimiento,
+          id_linea_tematica: programa.idLineaTematica,
+          estado: true,
+        })
+      } catch (error) {
+        rethrowDatabaseError(error, 'No se pudo asignar la red de conocimiento al coordinador')
+      }
+    }
+  }
+
+  /**
+   * El dump impide borrar `usuario_programa_formacion` si ya hay solicitudes.
+   * Se desactiva el pivot en vez de hacer detach.
+   */
   private async syncProgramaPivot(user: User, programIds: number[]) {
-    const pivot = Object.fromEntries(programIds.map((programId) => [programId, { estado: true }]))
+    const wanted = new Set(programIds)
 
     try {
-      await user.related('programasFormacion').sync(pivot)
+      const existing = await db
+        .from('usuario_programa_formacion')
+        .where('id_usuario', user.id)
+        .select('id_usuario_programa', 'id_programa_formacion', 'estado')
+
+      for (const row of existing) {
+        const programId = Number(row.id_programa_formacion)
+        const activa = wanted.has(programId)
+        if (Boolean(row.estado) !== activa) {
+          await db
+            .from('usuario_programa_formacion')
+            .where('id_usuario_programa', row.id_usuario_programa)
+            .update({ estado: activa })
+        }
+        wanted.delete(programId)
+      }
+
+      for (const programId of wanted) {
+        await db.table('usuario_programa_formacion').insert({
+          id_usuario: user.id,
+          id_programa_formacion: programId,
+          estado: true,
+        })
+      }
     } catch (error) {
       rethrowDatabaseError(error, 'No se pudieron asignar los programas de formación')
     }
@@ -407,7 +485,11 @@ export default class UsuarioService {
       .map((programa) => programa.id)
 
     if (outside.length) {
-      await user.related('programasFormacion').detach(outside)
+      await db
+        .from('usuario_programa_formacion')
+        .where('id_usuario', user.id)
+        .whereIn('id_programa_formacion', outside)
+        .update({ estado: false })
     }
   }
 

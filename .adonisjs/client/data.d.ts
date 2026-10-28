@@ -6,7 +6,6 @@
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type AdminUserTransformer from '#transformers/admin_user_transformer'
-import type AgregarMaterialLmTransformer from '#transformers/agregar_material_lm_transformer'
 import type AlertaTransformer from '#transformers/alerta_transformer'
 import type BodegaTransformer from '#transformers/bodega_transformer'
 import type CategoriaTransformer from '#transformers/categoria_transformer'
@@ -36,15 +35,13 @@ import type UnidadMedidaTransformer from '#transformers/unidad_medida_transforme
 import type UserTransformer from '#transformers/user_transformer'
 import type UsoPresupuestalTransformer from '#transformers/uso_presupuestal_transformer'
 import type VigenciaTransformer from '#transformers/vigencia_transformer'
+import type ListaMaestraMaterialTransformer from '#transformers/lista_maestra_material_transformer'
+import type SolicitudProgramaTransformer from '#transformers/solicitud_programa_transformer'
 
 export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
   export namespace AdminUser {
     export type Variants = InferVariants<AdminUserTransformer>
-  }
-  export type AgregarMaterialLm = InferData<AgregarMaterialLmTransformer>
-  export namespace AgregarMaterialLm {
-    export type Variants = InferVariants<AgregarMaterialLmTransformer>
   }
   export type Alerta = InferData<AlertaTransformer>
   export namespace Alerta {
@@ -161,5 +158,13 @@ export namespace Data {
   export type Vigencia = InferData<VigenciaTransformer>
   export namespace Vigencia {
     export type Variants = InferVariants<VigenciaTransformer>
+  }
+  export type ListaMaestraMaterial = InferData<ListaMaestraMaterialTransformer>
+  export namespace ListaMaestraMaterial {
+    export type Variants = InferVariants<ListaMaestraMaterialTransformer>
+  }
+  export type SolicitudPrograma = InferData<SolicitudProgramaTransformer>
+  export namespace SolicitudPrograma {
+    export type Variants = InferVariants<SolicitudProgramaTransformer>
   }
 }

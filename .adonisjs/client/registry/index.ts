@@ -84,12 +84,6 @@ const routes = {
     tokens: [{"old":"/api/v1/account/profile","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile","type":0,"val":"profile","end":""}],
     types: placeholder as Registry['account.profile.show']['types'],
   },
-  'account.profile.update': {
-    methods: ["PATCH"],
-    pattern: '/api/v1/account/profile',
-    tokens: [{"old":"/api/v1/account/profile","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile","type":0,"val":"profile","end":""}],
-    types: placeholder as Registry['account.profile.update']['types'],
-  },
   'account.profile.show_foto': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/account/profile/foto',
@@ -108,6 +102,12 @@ const routes = {
     tokens: [{"old":"/api/v1/account/profile/foto","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"profile","end":""},{"old":"/api/v1/account/profile/foto","type":0,"val":"foto","end":""}],
     types: placeholder as Registry['account.profile.destroy_foto']['types'],
   },
+  'account.profile.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/account/profile',
+    tokens: [{"old":"/api/v1/account/profile","type":0,"val":"api","end":""},{"old":"/api/v1/account/profile","type":0,"val":"v1","end":""},{"old":"/api/v1/account/profile","type":0,"val":"account","end":""},{"old":"/api/v1/account/profile","type":0,"val":"profile","end":""}],
+    types: placeholder as Registry['account.profile.update']['types'],
+  },
   'account.profile.change_password': {
     methods: ["PATCH"],
     pattern: '/api/v1/account/password',
@@ -125,6 +125,12 @@ const routes = {
     pattern: '/api/v1/account/notifications',
     tokens: [{"old":"/api/v1/account/notifications","type":0,"val":"api","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"v1","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"account","end":""},{"old":"/api/v1/account/notifications","type":0,"val":"notifications","end":""}],
     types: placeholder as Registry['account.notificaciones.index']['types'],
+  },
+  'account.notificaciones.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/account/notifications/:id',
+    tokens: [{"old":"/api/v1/account/notifications/:id","type":0,"val":"api","end":""},{"old":"/api/v1/account/notifications/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/account/notifications/:id","type":0,"val":"account","end":""},{"old":"/api/v1/account/notifications/:id","type":0,"val":"notifications","end":""},{"old":"/api/v1/account/notifications/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['account.notificaciones.show']['types'],
   },
   'account.notificaciones.update_all': {
     methods: ["PATCH"],
@@ -762,6 +768,12 @@ const routes = {
     tokens: [{"old":"/api/v1/listas-maestras-material","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material","type":0,"val":"listas-maestras-material","end":""}],
     types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.crear']['types'],
   },
+  'listasMaestrasMaterial.listas_maestras_material.plantilla': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/listas-maestras-material/plantilla',
+    tokens: [{"old":"/api/v1/listas-maestras-material/plantilla","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material/plantilla","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material/plantilla","type":0,"val":"listas-maestras-material","end":""},{"old":"/api/v1/listas-maestras-material/plantilla","type":0,"val":"plantilla","end":""}],
+    types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.plantilla']['types'],
+  },
   'listasMaestrasMaterial.listas_maestras_material.importar': {
     methods: ["POST"],
     pattern: '/api/v1/listas-maestras-material/importar',
@@ -780,35 +792,125 @@ const routes = {
     tokens: [{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"api","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":0,"val":"listas-maestras-material","end":""},{"old":"/api/v1/listas-maestras-material/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['listasMaestrasMaterial.listas_maestras_material.eliminar']['types'],
   },
-  'agregarMaterialLm.agregar_material_lm.index': {
+  'vigencias.vigencias.index': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/agregar-material-lm',
-    tokens: [{"old":"/api/v1/agregar-material-lm","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm","type":0,"val":"agregar-material-lm","end":""}],
-    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.index']['types'],
+    pattern: '/api/v1/vigencias',
+    tokens: [{"old":"/api/v1/vigencias","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias","type":0,"val":"vigencias","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.index']['types'],
   },
-  'agregarMaterialLm.agregar_material_lm.store': {
+  'vigencias.vigencias.activa': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/vigencias/activa',
+    tokens: [{"old":"/api/v1/vigencias/activa","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/activa","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/activa","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/activa","type":0,"val":"activa","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.activa']['types'],
+  },
+  'vigencias.vigencias.store': {
     methods: ["POST"],
-    pattern: '/api/v1/agregar-material-lm',
-    tokens: [{"old":"/api/v1/agregar-material-lm","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm","type":0,"val":"agregar-material-lm","end":""}],
-    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.store']['types'],
+    pattern: '/api/v1/vigencias',
+    tokens: [{"old":"/api/v1/vigencias","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias","type":0,"val":"vigencias","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.store']['types'],
   },
-  'agregarMaterialLm.agregar_material_lm.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/v1/agregar-material-lm/:id',
-    tokens: [{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"agregar-material-lm","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.show']['types'],
+  'vigencias.vigencias.update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/vigencias/:anio',
+    tokens: [{"old":"/api/v1/vigencias/:anio","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio","type":1,"val":"anio","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.update']['types'],
   },
-  'agregarMaterialLm.agregar_material_lm.update': {
-    methods: ["PATCH"],
-    pattern: '/api/v1/agregar-material-lm/:id',
-    tokens: [{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"agregar-material-lm","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.update']['types'],
-  },
-  'agregarMaterialLm.agregar_material_lm.destroy': {
+  'vigencias.vigencias.destroy': {
     methods: ["DELETE"],
-    pattern: '/api/v1/agregar-material-lm/:id',
-    tokens: [{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"api","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":0,"val":"agregar-material-lm","end":""},{"old":"/api/v1/agregar-material-lm/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['agregarMaterialLm.agregar_material_lm.destroy']['types'],
+    pattern: '/api/v1/vigencias/:anio',
+    tokens: [{"old":"/api/v1/vigencias/:anio","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio","type":1,"val":"anio","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.destroy']['types'],
+  },
+  'solicitudesPrograma.solicitudes_programa.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes-programa',
+    tokens: [{"old":"/api/v1/solicitudes-programa","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-programa","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-programa","type":0,"val":"solicitudes-programa","end":""}],
+    types: placeholder as Registry['solicitudesPrograma.solicitudes_programa.index']['types'],
+  },
+  'solicitudesPrograma.solicitudes_programa.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/solicitudes-programa',
+    tokens: [{"old":"/api/v1/solicitudes-programa","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-programa","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-programa","type":0,"val":"solicitudes-programa","end":""}],
+    types: placeholder as Registry['solicitudesPrograma.solicitudes_programa.store']['types'],
+  },
+  'solicitudesPrograma.solicitudes_programa.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/solicitudes-programa/:id',
+    tokens: [{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"solicitudes-programa","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['solicitudesPrograma.solicitudes_programa.show']['types'],
+  },
+  'solicitudesPrograma.solicitudes_programa.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/solicitudes-programa/:id',
+    tokens: [{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"solicitudes-programa","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['solicitudesPrograma.solicitudes_programa.update']['types'],
+  },
+  'solicitudesPrograma.solicitudes_programa.enviar': {
+    methods: ["POST"],
+    pattern: '/api/v1/solicitudes-programa/:id/enviar',
+    tokens: [{"old":"/api/v1/solicitudes-programa/:id/enviar","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-programa/:id/enviar","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-programa/:id/enviar","type":0,"val":"solicitudes-programa","end":""},{"old":"/api/v1/solicitudes-programa/:id/enviar","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-programa/:id/enviar","type":0,"val":"enviar","end":""}],
+    types: placeholder as Registry['solicitudesPrograma.solicitudes_programa.enviar']['types'],
+  },
+  'solicitudesPrograma.solicitudes_programa.decidir': {
+    methods: ["POST"],
+    pattern: '/api/v1/solicitudes-programa/:id/decidir',
+    tokens: [{"old":"/api/v1/solicitudes-programa/:id/decidir","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-programa/:id/decidir","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-programa/:id/decidir","type":0,"val":"solicitudes-programa","end":""},{"old":"/api/v1/solicitudes-programa/:id/decidir","type":1,"val":"id","end":""},{"old":"/api/v1/solicitudes-programa/:id/decidir","type":0,"val":"decidir","end":""}],
+    types: placeholder as Registry['solicitudesPrograma.solicitudes_programa.decidir']['types'],
+  },
+  'solicitudesPrograma.solicitudes_programa.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/solicitudes-programa/:id',
+    tokens: [{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"solicitudes-programa","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['solicitudesPrograma.solicitudes_programa.destroy']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.resumen': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/presupuesto-formacion',
+    tokens: [{"old":"/api/v1/presupuesto-formacion","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion","type":0,"val":"presupuesto-formacion","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.resumen']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.guardar_monto': {
+    methods: ["PUT"],
+    pattern: '/api/v1/presupuesto-formacion/monto',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/monto","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/monto","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/monto","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/monto","type":0,"val":"monto","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.guardar_monto']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.repartir': {
+    methods: ["PUT"],
+    pattern: '/api/v1/presupuesto-formacion/fichas',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"fichas","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.repartir']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.lotes': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/presupuesto-formacion/lotes',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/lotes","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/lotes","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/lotes","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/lotes","type":0,"val":"lotes","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.lotes']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.crear_lote': {
+    methods: ["POST"],
+    pattern: '/api/v1/presupuesto-formacion/lotes',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/lotes","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/lotes","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/lotes","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/lotes","type":0,"val":"lotes","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.crear_lote']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.descargar': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/presupuesto-formacion/descargar',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/descargar","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/descargar","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/descargar","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/descargar","type":0,"val":"descargar","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.descargar']['types'],
+  },
+  'procesosCompra.procesos_compra.consolidado': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/procesos-compra/consolidado',
+    tokens: [{"old":"/api/v1/procesos-compra/consolidado","type":0,"val":"api","end":""},{"old":"/api/v1/procesos-compra/consolidado","type":0,"val":"v1","end":""},{"old":"/api/v1/procesos-compra/consolidado","type":0,"val":"procesos-compra","end":""},{"old":"/api/v1/procesos-compra/consolidado","type":0,"val":"consolidado","end":""}],
+    types: placeholder as Registry['procesosCompra.procesos_compra.consolidado']['types'],
+  },
+  'procesosCompra.procesos_compra.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/procesos-compra',
+    tokens: [{"old":"/api/v1/procesos-compra","type":0,"val":"api","end":""},{"old":"/api/v1/procesos-compra","type":0,"val":"v1","end":""},{"old":"/api/v1/procesos-compra","type":0,"val":"procesos-compra","end":""}],
+    types: placeholder as Registry['procesosCompra.procesos_compra.store']['types'],
   },
   'fichas.fichas.index': {
     methods: ["GET","HEAD"],
@@ -1001,30 +1103,6 @@ const routes = {
     pattern: '/api/v1/reportes/bodega/:id/:formato',
     tokens: [{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"api","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"v1","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"reportes","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"bodega","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"id","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"formato","end":""}],
     types: placeholder as Registry['reportes.reportes.bodega']['types'],
-  },
-  'vigencias.vigencias.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/v1/vigencias',
-    tokens: [{"old":"/api/v1/vigencias","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias","type":0,"val":"vigencias","end":""}],
-    types: placeholder as Registry['vigencias.vigencias.index']['types'],
-  },
-  'vigencias.vigencias.store': {
-    methods: ["POST"],
-    pattern: '/api/v1/vigencias',
-    tokens: [{"old":"/api/v1/vigencias","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias","type":0,"val":"vigencias","end":""}],
-    types: placeholder as Registry['vigencias.vigencias.store']['types'],
-  },
-  'vigencias.vigencias.update': {
-    methods: ["PUT"],
-    pattern: '/api/v1/vigencias/:id',
-    tokens: [{"old":"/api/v1/vigencias/:id","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:id","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['vigencias.vigencias.update']['types'],
-  },
-  'vigencias.vigencias.destroy': {
-    methods: ["DELETE"],
-    pattern: '/api/v1/vigencias/:id',
-    tokens: [{"old":"/api/v1/vigencias/:id","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:id","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['vigencias.vigencias.destroy']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 
