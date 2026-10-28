@@ -29,9 +29,6 @@ export interface ApiDefinition {
   account: {
     profile: {
       show: typeof routes['account.profile.show']
-      showFoto: typeof routes['account.profile.show_foto']
-      storeFoto: typeof routes['account.profile.store_foto']
-      destroyFoto: typeof routes['account.profile.destroy_foto']
       update: typeof routes['account.profile.update']
       showFoto: typeof routes['account.profile.show_foto']
       storeFoto: typeof routes['account.profile.store_foto']

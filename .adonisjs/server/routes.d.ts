@@ -17,9 +17,6 @@ export type ScannedRoutes = {
     'authTwoFactor.password_recovery.confirm_google': { paramsTuple?: []; params?: {} }
     'authTwoFactor.password_recovery.disable_google': { paramsTuple?: []; params?: {} }
     'account.profile.show': { paramsTuple?: []; params?: {} }
-    'account.profile.show_foto': { paramsTuple?: []; params?: {} }
-    'account.profile.store_foto': { paramsTuple?: []; params?: {} }
-    'account.profile.destroy_foto': { paramsTuple?: []; params?: {} }
     'account.profile.update': { paramsTuple?: []; params?: {} }
     'account.profile.show_foto': { paramsTuple?: []; params?: {} }
     'account.profile.store_foto': { paramsTuple?: []; params?: {} }
@@ -359,7 +356,6 @@ export type ScannedRoutes = {
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
-    'account.profile.store_foto': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
     'auth.access_tokens.store': { paramsTuple?: []; params?: {} }
