@@ -52,6 +52,9 @@ export default class User extends AuthFinder(BaseModel) {
   @column({ columnName: 'correo' })
   declare email: string
 
+  @column({ columnName: 'url_fotografia' })
+  declare urlFotografia: string | null
+
   @column({ serializeAs: null })
   declare password: string
 

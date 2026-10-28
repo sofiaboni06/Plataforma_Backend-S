@@ -3,6 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import CargaListaMaestra from '#models/carga_lista_maestra'
 import ListaMaestraMaterial from '#models/lista_maestra_material'
 import LoteVigencia from '#models/lote_vigencia'
+import CodigoEstandar from '#models/codigo_estandar'
 import ProgramaFormacion from '#models/programa_formacion'
 import UnidadMedida from '#models/unidad_medida'
 import { assertCan, can, type AccessScope } from '#services/access_control'
@@ -32,13 +33,15 @@ export default class ListaMaestraMaterialService {
     assertCan(scope, 'lista_maestra.ver')
     const unidades = await this.etiquetasUnidad()
     const lotes = await this.nombresLote(scope.idCformacion)
-    if (!programaId) return plantillaListaMaestra({ unidades, lotes })
+    const codigosUnspsc = await this.etiquetasUnspsc()
+    if (!programaId) return plantillaListaMaestra({ unidades, lotes, codigosUnspsc })
     const programa = await this.assertProgramaVisible(scope, programaId)
     return plantillaListaMaestra({
       codigo: programa.codigo,
       nombre: programa.nombre,
       unidades,
       lotes,
+      codigosUnspsc,
     })
   }
 
@@ -52,6 +55,11 @@ export default class ListaMaestraMaterialService {
       .orderBy('nombre', 'asc')
 
     return filas.map((fila) => fila.nombre)
+  }
+
+  private async etiquetasUnspsc() {
+    const filas = await CodigoEstandar.query().orderBy('codigo', 'asc')
+    return filas.map((fila) => `${fila.codigo} · ${fila.nombre}`)
   }
 
   private async etiquetasUnidad() {

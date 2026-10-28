@@ -34,6 +34,15 @@ export const updateProfileValidator = vine.create({
   email: email().optional(),
 })
 
+export const fotoPerfilValidator = vine.compile(
+  vine.object({
+    fotografia: vine.file({
+      size: '8mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp'],
+    }),
+  })
+)
+
 export const changePasswordValidator = vine.create({
   currentPassword: vine.string(),
   password: password(),

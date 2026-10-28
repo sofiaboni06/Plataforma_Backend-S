@@ -33,6 +33,9 @@ export interface ApiDefinition {
       storeFoto: typeof routes['account.profile.store_foto']
       destroyFoto: typeof routes['account.profile.destroy_foto']
       update: typeof routes['account.profile.update']
+      showFoto: typeof routes['account.profile.show_foto']
+      storeFoto: typeof routes['account.profile.store_foto']
+      destroyFoto: typeof routes['account.profile.destroy_foto']
       changePassword: typeof routes['account.profile.change_password']
       programas: typeof routes['account.profile.programas']
     }
@@ -101,6 +104,8 @@ export interface ApiDefinition {
   elementos: {
     elementos: {
       index: typeof routes['elementos.elementos.index']
+      plantilla: typeof routes['elementos.elementos.plantilla']
+      importar: typeof routes['elementos.elementos.importar']
       store: typeof routes['elementos.elementos.store']
       show: typeof routes['elementos.elementos.show']
       showFoto: typeof routes['elementos.elementos.show_foto']

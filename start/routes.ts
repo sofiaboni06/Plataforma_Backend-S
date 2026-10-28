@@ -175,6 +175,12 @@ router
       .group(() => {
         router.get('/', [controllers.Elementos, 'index']).use(middleware.permission('elemento.ver'))
         router
+          .get('plantilla', [controllers.Elementos, 'plantilla'])
+          .use(middleware.permission('elemento.ver'))
+        router
+          .post('importar', [controllers.Elementos, 'importar'])
+          .use(middleware.permission('elemento.crear'))
+        router
           .post('/', [controllers.Elementos, 'store'])
           .use(middleware.permission('elemento.crear'))
         router

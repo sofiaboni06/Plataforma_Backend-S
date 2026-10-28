@@ -93,6 +93,15 @@ export const updateElementoValidator = vine.compile(
   })
 )
 
+export const importElementosValidator = vine.compile(
+  vine.object({
+    archivo: vine.file({
+      size: '15mb',
+      extnames: ['xlsx', 'xls'],
+    }),
+  })
+)
+
 export const fotoElementoValidator = vine.compile(
   vine.object({
     fotografia: vine.file({

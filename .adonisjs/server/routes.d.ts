@@ -21,6 +21,9 @@ export type ScannedRoutes = {
     'account.profile.store_foto': { paramsTuple?: []; params?: {} }
     'account.profile.destroy_foto': { paramsTuple?: []; params?: {} }
     'account.profile.update': { paramsTuple?: []; params?: {} }
+    'account.profile.show_foto': { paramsTuple?: []; params?: {} }
+    'account.profile.store_foto': { paramsTuple?: []; params?: {} }
+    'account.profile.destroy_foto': { paramsTuple?: []; params?: {} }
     'account.profile.change_password': { paramsTuple?: []; params?: {} }
     'account.profile.programas': { paramsTuple?: []; params?: {} }
     'account.notificaciones.index': { paramsTuple?: []; params?: {} }
@@ -57,6 +60,8 @@ export type ScannedRoutes = {
     'subcategorias.subcategorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'subcategorias.subcategorias.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.index': { paramsTuple?: []; params?: {} }
+    'elementos.elementos.plantilla': { paramsTuple?: []; params?: {} }
+    'elementos.elementos.importar': { paramsTuple?: []; params?: {} }
     'elementos.elementos.store': { paramsTuple?: []; params?: {} }
     'elementos.elementos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.show_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -210,6 +215,7 @@ export type ScannedRoutes = {
     'subcategorias.subcategorias.index': { paramsTuple?: []; params?: {} }
     'subcategorias.subcategorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.index': { paramsTuple?: []; params?: {} }
+    'elementos.elementos.plantilla': { paramsTuple?: []; params?: {} }
     'elementos.elementos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.show_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'alertas.alertas.index': { paramsTuple?: []; params?: {} }
@@ -291,6 +297,7 @@ export type ScannedRoutes = {
     'subcategorias.subcategorias.index': { paramsTuple?: []; params?: {} }
     'subcategorias.subcategorias.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.index': { paramsTuple?: []; params?: {} }
+    'elementos.elementos.plantilla': { paramsTuple?: []; params?: {} }
     'elementos.elementos.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'elementos.elementos.show_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'alertas.alertas.index': { paramsTuple?: []; params?: {} }
@@ -362,12 +369,14 @@ export type ScannedRoutes = {
     'auth.password_recovery.reset': { paramsTuple?: []; params?: {} }
     'authTwoFactor.password_recovery.setup_google': { paramsTuple?: []; params?: {} }
     'authTwoFactor.password_recovery.confirm_google': { paramsTuple?: []; params?: {} }
+    'account.profile.store_foto': { paramsTuple?: []; params?: {} }
     'account.access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'modules.modules.store': { paramsTuple?: []; params?: {} }
     'roles.roles.store': { paramsTuple?: []; params?: {} }
     'users.users.store': { paramsTuple?: []; params?: {} }
     'categorias.categorias.store': { paramsTuple?: []; params?: {} }
     'subcategorias.subcategorias.store': { paramsTuple?: []; params?: {} }
+    'elementos.elementos.importar': { paramsTuple?: []; params?: {} }
     'elementos.elementos.store': { paramsTuple?: []; params?: {} }
     'elementos.elementos.store_foto': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'items.items.store': { paramsTuple?: []; params?: {} }

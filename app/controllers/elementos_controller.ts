@@ -7,6 +7,7 @@ import { onlyRequests, resolveScope } from '#services/access_control'
 import {
   createElementoValidator,
   fotoElementoValidator,
+  importElementosValidator,
   updateElementoValidator,
 } from '#validators/elemento'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -16,6 +17,29 @@ export default class ElementosController {
     const scope = await resolveScope(auth.getUserOrFail())
     const elementos = await new ElementoService().list(scope)
     return serialize(ElementoTransformer.transform(elementos, !onlyRequests(scope)))
+  }
+
+  async plantilla({ auth, response }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    const archivo = await new ElementoService().plantilla(scope)
+    response.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response.header('Content-Disposition', 'attachment; filename="plantilla-elementos.xlsx"')
+    return response.send(archivo)
+  }
+
+  async importar({ request, auth, serialize }: HttpContext) {
+    const { archivo } = await request.validateUsing(importElementosValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    const result = await new ElementoService().importarExcel(scope, archivo.tmpPath!)
+
+    return serialize({
+      creados: result.creados,
+      errores: result.errores,
+      items: ElementoTransformer.transform(result.items),
+    })
   }
 
   async store({ request, auth, serialize }: HttpContext) {

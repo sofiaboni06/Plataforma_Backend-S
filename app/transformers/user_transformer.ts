@@ -21,7 +21,7 @@ export default class UserTransformer extends BaseTransformer<User> {
       fullName: this.resource.fullName,
       roleLabel: roleName,
       location: [trainingCenter?.nombre, regional?.nombre].filter(Boolean).join(' — '),
-      avatarUrl: this.resource.fotografia ? '/api/v1/account/profile/foto' : '',
+      avatarUrl: this.resource.urlFotografia ? '/api/v1/account/profile/foto' : '',
       documentType: this.resource.tipoDocumento,
       documentId: this.resource.numeroDocumento,
       email: this.resource.email,

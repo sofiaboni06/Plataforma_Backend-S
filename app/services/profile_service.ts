@@ -1,5 +1,6 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import User from '#models/usuario'
+import { rethrowDatabaseError } from '#services/database_error'
 
 type ProfileUpdate = {
   nombres?: string
@@ -62,6 +63,18 @@ export default class ProfileService {
 
     user.password = nextPassword
     await user.save()
+    return this.load(user)
+  }
+
+  async asignarFotografia(user: User, ruta: string | null) {
+    user.urlFotografia = ruta
+
+    try {
+      await user.save()
+    } catch (error) {
+      rethrowDatabaseError(error, 'No se pudo guardar la fotografía del perfil')
+    }
+
     return this.load(user)
   }
 }

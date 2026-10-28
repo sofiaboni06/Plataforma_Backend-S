@@ -1,7 +1,12 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import db from '@adonisjs/lucid/services/db'
+import ClasificacionElemento from '#models/clasificacion_elemento'
+import CodigoEstandar from '#models/codigo_estandar'
 import Elemento from '#models/elemento'
 import Item from '#models/item'
+import Stand from '#models/stand'
+import UnidadMedida from '#models/unidad_medida'
+import UsoPresupuestal from '#models/uso_presupuestal'
 import type Notificacion from '#models/notificacion'
 import { assertStandInScope, standIdsQuery, type AccessScope } from '#services/access_control'
 import DisponibilidadService, {
@@ -10,6 +15,11 @@ import DisponibilidadService, {
 } from '#services/disponibilidad_service'
 import NotificacionService from '#services/notificacion_service'
 import { rethrowDatabaseError } from '#services/database_error'
+import {
+  leerElementosExcel,
+  plantillaElementos,
+  type FilaElementoExcel,
+} from '#services/elemento_excel'
 import type { CaracterElemento } from '#data/clasificaciones_elemento'
 
 type ElementoPayload = {
@@ -43,6 +53,55 @@ export default class ElementoService {
     await this.marcarDisponible(rows)
 
     return rows
+  }
+
+  async plantilla(scope: AccessScope) {
+    const [items, stands, unidades, clasificaciones, codigos, usos] = await Promise.all([
+      Item.query().where('idCformacion', scope.idCformacion).where('estado', true).orderBy('nombre', 'asc'),
+      Stand.query().whereIn('id', standIdsQuery(scope)).where('estado', true).orderBy('nombre', 'asc'),
+      UnidadMedida.query().where('estado', true).orderBy('nombre', 'asc'),
+      ClasificacionElemento.query().where('estado', true).orderBy('nombre', 'asc'),
+      CodigoEstandar.query().orderBy('codigo', 'asc'),
+      UsoPresupuestal.query().where('estado', true).orderBy('nombre', 'asc'),
+    ])
+
+    return plantillaElementos({
+      items: items.map((item) => item.nombre),
+      stands: stands.map((stand) => stand.nombre),
+      unidades: unidades.map((unidad) => `${unidad.nombre} (${unidad.abreviatura})`),
+      clasificaciones: clasificaciones.map((row) => row.nombre),
+      codigosUnspsc: codigos.map((row) => `${row.codigo} · ${row.nombre}`),
+      usos: usos.map((row) => row.nombre),
+    })
+  }
+
+  async importarExcel(scope: AccessScope, filePath: string) {
+    const lectura = await leerElementosExcel(filePath)
+    const catalogo = await this.catalogoImportacion(scope)
+    const errores = [...lectura.errores]
+    const items = []
+    const codigos = new Set<string>()
+
+    for (const fila of lectura.filas) {
+      const codigo = fila.codigo.trim().toLowerCase()
+      if (codigos.has(codigo)) {
+        errores.push(`Fila ${fila.fila}: el código interno ${fila.codigo} está repetido en el archivo.`)
+        continue
+      }
+      codigos.add(codigo)
+
+      const payload = this.filaAPayload(fila, catalogo, errores)
+      if (!payload) continue
+
+      try {
+        items.push(await this.create(scope, payload))
+      } catch (error) {
+        const message = error instanceof Exception ? error.message : 'No se pudo crear el elemento'
+        errores.push(`Fila ${fila.fila}: ${message}`)
+      }
+    }
+
+    return { creados: items.length, errores, items }
   }
 
   async create(scope: AccessScope, payload: ElementoPayload) {
@@ -213,6 +272,101 @@ export default class ElementoService {
     }
 
     return this.findById(scope, id)
+  }
+
+  private async catalogoImportacion(scope: AccessScope) {
+    const [items, stands, unidades, clasificaciones, codigos, usos] = await Promise.all([
+      Item.query().where('idCformacion', scope.idCformacion).where('estado', true),
+      Stand.query().whereIn('id', standIdsQuery(scope)).where('estado', true),
+      UnidadMedida.query().where('estado', true),
+      ClasificacionElemento.query().where('estado', true),
+      CodigoEstandar.query(),
+      UsoPresupuestal.query().where('estado', true),
+    ])
+    const index = (labels: Array<[string, number]>) => {
+      const map = new Map<string, number>()
+      for (const [label, id] of labels) map.set(label.trim().toLowerCase(), id)
+      return map
+    }
+
+    return {
+      items: index(items.map((row) => [row.nombre, row.id])),
+      stands: index(stands.map((row) => [row.nombre, row.id])),
+      unidades: index(unidades.map((row) => [`${row.nombre} (${row.abreviatura})`, row.id])),
+      clasificaciones: index(clasificaciones.map((row) => [row.nombre, row.id])),
+      codigos: index(codigos.map((row) => [`${row.codigo} · ${row.nombre}`, row.id])),
+      usos: index(usos.map((row) => [row.nombre, row.id])),
+    }
+  }
+
+  private filaAPayload(
+    fila: FilaElementoExcel,
+    catalogo: Awaited<ReturnType<ElementoService['catalogoImportacion']>>,
+    errores: string[]
+  ): ElementoPayload | null {
+    const pick = (map: Map<string, number>, label: string) => map.get(label.trim().toLowerCase())
+    const faltan: string[] = []
+    const idItem = pick(catalogo.items, fila.item)
+    const idStand = pick(catalogo.stands, fila.stand)
+    const idUnidadMedida = pick(catalogo.unidades, fila.unidad)
+    const idClasificacion = pick(catalogo.clasificaciones, fila.clasificacion)
+    if (!idItem) faltan.push('ítem')
+    if (!idStand) faltan.push('stand')
+    if (!idUnidadMedida) faltan.push('unidad de medida')
+    if (!idClasificacion) faltan.push('clasificación')
+
+    const caracterToken = fila.caracter
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase()
+    const caracter: CaracterElemento | null =
+      caracterToken === 'consumo' ? 'consumo' : caracterToken === 'devolutivo' ? 'devolutivo' : null
+    if (!caracter) faltan.push('carácter')
+
+    const estadoToken = fila.estado
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase()
+    const estado = estadoToken === 'activo' ? true : estadoToken === 'inactivo' ? false : null
+    if (estado === null) faltan.push('estado')
+    if (fila.cantidad === null || fila.cantidad < 10) faltan.push('cantidad (mínimo 10)')
+
+    let idCodigoEstandar: number | null = null
+    if (fila.codigoUnspsc) {
+      idCodigoEstandar = pick(catalogo.codigos, fila.codigoUnspsc) ?? null
+      if (!idCodigoEstandar) faltan.push('código UNSPSC')
+    }
+    let idUsoPresupuestal: number | null = null
+    if (fila.uso) {
+      idUsoPresupuestal = pick(catalogo.usos, fila.uso) ?? null
+      if (!idUsoPresupuestal) faltan.push('uso presupuestal')
+    }
+
+    if (faltan.length || estado === null || !caracter || !idItem || !idStand || !idUnidadMedida || !idClasificacion) {
+      errores.push(`Fila ${fila.fila}: revise ${faltan.join(', ')}. Use las listas de la plantilla.`)
+      return null
+    }
+
+    return {
+      nombre: fila.nombre,
+      codigo: fila.codigo,
+      idItem,
+      idStand,
+      cantidad: fila.cantidad!,
+      cantidadMinima: fila.cantidadMinima ?? undefined,
+      gramaje: fila.gramaje,
+      estado,
+      idUnidadMedida,
+      descripcion: fila.descripcion || null,
+      marca: fila.marca || null,
+      color: fila.color || null,
+      idClasificacion,
+      caracter,
+      valorUnitarioPromedio: fila.valorUnitario,
+      porcentajeAumento: fila.porcentajeAumento,
+      idCodigoEstandar,
+      idUsoPresupuestal,
+    }
   }
 
   private async centerOfStand(idStand: number) {

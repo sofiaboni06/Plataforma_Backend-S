@@ -211,6 +211,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'account.profile.show_foto': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/profile/foto'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['showFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['showFoto']>>>
+    }
+  }
+  'account.profile.store_foto': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/profile/foto'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/usuario').fotoPerfilValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/usuario').fotoPerfilValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['storeFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['storeFoto']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'account.profile.destroy_foto': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/account/profile/foto'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['destroyFoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['destroyFoto']>>>
+    }
+  }
   'account.profile.change_password': {
     methods: ["PATCH"]
     pattern: '/api/v1/account/password'
@@ -641,6 +677,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['index']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['index']>>>
+    }
+  }
+  'elementos.elementos.plantilla': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/inventario/elementos/plantilla'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['plantilla']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['plantilla']>>>
+    }
+  }
+  'elementos.elementos.importar': {
+    methods: ["POST"]
+    pattern: '/api/v1/inventario/elementos/importar'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/elemento').importElementosValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/elemento').importElementosValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['importar']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/elementos_controller').default['importar']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'elementos.elementos.store': {

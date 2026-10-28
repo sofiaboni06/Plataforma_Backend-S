@@ -69,11 +69,24 @@ function marked(value: string) {
   return token === 'x' || token === '1' || token === 'si' || token === 'true'
 }
 
+function caracterTexto(value: string): CaracterListaMaestra | null {
+  const token = normalizeHeader(value)
+  if (token === 'software') return 'software'
+  if (token === 'devolutivo') return 'devolutivo'
+  if (token === 'consumo') return 'consumo'
+  return null
+}
+
 function caracterDe(consumo: string, devolutivo: string, software: string): CaracterListaMaestra | null {
   if (marked(software)) return 'software'
   if (marked(devolutivo)) return 'devolutivo'
   if (marked(consumo)) return 'consumo'
-  return null
+  return caracterTexto(consumo) ?? caracterTexto(devolutivo) ?? caracterTexto(software)
+}
+
+function codigoUnspscDe(value: string) {
+  const codigo = value.split('·')[0] ?? value
+  return codigo.replace(/\s+/g, '').slice(0, 20)
 }
 
 type ColumnMap = {
@@ -85,6 +98,7 @@ type ColumnMap = {
   lote?: number
   cantidad?: number
   observaciones?: number
+  caracter?: number
   consumo?: number
   devolutivo?: number
   software?: number
@@ -110,6 +124,8 @@ function mapFromHeaders(headers: Map<number, string>): ColumnMap {
       map.cantidad = index
     } else if (header.includes('observacion')) {
       map.observaciones = index
+    } else if (header === 'caracter' || header === 'tipo') {
+      map.caracter = index
     } else if (header === 'consumo') {
       map.consumo = index
     } else if (header === 'devolutivo') {
@@ -188,7 +204,7 @@ function readMappedRow(
 
   return {
     fila: rowNumber,
-    codigoUnspsc: codigo.replace(/\s+/g, ''),
+    codigoUnspsc: codigoUnspscDe(codigo),
     producto: producto.slice(0, 200),
     descripcionTecnica: columns.descripcion
       ? cellText(row.getCell(columns.descripcion).value) || null
@@ -197,11 +213,13 @@ function readMappedRow(
     valorUnitario: columns.valor ? asMoney(cellText(row.getCell(columns.valor).value)) : null,
     loteNombre: columns.lote ? cellText(row.getCell(columns.lote).value) || null : null,
     cantidadBase: cantidad,
-    caracter: caracterDe(
-      columns.consumo ? cellText(row.getCell(columns.consumo).value) : '',
-      columns.devolutivo ? cellText(row.getCell(columns.devolutivo).value) : '',
-      columns.software ? cellText(row.getCell(columns.software).value) : ''
-    ),
+    caracter: columns.caracter
+      ? caracterTexto(cellText(row.getCell(columns.caracter).value))
+      : caracterDe(
+          columns.consumo ? cellText(row.getCell(columns.consumo).value) : '',
+          columns.devolutivo ? cellText(row.getCell(columns.devolutivo).value) : '',
+          columns.software ? cellText(row.getCell(columns.software).value) : ''
+        ),
     observaciones: columns.observaciones
       ? cellText(row.getCell(columns.observaciones).value) || null
       : null,
@@ -299,6 +317,7 @@ export async function plantillaListaMaestra(meta: {
   nombre?: string | null
   unidades?: string[]
   lotes?: string[]
+  codigosUnspsc?: string[]
 } = {}) {
   const workbook = new ExcelJS.Workbook()
   workbook.creator = 'Plataforma SENA'
@@ -319,12 +338,10 @@ export async function plantillaListaMaestra(meta: {
     { key: 'lote', width: 18 },
     { key: 'cantidad', width: 24 },
     { key: 'observaciones', width: 28 },
-    { key: 'consumo', width: 14 },
-    { key: 'devolutivo', width: 14 },
-    { key: 'software', width: 14 },
+    { key: 'caracter', width: 16 },
   ]
 
-  sheet.mergeCells('A1:L1')
+  sheet.mergeCells('A1:J1')
   const title = sheet.getCell('A1')
   title.value = 'Lista maestra de materiales de formación'
   title.font = { name: 'Calibri', size: 18, bold: true, color: { argb: SENA.white } }
@@ -332,10 +349,10 @@ export async function plantillaListaMaestra(meta: {
   title.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 }
   sheet.getRow(1).height = 36
 
-  sheet.mergeCells('A2:L2')
+  sheet.mergeCells('A2:J2')
   const subtitle = sheet.getCell('A2')
   subtitle.value =
-    'Complete una fila por material. Marque con una X el carácter (consumo, devolutivo o software). La cantidad es para formar 30 aprendices.'
+    'Complete una fila por material. En código UNSPSC, unidad, lote y carácter despliegue la lista. La cantidad es para formar 30 aprendices.'
   subtitle.font = { name: 'Calibri', size: 11, color: { argb: SENA.text } }
   subtitle.fill = fill(SENA.soft)
   subtitle.alignment = { vertical: 'middle', wrapText: true, indent: 1 }
@@ -362,7 +379,7 @@ export async function plantillaListaMaestra(meta: {
   sheet.mergeCells('A4:B4')
   sheet.mergeCells('C4:D4')
   sheet.mergeCells('E4:F4')
-  sheet.mergeCells('G4:L4')
+  sheet.mergeCells('G4:J4')
   sheet.getRow(4).height = 28
   sheet.getRow(5).height = 8
   sheet.getRow(6).height = 8
@@ -377,9 +394,7 @@ export async function plantillaListaMaestra(meta: {
     'LOTE',
     'CANTIDAD REQUERIDA PARA FORMAR 30 APRENDICES',
     'OBSERVACIONES',
-    'Consumo',
-    'Devolutivo',
-    'Software',
+    'CARÁCTER',
   ]
   const headerRow = sheet.getRow(8)
   headerRow.height = 36
@@ -397,7 +412,7 @@ export async function plantillaListaMaestra(meta: {
     const row = sheet.getRow(rowNumber)
     row.height = 24
     row.getCell(1).value = index + 1
-    for (let col = 1; col <= 12; col++) {
+    for (let col = 1; col <= 10; col++) {
       const cell = row.getCell(col)
       cell.border = thinBorder()
       cell.font = { name: 'Calibri', size: 11, color: { argb: SENA.text } }
@@ -405,9 +420,7 @@ export async function plantillaListaMaestra(meta: {
       cell.fill = fill(index % 2 === 0 ? SENA.white : SENA.soft)
     }
     row.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' }
-    for (const col of [10, 11, 12]) {
-      row.getCell(col).alignment = { vertical: 'middle', horizontal: 'center' }
-    }
+    row.getCell(10).alignment = { vertical: 'middle', horizontal: 'center' }
   }
 
   const unidades = [
@@ -447,6 +460,50 @@ export async function plantillaListaMaestra(meta: {
     }
   }
 
+  const codigos = [
+    ...new Set((meta.codigosUnspsc ?? []).map((item) => item.trim()).filter(Boolean)),
+  ]
+  if (codigos.length) {
+    const hojaCodigos = workbook.addWorksheet('Unspsc', { state: 'hidden' })
+    codigos.forEach((etiqueta, index) => {
+      hojaCodigos.getCell(index + 1, 1).value = etiqueta
+    })
+    const listaCodigos = `Unspsc!$A$1:$A$${codigos.length}`
+    for (let rowNumber = 9; rowNumber <= 200; rowNumber++) {
+      sheet.getCell(rowNumber, 2).dataValidation = {
+        type: 'list',
+        allowBlank: false,
+        formulae: [listaCodigos],
+        showErrorMessage: true,
+        errorStyle: 'warning',
+        errorTitle: 'Código UNSPSC',
+        error: 'Elija un código de la lista.',
+        showInputMessage: true,
+        promptTitle: 'Código UNSPSC',
+        prompt: 'Despliegue la lista. El sistema guarda el código, no el nombre.',
+      }
+    }
+  }
+
+  const hojaCaracter = workbook.addWorksheet('Caracteres', { state: 'hidden' })
+  ;['Consumo', 'Devolutivo', 'Software'].forEach((etiqueta, index) => {
+    hojaCaracter.getCell(index + 1, 1).value = etiqueta
+  })
+  for (let rowNumber = 9; rowNumber <= 200; rowNumber++) {
+    sheet.getCell(rowNumber, 10).dataValidation = {
+      type: 'list',
+      allowBlank: true,
+      formulae: ['Caracteres!$A$1:$A$3'],
+      showErrorMessage: true,
+      errorStyle: 'warning',
+      errorTitle: 'Carácter',
+      error: 'Elija Consumo, Devolutivo o Software.',
+      showInputMessage: true,
+      promptTitle: 'Carácter',
+      prompt: 'Despliegue la lista.',
+    }
+  }
+
   for (let rowNumber = 9; rowNumber <= 200; rowNumber++) {
     sheet.getCell(rowNumber, 5).dataValidation = {
       type: 'list',
@@ -476,9 +533,8 @@ export async function plantillaListaMaestra(meta: {
     'Escriba el código y el nombre del programa en la fila 4 si no vinieron diligenciados.',
     'Una fila = un material. Código UNSPSC y producto son obligatorios.',
     'La cantidad es la requerida para formar 30 aprendices.',
-    'En Unidad de medida despliegue la lista y elija una opción, por ejemplo Galón (gl) o Bulto (bult). No invente abreviaturas.',
-    'Valor unitario es el precio de una unidad. Lote es el tipo de producto: elíjalo de la lista.',
-    'Marque con una X una sola columna de carácter: Consumo, Devolutivo o Software.',
+    'En Código UNSPSC, Unidad de medida, Lote y Carácter despliegue la lista. No escriba un código o una unidad que no esté ahí.',
+    'Valor unitario es el precio de una unidad. Carácter es Consumo, Devolutivo o Software.',
     'Deje en blanco las filas que no use. No combine celdas en la zona de datos.',
     'Guarde el archivo en .xlsx y súbalo con el botón Subir Excel. También puede agregar o editar materiales uno a uno en la plataforma.',
   ]
