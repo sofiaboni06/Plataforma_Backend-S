@@ -9,6 +9,7 @@ import env from '#start/env'
 import User from '#models/usuario'
 import PasswordResetCode from '#models/password_reset_code'
 import nodemailer from 'nodemailer'
+import { adjuntosLogos, encabezadoLogos } from '#services/correo_service'
 
 type Mailer = ReturnType<typeof nodemailer.createTransport>
 
@@ -75,6 +76,7 @@ export default class PasswordRecoveryService {
       text: `Tu código de recuperación es ${code}. Este código vence en ${CODE_MINUTES} minutos. Si no solicitaste este cambio, ignora este mensaje.`,
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.6;color:#073b2a;max-width:560px;margin:auto">
+          <p style="margin:0 0 18px">${encabezadoLogos}</p>
           <h2 style="color:#005c3b">Recuperación de contraseña</h2>
           <p>Recibimos una solicitud para cambiar la contraseña de tu cuenta.</p>
           <p style="font-size:30px;font-weight:700;letter-spacing:8px;text-align:center;color:#00a651">${code}</p>
@@ -82,6 +84,7 @@ export default class PasswordRecoveryService {
           <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
         </div>
       `,
+      attachments: adjuntosLogos,
     })
   }
 

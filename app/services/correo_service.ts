@@ -6,6 +6,28 @@ import nodemailer from 'nodemailer'
 
 const logos = join(dirname(fileURLToPath(import.meta.url)), '../../resources/mail')
 
+export const adjuntosLogos = [
+  {
+    filename: 'logo-sena.jpg',
+    path: join(logos, 'logo-sena.jpg'),
+    cid: 'logo-sena',
+  },
+  {
+    filename: 'logo-fabrica-completo.png',
+    path: join(logos, 'logo-fabrica-completo.png'),
+    cid: 'logo-fabrica',
+  },
+  {
+    filename: 'logo-sigma.png',
+    path: join(logos, 'logo-sigma.png'),
+    cid: 'logo-sigma',
+  },
+]
+
+export const encabezadoLogos = `<img src="cid:logo-sena" alt="SENA" height="48" style="height:48px;width:auto;vertical-align:middle" />
+<img src="cid:logo-fabrica" alt="Fábrica de Software" height="64" style="height:64px;width:auto;vertical-align:middle;margin-left:18px" />
+<img src="cid:logo-sigma" alt="Sigma" height="52" style="height:52px;width:auto;vertical-align:middle;margin-left:18px" />`
+
 function transporte() {
   const host = env.get('MAIL_HOST')
   const username = env.get('MAIL_USERNAME')
@@ -55,9 +77,7 @@ function plantilla(subject: string, text: string) {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden">
           <tr>
             <td style="padding:18px 28px 14px;font-family:Arial,sans-serif">
-              <img src="cid:logo-sena" alt="SENA" height="48" style="height:48px;width:auto;vertical-align:middle" />
-              <img src="cid:logo-fabrica" alt="Fábrica de Software" height="64" style="height:64px;width:auto;vertical-align:middle;margin-left:18px" />
-              <img src="cid:logo-sigma" alt="Sigma" height="52" style="height:52px;width:auto;vertical-align:middle;margin-left:18px" />
+              ${encabezadoLogos}
             </td>
           </tr>
           <tr>
@@ -102,23 +122,7 @@ export async function enviarCorreo(input: { to: string; subject: string; text: s
     subject: input.subject.slice(0, 200),
     text: input.text,
     html: plantilla(input.subject.slice(0, 200), input.text),
-    attachments: [
-      {
-        filename: 'logo-sena.jpg',
-        path: join(logos, 'logo-sena.jpg'),
-        cid: 'logo-sena',
-      },
-      {
-        filename: 'logo-fabrica-completo.png',
-        path: join(logos, 'logo-fabrica-completo.png'),
-        cid: 'logo-fabrica',
-      },
-      {
-        filename: 'logo-sigma.png',
-        path: join(logos, 'logo-sigma.png'),
-        cid: 'logo-sigma',
-      },
-    ],
+    attachments: adjuntosLogos,
   })
 
   return true
