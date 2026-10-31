@@ -1,6 +1,7 @@
 import { HttpContext } from '@adonisjs/core/http'
 import ReporteService, { type CampoReporte } from '#services/reporte_service'
 import { resolveScope } from '#services/access_control'
+import logger from '@adonisjs/core/services/logger'
 
 export default class ReportesController {
   /**
@@ -57,12 +58,12 @@ export default class ReportesController {
       response.header('Content-Disposition', `attachment; filename="${filename}"`)
       return response.send(buffer)
     } catch (error) {
-      console.error('Error generando reporte elementos:', error)
-      return response.internalServerError({
-        message: 'Error al generar el reporte',
-        error: error instanceof Error ? error.message : 'Error desconocido',
-      })
-    }
+     logger.error({ err: error }, 'Error generando reporte de elementos')
+
+     return response.internalServerError({
+    message: 'Error al generar el reporte',
+  })
+}
   }
 
   /**
@@ -108,11 +109,11 @@ export default class ReportesController {
       response.header('Content-Disposition', `attachment; filename="${filename}"`)
       return response.send(buffer)
     } catch (error) {
-      console.error('Error generando reporte bodega:', error)
-      return response.internalServerError({
-        message: 'Error al generar el reporte',
-        error: error instanceof Error ? error.message : 'Error desconocido',
-      })
-    }
+  logger.error({ err: error }, 'Error generando reporte de bodega')
+
+  return response.internalServerError({
+    message: 'Error al generar el reporte',
+  })
+}
   }
 }

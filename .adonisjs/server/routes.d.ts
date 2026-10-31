@@ -122,6 +122,16 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'redes_conocimiento.index': { paramsTuple?: []; params?: {} }
+    'redes_conocimiento.store': { paramsTuple?: []; params?: {} }
+    'redes_conocimiento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redes_conocimiento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redes_conocimiento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineas_tematicas.index': { paramsTuple?: []; params?: {} }
+    'lineas_tematicas.store': { paramsTuple?: []; params?: {} }
+    'lineas_tematicas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineas_tematicas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineas_tematicas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -173,6 +183,10 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'redes_conocimiento.index': { paramsTuple?: []; params?: {} }
+    'redes_conocimiento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineas_tematicas.index': { paramsTuple?: []; params?: {} }
+    'lineas_tematicas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -224,6 +238,10 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'redes_conocimiento.index': { paramsTuple?: []; params?: {} }
+    'redes_conocimiento.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineas_tematicas.index': { paramsTuple?: []; params?: {} }
+    'lineas_tematicas.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -257,6 +275,8 @@ export type ScannedRoutes = {
     'solicitudes.solicitudes.registrar_en_bodega': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
+    'redes_conocimiento.store': { paramsTuple?: []; params?: {} }
+    'lineas_tematicas.store': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'authTwoFactor.password_recovery.disable_google': { paramsTuple?: []; params?: {} }
@@ -271,6 +291,8 @@ export type ScannedRoutes = {
     'codigosEstandar.codigos_estandar.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'unidadesMedida.unidades_medida.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redes_conocimiento.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineas_tematicas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'account.profile.update': { paramsTuple?: []; params?: {} }
@@ -296,6 +318,8 @@ export type ScannedRoutes = {
     'solicitudesEquipo.solicitud_equipo.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesEquipo.solicitud_equipo.devolver': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'redes_conocimiento.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'lineas_tematicas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

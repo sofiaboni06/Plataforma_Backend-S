@@ -224,4 +224,18 @@ export interface ApiDefinition {
       bodega: typeof routes['reportes.reportes.bodega']
     }
   }
+  redesConocimiento: {
+    index: typeof routes['redes_conocimiento.index']
+    store: typeof routes['redes_conocimiento.store']
+    show: typeof routes['redes_conocimiento.show']
+    update: typeof routes['redes_conocimiento.update']
+    destroy: typeof routes['redes_conocimiento.destroy']
+  }
+  lineasTematicas: {
+    index: typeof routes['lineas_tematicas.index']
+    store: typeof routes['lineas_tematicas.store']
+    show: typeof routes['lineas_tematicas.show']
+    update: typeof routes['lineas_tematicas.update']
+    destroy: typeof routes['lineas_tematicas.destroy']
+  }
 }

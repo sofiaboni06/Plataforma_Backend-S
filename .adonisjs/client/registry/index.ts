@@ -714,6 +714,66 @@ const routes = {
     tokens: [{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"api","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"v1","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"reportes","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"bodega","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"id","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"formato","end":""}],
     types: placeholder as Registry['reportes.reportes.bodega']['types'],
   },
+  'redes_conocimiento.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/redes-conocimiento',
+    tokens: [{"old":"/api/v1/redes-conocimiento","type":0,"val":"api","end":""},{"old":"/api/v1/redes-conocimiento","type":0,"val":"v1","end":""},{"old":"/api/v1/redes-conocimiento","type":0,"val":"redes-conocimiento","end":""}],
+    types: placeholder as Registry['redes_conocimiento.index']['types'],
+  },
+  'redes_conocimiento.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/redes-conocimiento',
+    tokens: [{"old":"/api/v1/redes-conocimiento","type":0,"val":"api","end":""},{"old":"/api/v1/redes-conocimiento","type":0,"val":"v1","end":""},{"old":"/api/v1/redes-conocimiento","type":0,"val":"redes-conocimiento","end":""}],
+    types: placeholder as Registry['redes_conocimiento.store']['types'],
+  },
+  'redes_conocimiento.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/redes-conocimiento/:id',
+    tokens: [{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"api","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"redes-conocimiento","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['redes_conocimiento.show']['types'],
+  },
+  'redes_conocimiento.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/redes-conocimiento/:id',
+    tokens: [{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"api","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"redes-conocimiento","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['redes_conocimiento.update']['types'],
+  },
+  'redes_conocimiento.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/redes-conocimiento/:id',
+    tokens: [{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"api","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":0,"val":"redes-conocimiento","end":""},{"old":"/api/v1/redes-conocimiento/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['redes_conocimiento.destroy']['types'],
+  },
+  'lineas_tematicas.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/lineas-tematicas',
+    tokens: [{"old":"/api/v1/lineas-tematicas","type":0,"val":"api","end":""},{"old":"/api/v1/lineas-tematicas","type":0,"val":"v1","end":""},{"old":"/api/v1/lineas-tematicas","type":0,"val":"lineas-tematicas","end":""}],
+    types: placeholder as Registry['lineas_tematicas.index']['types'],
+  },
+  'lineas_tematicas.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/lineas-tematicas',
+    tokens: [{"old":"/api/v1/lineas-tematicas","type":0,"val":"api","end":""},{"old":"/api/v1/lineas-tematicas","type":0,"val":"v1","end":""},{"old":"/api/v1/lineas-tematicas","type":0,"val":"lineas-tematicas","end":""}],
+    types: placeholder as Registry['lineas_tematicas.store']['types'],
+  },
+  'lineas_tematicas.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/lineas-tematicas/:id',
+    tokens: [{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"lineas-tematicas","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['lineas_tematicas.show']['types'],
+  },
+  'lineas_tematicas.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/lineas-tematicas/:id',
+    tokens: [{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"lineas-tematicas","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['lineas_tematicas.update']['types'],
+  },
+  'lineas_tematicas.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/lineas-tematicas/:id',
+    tokens: [{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"api","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":0,"val":"lineas-tematicas","end":""},{"old":"/api/v1/lineas-tematicas/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['lineas_tematicas.destroy']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

@@ -1423,4 +1423,124 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'redes_conocimiento.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/redes-conocimiento'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'redes_conocimiento.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/redes-conocimiento'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'redes_conocimiento.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/redes-conocimiento/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'redes_conocimiento.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/redes-conocimiento/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'redes_conocimiento.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/redes-conocimiento/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'lineas_tematicas.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/lineas-tematicas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'lineas_tematicas.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/lineas-tematicas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'lineas_tematicas.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/lineas-tematicas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'lineas_tematicas.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/lineas-tematicas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'lineas_tematicas.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/lineas-tematicas/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
 }
