@@ -3,6 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import NivelPrograma from '#models/nivel_programa'
 import ProgramaFormacion from '#models/programa_formacion'
 import RedConocimiento from '#models/red_conocimiento'
+import type { AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type ProgramaFormacionPayload = {
@@ -19,6 +20,7 @@ type ProgramaFormacionPayload = {
 
 export default class ProgramaFormacionService {
   async index(
+    scope: AccessScope,
     options: {
       estado?: boolean
       idNivelPrograma?: number
@@ -51,7 +53,19 @@ export default class ProgramaFormacionService {
       query.whereILike('nombre_programa', `%${options.search}%`)
     }
 
+    if (!scope.isAdmin) {
+      query.whereIn('id_programa_formacion', this.asignados(scope.idUsuario))
+    }
+
     return query
+  }
+
+  private asignados(idUsuario: number) {
+    return db
+      .from('usuario_programa_formacion')
+      .select('id_programa_formacion')
+      .where('id_usuario', idUsuario)
+      .where('estado', true)
   }
 
   async show(id: number) {

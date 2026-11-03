@@ -257,9 +257,14 @@ export interface ApiDefinition {
   }
   presupuestoFormacion: {
     presupuestoFormacion: {
+      coordinadores: typeof routes['presupuestoFormacion.presupuesto_formacion.coordinadores']
+      asignarCoordinador: typeof routes['presupuestoFormacion.presupuesto_formacion.asignar_coordinador']
+      asignarArea: typeof routes['presupuestoFormacion.presupuesto_formacion.asignar_area']
+      asignarFicha: typeof routes['presupuestoFormacion.presupuesto_formacion.asignar_ficha']
       resumen: typeof routes['presupuestoFormacion.presupuesto_formacion.resumen']
       guardarMonto: typeof routes['presupuestoFormacion.presupuesto_formacion.guardar_monto']
       repartir: typeof routes['presupuestoFormacion.presupuesto_formacion.repartir']
+      alertas: typeof routes['presupuestoFormacion.presupuesto_formacion.alertas']
       lotes: typeof routes['presupuestoFormacion.presupuesto_formacion.lotes']
       crearLote: typeof routes['presupuestoFormacion.presupuesto_formacion.crear_lote']
       descargar: typeof routes['presupuestoFormacion.presupuesto_formacion.descargar']
@@ -268,6 +273,7 @@ export interface ApiDefinition {
   procesosCompra: {
     procesosCompra: {
       consolidado: typeof routes['procesosCompra.procesos_compra.consolidado']
+      descargar: typeof routes['procesosCompra.procesos_compra.descargar']
       store: typeof routes['procesosCompra.procesos_compra.store']
     }
   }

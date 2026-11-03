@@ -550,14 +550,29 @@ router
     router
       .group(() => {
         router
+          .get('coordinadores', [PresupuestoFormacionController, 'coordinadores'])
+          .use(middleware.permission('solicitud_programa.ver'))
+        router
+          .put('coordinadores', [PresupuestoFormacionController, 'asignarCoordinador'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .put('areas', [PresupuestoFormacionController, 'asignarArea'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .put('fichas', [PresupuestoFormacionController, 'asignarFicha'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
           .get('/', [PresupuestoFormacionController, 'resumen'])
           .use(middleware.permission('solicitud_programa.ver'))
         router
           .put('monto', [PresupuestoFormacionController, 'guardarMonto'])
           .use(middleware.permission('solicitud_programa.editar'))
         router
-          .put('fichas', [PresupuestoFormacionController, 'repartir'])
+          .put('programas', [PresupuestoFormacionController, 'repartir'])
           .use(middleware.permission('solicitud_programa.editar'))
+        router
+          .get('alertas', [PresupuestoFormacionController, 'alertas'])
+          .use(middleware.permission('solicitud_programa.ver'))
         router
           .get('lotes', [PresupuestoFormacionController, 'lotes'])
           .use(middleware.permission('solicitud_programa.ver'))
@@ -577,6 +592,9 @@ router
       .group(() => {
         router
           .get('consolidado', [ProcesosCompraController, 'consolidado'])
+          .use(middleware.permission('proceso_compra.ver'))
+        router
+          .get('descargar', [ProcesosCompraController, 'descargar'])
           .use(middleware.permission('proceso_compra.ver'))
         router
           .post('/', [ProcesosCompraController, 'store'])

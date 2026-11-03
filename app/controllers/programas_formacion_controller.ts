@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { resolveScope } from '#services/access_control'
 import { parseOptionalBoolean, parseOptionalPositiveInt } from '#services/query_params'
 import ProgramaFormacionService from '#services/programa_formacion_service'
 import UsuarioService from '#services/usuario_service'
@@ -12,12 +13,13 @@ import {
 export default class ProgramasFormacionController {
   private service = new ProgramaFormacionService()
 
-  async index({ request, serialize }: HttpContext) {
+  async index({ auth, request, serialize }: HttpContext) {
     const estado = parseOptionalBoolean(request.input('estado'))
     const idNivelPrograma = parseOptionalPositiveInt(request.input('idNivelPrograma'))
     const idCformacion = parseOptionalPositiveInt(request.input('idCformacion'))
     const search = String(request.input('search', '')).trim() || undefined
-    const programas = await this.service.index({ estado, idNivelPrograma, idCformacion, search })
+    const scope = await resolveScope(auth.getUserOrFail())
+    const programas = await this.service.index(scope, { estado, idNivelPrograma, idCformacion, search })
 
     return serialize(ProgramaFormacionTransformer.transform(programas))
   }

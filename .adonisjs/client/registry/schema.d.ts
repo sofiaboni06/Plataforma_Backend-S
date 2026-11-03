@@ -1747,6 +1747,54 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'presupuestoFormacion.presupuesto_formacion.coordinadores': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/presupuesto-formacion/coordinadores'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.asignar_coordinador': {
+    methods: ["PUT"]
+    pattern: '/api/v1/presupuesto-formacion/coordinadores'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.asignar_area': {
+    methods: ["PUT"]
+    pattern: '/api/v1/presupuesto-formacion/areas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.asignar_ficha': {
+    methods: ["PUT"]
+    pattern: '/api/v1/presupuesto-formacion/fichas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'presupuestoFormacion.presupuesto_formacion.resumen': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/presupuesto-formacion'
@@ -1773,7 +1821,19 @@ export interface Registry {
   }
   'presupuestoFormacion.presupuesto_formacion.repartir': {
     methods: ["PUT"]
-    pattern: '/api/v1/presupuesto-formacion/fichas'
+    pattern: '/api/v1/presupuesto-formacion/programas'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'presupuestoFormacion.presupuesto_formacion.alertas': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/presupuesto-formacion/alertas'
     types: {
       body: {}
       paramsTuple: []
@@ -1822,6 +1882,18 @@ export interface Registry {
   'procesosCompra.procesos_compra.consolidado': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/procesos-compra/consolidado'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'procesosCompra.procesos_compra.descargar': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/procesos-compra/descargar'
     types: {
       body: {}
       paramsTuple: []

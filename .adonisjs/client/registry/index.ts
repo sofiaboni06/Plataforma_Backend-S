@@ -876,6 +876,30 @@ const routes = {
     tokens: [{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"api","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":0,"val":"solicitudes-programa","end":""},{"old":"/api/v1/solicitudes-programa/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['solicitudesPrograma.solicitudes_programa.destroy']['types'],
   },
+  'presupuestoFormacion.presupuesto_formacion.coordinadores': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/presupuesto-formacion/coordinadores',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/coordinadores","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/coordinadores","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/coordinadores","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/coordinadores","type":0,"val":"coordinadores","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.coordinadores']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.asignar_coordinador': {
+    methods: ["PUT"],
+    pattern: '/api/v1/presupuesto-formacion/coordinadores',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/coordinadores","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/coordinadores","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/coordinadores","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/coordinadores","type":0,"val":"coordinadores","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.asignar_coordinador']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.asignar_area': {
+    methods: ["PUT"],
+    pattern: '/api/v1/presupuesto-formacion/areas',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/areas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/areas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/areas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/areas","type":0,"val":"areas","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.asignar_area']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.asignar_ficha': {
+    methods: ["PUT"],
+    pattern: '/api/v1/presupuesto-formacion/fichas',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"fichas","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.asignar_ficha']['types'],
+  },
   'presupuestoFormacion.presupuesto_formacion.resumen': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/presupuesto-formacion',
@@ -890,9 +914,15 @@ const routes = {
   },
   'presupuestoFormacion.presupuesto_formacion.repartir': {
     methods: ["PUT"],
-    pattern: '/api/v1/presupuesto-formacion/fichas',
-    tokens: [{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"fichas","end":""}],
+    pattern: '/api/v1/presupuesto-formacion/programas',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/programas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/programas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/programas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/programas","type":0,"val":"programas","end":""}],
     types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.repartir']['types'],
+  },
+  'presupuestoFormacion.presupuesto_formacion.alertas': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/presupuesto-formacion/alertas',
+    tokens: [{"old":"/api/v1/presupuesto-formacion/alertas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/alertas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/alertas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/alertas","type":0,"val":"alertas","end":""}],
+    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.alertas']['types'],
   },
   'presupuestoFormacion.presupuesto_formacion.lotes': {
     methods: ["GET","HEAD"],
@@ -917,6 +947,12 @@ const routes = {
     pattern: '/api/v1/procesos-compra/consolidado',
     tokens: [{"old":"/api/v1/procesos-compra/consolidado","type":0,"val":"api","end":""},{"old":"/api/v1/procesos-compra/consolidado","type":0,"val":"v1","end":""},{"old":"/api/v1/procesos-compra/consolidado","type":0,"val":"procesos-compra","end":""},{"old":"/api/v1/procesos-compra/consolidado","type":0,"val":"consolidado","end":""}],
     types: placeholder as Registry['procesosCompra.procesos_compra.consolidado']['types'],
+  },
+  'procesosCompra.procesos_compra.descargar': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/procesos-compra/descargar',
+    tokens: [{"old":"/api/v1/procesos-compra/descargar","type":0,"val":"api","end":""},{"old":"/api/v1/procesos-compra/descargar","type":0,"val":"v1","end":""},{"old":"/api/v1/procesos-compra/descargar","type":0,"val":"procesos-compra","end":""},{"old":"/api/v1/procesos-compra/descargar","type":0,"val":"descargar","end":""}],
+    types: placeholder as Registry['procesosCompra.procesos_compra.descargar']['types'],
   },
   'procesosCompra.procesos_compra.store': {
     methods: ["POST"],

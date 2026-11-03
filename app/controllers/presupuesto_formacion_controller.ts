@@ -3,6 +3,9 @@ import PresupuestoFormacionService from '#services/presupuesto_formacion_service
 import { resolveScope } from '#services/access_control'
 import { parseOptionalPositiveInt } from '#services/query_params'
 import {
+  asignacionCoordinadorValidator,
+  asignacionAreaValidator,
+  asignacionFichaValidator,
   lotePresupuestoValidator,
   montoPresupuestoValidator,
   repartoPresupuestoValidator,
@@ -26,7 +29,43 @@ export default class PresupuestoFormacionController {
   async repartir({ auth, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(repartoPresupuestoValidator)
     const scope = await resolveScope(auth.getUserOrFail())
-    return serialize(await this.service.repartir(scope, payload.anio, payload.fichas))
+    return serialize(await this.service.repartir(scope, payload.anio, payload.programas))
+  }
+
+  async coordinadores({ auth, request, serialize }: HttpContext) {
+    const anio = parseOptionalPositiveInt(request.input('anio'))
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(await this.service.coordinadores(scope, anio ?? new Date().getFullYear()))
+  }
+
+  async asignarCoordinador({ auth, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(asignacionCoordinadorValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(
+      await this.service.asignarCoordinador(scope, payload.anio, payload.idUsuario, payload.monto)
+    )
+  }
+
+  async asignarArea({ auth, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(asignacionAreaValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(
+      await this.service.asignarArea(scope, payload.anio, payload.programaId, payload.monto)
+    )
+  }
+
+  async asignarFicha({ auth, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(asignacionFichaValidator)
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(
+      await this.service.asignarFicha(scope, payload.anio, payload.fichaId, payload.monto)
+    )
+  }
+
+  async alertas({ auth, request, serialize }: HttpContext) {
+    const anio = parseOptionalPositiveInt(request.input('anio')) ?? new Date().getFullYear()
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(await this.service.alertas(scope, anio))
   }
 
   async lotes({ auth, request, serialize }: HttpContext) {

@@ -26,6 +26,7 @@ export const INSTRUCTOR_PERMISSIONS = [
   'lista_maestra.crear',
   'lista_maestra.editar',
   'lista_maestra.eliminar',
+  'precio_lista_maestra.editar',
   'vigencia.ver',
   'solicitud_programa.ver',
   'solicitud_programa.crear',

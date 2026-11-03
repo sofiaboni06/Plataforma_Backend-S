@@ -19,6 +19,8 @@ export const ADMIN_PROFILE_NAME = 'Administrador'
 export type AccessScope = {
   idUsuario: number
   isAdmin: boolean
+  /** Asigna el monto único del centro en la vigencia. */
+  asignaPresupuesto: boolean
   /** Training center the user belongs to (`usuario.id_cformacion`). */
   idCformacion: number
   /** Bodegas the admin assigned to this user through `usuario_bodega`. */
@@ -56,9 +58,11 @@ async function loadScope(user: User): Promise<AccessScope> {
     })
     .firstOrFail()
 
+  const perfil = account.perfil?.nombre ?? ''
   return {
     idUsuario: account.id,
-    isAdmin: account.perfil?.nombre === ADMIN_PROFILE_NAME,
+    isAdmin: perfil === ADMIN_PROFILE_NAME,
+    asignaPresupuesto: perfil === ADMIN_PROFILE_NAME || /^subdirector/i.test(perfil),
     idCformacion: account.idCformacion,
     bodegaIds: account.bodegas.map((bodega) => bodega.id),
     permissions: new Set(account.perfil?.permisos.map((permiso) => permiso.code) ?? []),

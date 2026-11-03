@@ -131,6 +131,11 @@ export const PERMISSION_RESOURCES = {
     label: 'Lista maestra de materiales',
     actions: ['ver', 'crear', 'editar', 'eliminar'],
   },
+  precio_lista_maestra: {
+    module: 'Materiales de Formación',
+    label: 'Precios de la lista maestra',
+    actions: ['editar'],
+  },
   vigencia: {
     module: 'Materiales de Formación',
     label: 'Vigencias',

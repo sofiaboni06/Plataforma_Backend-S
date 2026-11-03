@@ -19,7 +19,8 @@ export default class ListasMaestrasMaterialController {
       throw new Exception('programaId es requerido', { status: 422, code: 'E_VALIDATION_ERROR' })
     }
     const scope = await resolveScope(auth.getUserOrFail())
-    const items = await this.service.listar(scope, programaId)
+    const loteId = parseOptionalPositiveInt(request.input('loteId'))
+    const items = await this.service.listar(scope, programaId, loteId)
     return serialize(ListaMaestraMaterialTransformer.transform(items))
   }
 

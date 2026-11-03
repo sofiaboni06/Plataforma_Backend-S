@@ -17,6 +17,36 @@ export default class ProcesosCompraController {
     return serialize(await this.service.consolidado(scope, vigencia))
   }
 
+  async descargar({ auth, request, response }: HttpContext) {
+    const vigencia = parseOptionalPositiveInt(request.input('vigencia'))
+    if (!vigencia) {
+      throw new Exception('vigencia es requerida', { status: 422, code: 'E_VALIDATION_ERROR' })
+    }
+    const formato = String(request.input('formato') ?? 'excel')
+    const scope = await resolveScope(auth.getUserOrFail())
+
+    if (formato === 'pdf') {
+      const archivo = await this.service.pdf(scope, vigencia)
+      response.header('Content-Type', 'application/pdf')
+      response.header(
+        'Content-Disposition',
+        `attachment; filename="pedido-aprobado-${vigencia}.pdf"`
+      )
+      return response.send(archivo)
+    }
+
+    const archivo = await this.service.excel(scope, vigencia)
+    response.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response.header(
+      'Content-Disposition',
+      `attachment; filename="pedido-aprobado-${vigencia}.xlsx"`
+    )
+    return response.send(archivo)
+  }
+
   async store({ auth, request, serialize }: HttpContext) {
     const payload = await request.validateUsing(createProcesoCompraValidator)
     const scope = await resolveScope(auth.getUserOrFail())

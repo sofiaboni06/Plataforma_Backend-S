@@ -35,6 +35,7 @@ export const decidirSolicitudProgramaValidator = vine.compile(
         vine.object({
           id: vine.number().positive().withoutDecimals(),
           accion: vine.enum(['entregar', 'pendiente', 'rechazar']),
+          cantidadSolicitada: vine.number().positive().optional(),
           cantidadAprobada: vine.number().min(0).optional(),
           observacionCoordinador: vine.string().trim().maxLength(500).nullable().optional(),
         })

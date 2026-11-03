@@ -38,6 +38,9 @@ export default class SolicitudProgramaTransformer extends BaseTransformer<Solici
           }
         : null,
       ficha: ficha ? { id: ficha.id, numeroFicha: ficha.numeroFicha } : null,
+      presupuestoFicha: this.resource.$extras.presupuestoFicha ?? null,
+      valorAproximado: this.valorAproximado(),
+      valorPromedio: this.valorPromedio(),
       items: (this.resource.detalles ?? []).map((detalle) => ({
         id: detalle.id,
         listaMaestraId: detalle.listaMaestraId,
@@ -46,6 +49,8 @@ export default class SolicitudProgramaTransformer extends BaseTransformer<Solici
         cantidadMaestraReferencia: detalle.cantidadMaestraReferencia,
         estado: detalle.estado,
         observacionCoordinador: detalle.observacionCoordinador,
+        valorAproximado:
+          Number(detalle.cantidadSolicitada) * Number(detalle.listaMaestra?.valorUnitario ?? 0),
         material: detalle.listaMaestra
           ? {
               id: detalle.listaMaestra.id,
@@ -62,5 +67,31 @@ export default class SolicitudProgramaTransformer extends BaseTransformer<Solici
           : null,
       })),
     }
+  }
+
+  private lineasConsumo() {
+    return (this.resource.detalles ?? []).filter(
+      (detalle) => detalle.listaMaestra?.caracter === 'consumo'
+    )
+  }
+
+  private valorAproximado() {
+    return this.lineasConsumo().reduce(
+      (suma, detalle) =>
+        suma + Number(detalle.cantidadSolicitada) * Number(detalle.listaMaestra?.valorUnitario ?? 0),
+      0
+    )
+  }
+
+  private valorPromedio() {
+    const lineas = this.lineasConsumo().filter(
+      (detalle) => detalle.listaMaestra?.valorUnitario !== null && detalle.listaMaestra?.valorUnitario !== undefined
+    )
+    if (!lineas.length) return 0
+    const suma = lineas.reduce(
+      (total, detalle) => total + Number(detalle.listaMaestra?.valorUnitario ?? 0),
+      0
+    )
+    return suma / lineas.length
   }
 }

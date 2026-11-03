@@ -17,6 +17,7 @@ export const COORDINADOR_PERMISSIONS = [
   'lista_maestra.ver',
   'lista_maestra.crear',
   'lista_maestra.editar',
+  'precio_lista_maestra.editar',
   'vigencia.ver',
   'vigencia.crear',
   'vigencia.editar',

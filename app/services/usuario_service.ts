@@ -121,6 +121,9 @@ export default class UsuarioService {
 
     if (programaIds.length) {
       await this.syncProgramaPivot(user, programaIds)
+      if (this.tienePermiso(role, 'solicitud_programa.editar')) {
+        await this.syncRedAlcance(user.id, programaIds)
+      }
     }
 
     return this.show(user.id)
@@ -242,7 +245,14 @@ export default class UsuarioService {
   }
 
   async syncProgramas(id: number, programIds: number[]) {
-    const user = await User.query().where('id', id).preload('perfil').first()
+    const user = await User.query()
+      .where('id', id)
+      .preload('perfil', (query) => {
+        query.preload('permisos', (permisos) => {
+          permisos.where('permiso.estado', true).wherePivot('estado', true)
+        })
+      })
+      .first()
     if (!user) {
       throw new Exception('El usuario no existe', { status: 404, code: 'E_NOT_FOUND' })
     }
@@ -253,7 +263,7 @@ export default class UsuarioService {
     await this.assertProgramas(uniqueIds)
     await this.assertProgramasInCenter(user.idCformacion, uniqueIds)
     await this.syncProgramaPivot(user, uniqueIds)
-    if (/^coordinador/i.test(user.perfil?.nombre ?? '')) {
+    if (this.tienePermiso(user.perfil, 'solicitud_programa.editar')) {
       await this.syncRedAlcance(user.id, uniqueIds)
     }
 
@@ -494,17 +504,28 @@ export default class UsuarioService {
   }
 
   /**
-   * Los programas de formación se asignan a instructores y coordinadores.
-   * La regla se basa en el nombre del perfil, no en datos extra del usuario.
+   * Cualquier perfil con permiso de pedir, revisar, armar la lista o comprar
+   * puede recibir programas. El nombre del rol no decide.
    */
+  private tienePermiso(perfil: Perfil | null | undefined, code: string) {
+    return Boolean(perfil?.permisos?.some((permiso) => permiso.code === code))
+  }
+
   private isProgramasPerfil(perfil: Perfil | null | undefined) {
-    return Boolean(perfil && /^(instructor|coordinador)/i.test(perfil.nombre))
+    const codes = [
+      'solicitud_programa.crear',
+      'solicitud_programa.editar',
+      'lista_maestra.crear',
+      'lista_maestra.editar',
+      'proceso_compra.ver',
+    ]
+    return codes.some((code) => this.tienePermiso(perfil, code))
   }
 
   private assertProgramasPerfil(perfil: Perfil | null | undefined) {
     if (!this.isProgramasPerfil(perfil)) {
       throw new Exception(
-        'Solo se pueden asignar programas a usuarios con perfil Instructor o Coordinador',
+        'Solo se asignan programas a un perfil que pueda pedir, revisar, armar la lista maestra o comprar',
         {
           status: 422,
           code: 'E_VALIDATION_ERROR',
@@ -514,7 +535,12 @@ export default class UsuarioService {
   }
 
   private async assertActiveRole(idPerfil: number) {
-    const role = await Perfil.find(idPerfil)
+    const role = await Perfil.query()
+      .where('id', idPerfil)
+      .preload('permisos', (permisos) => {
+        permisos.where('permiso.estado', true).wherePivot('estado', true)
+      })
+      .first()
     if (!role || !role.estado) {
       throw new Exception('El perfil no existe o está inactivo', {
         status: 422,

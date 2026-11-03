@@ -41,6 +41,16 @@ export default class FichaService {
       query.whereILike('numero_ficha', `%${options.search}%`)
     }
 
+    if (!scope.isAdmin) {
+      query.whereIn('programa_id', (sub) => {
+        sub
+          .from('usuario_programa_formacion')
+          .select('id_programa_formacion')
+          .where('id_usuario', scope.idUsuario)
+          .where('estado', true)
+      })
+    }
+
     return query
   }
 

@@ -70,22 +70,26 @@ export default class ListaMaestraMaterialService {
     return filas.map((fila) => etiquetaUnidadMedida(fila.nombre, fila.abreviatura))
   }
 
-  async listar(scope: AccessScope, programaId: number) {
+  async listar(scope: AccessScope, programaId: number, loteId?: number) {
     assertCan(scope, 'lista_maestra.ver')
     await this.assertProgramaVisible(scope, programaId)
 
-    return ListaMaestraMaterial.query()
+    const consulta = ListaMaestraMaterial.query()
       .where('programaId', programaId)
       .where('estado', true)
       .preload('programa')
       .preload('lote')
       .orderBy('producto', 'asc')
+
+    if (loteId) consulta.where('loteId', loteId)
+    return consulta
   }
 
   async agregar(scope: AccessScope, payload: ListaMaestraPayload) {
     assertCan(scope, 'lista_maestra.crear')
     await this.assertProgramaVisible(scope, payload.programaId)
 
+    this.assertPrecio(scope, payload.valorUnitario ?? null, null)
     try {
       if (payload.loteId) await this.assertLote(payload.loteId, scope.idCformacion)
       const item = await this.upsertFila(
@@ -123,6 +127,9 @@ export default class ListaMaestraMaterialService {
     await this.assertProgramaVisible(scope, item.programaId)
 
     if (payload.loteId) await this.assertLote(payload.loteId, scope.idCformacion)
+    if (payload.valorUnitario !== undefined) {
+      this.assertPrecio(scope, payload.valorUnitario, item.valorUnitario)
+    }
 
     item.merge({
       ...(payload.codigoUnspsc !== undefined ? { codigoUnspsc: payload.codigoUnspsc } : {}),
@@ -173,6 +180,7 @@ export default class ListaMaestraMaterialService {
   ) {
     assertCan(scope, 'lista_maestra.crear')
     const programa = await this.assertProgramaVisible(scope, programaId)
+    const puedePrecio = can(scope, 'precio_lista_maestra.editar')
     const lectura = await leerListaMaestraExcel(filePath)
 
     if (
@@ -209,7 +217,9 @@ export default class ListaMaestraMaterialService {
     for (const fila of lectura.filas) {
       try {
         const loteId = await this.lotePorNombre(scope.idCformacion, fila.loteNombre)
-        items.push(await this.upsertFila(programaId, fila, scope.idUsuario, carga.id, loteId))
+        items.push(
+          await this.upsertFila(programaId, fila, scope.idUsuario, carga.id, loteId, puedePrecio)
+        )
       } catch (error) {
         errores.push(
           `Fila ${fila.fila}: ${error instanceof Error ? error.message : 'no se pudo guardar'}`
@@ -240,12 +250,23 @@ export default class ListaMaestraMaterialService {
     return ListaMaestraMaterial.query().where('id', id).preload('programa').preload('lote').firstOrFail()
   }
 
+  private assertPrecio(scope: AccessScope, entrante: number | null, anterior: number | null) {
+    const cambia = Number(entrante ?? 0) !== Number(anterior ?? 0)
+    if (!cambia) return
+    if (can(scope, 'precio_lista_maestra.editar')) return
+    throw new Exception('No tienes permiso para cambiar precios de la lista maestra', {
+      status: 403,
+      code: 'E_FORBIDDEN',
+    })
+  }
+
   private async upsertFila(
     programaId: number,
     fila: FilaListaMaestraExcel,
     usuarioId: number,
     cargaId: number | null,
-    loteId: number | null
+    loteId: number | null,
+    puedePrecio = true
   ) {
     const existing = await ListaMaestraMaterial.query()
       .where('programaId', programaId)
@@ -257,7 +278,7 @@ export default class ListaMaestraMaterialService {
       existing.merge({
         descripcionTecnica: fila.descripcionTecnica,
         unidadMedida: fila.unidadMedida,
-        valorUnitario: fila.valorUnitario,
+        valorUnitario: puedePrecio ? fila.valorUnitario : existing.valorUnitario,
         loteId,
         cantidadBase: fila.cantidadBase,
         caracter: fila.caracter,
@@ -276,7 +297,7 @@ export default class ListaMaestraMaterialService {
       producto: fila.producto,
       descripcionTecnica: fila.descripcionTecnica,
       unidadMedida: fila.unidadMedida,
-      valorUnitario: fila.valorUnitario,
+      valorUnitario: puedePrecio ? fila.valorUnitario : null,
       loteId,
       cantidadBase: fila.cantidadBase,
       caracter: fila.caracter,
@@ -323,7 +344,7 @@ export default class ListaMaestraMaterialService {
 
   private async assertProgramaVisible(scope: AccessScope, programaId: number) {
     const programa = await ProgramaFormacion.findOrFail(programaId)
-    if (scope.isAdmin || can(scope, 'proceso_compra.ver')) return programa
+    if (scope.isAdmin) return programa
 
     const assigned = await db
       .from('usuario_programa_formacion')

@@ -1,7 +1,8 @@
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
-import PresupuestoFicha from '#models/presupuesto_ficha'
+import PresupuestoAsignacion from '#models/presupuesto_asignacion'
+import PresupuestoPrograma from '#models/presupuesto_programa'
 
 export default class PresupuestoCoordinador extends BaseModel {
   static table = 'presupuesto_coordinador'
@@ -12,8 +13,8 @@ export default class PresupuestoCoordinador extends BaseModel {
   @column()
   declare anio: number
 
-  @column({ columnName: 'id_usuario' })
-  declare idUsuario: number
+  @column({ columnName: 'id_cformacion' })
+  declare idCformacion: number
 
   @column({
     consume: (value) => (value === null || value === undefined ? 0 : Number(value)),
@@ -26,6 +27,9 @@ export default class PresupuestoCoordinador extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'updated_at' })
   declare updatedAt: DateTime
 
-  @hasMany(() => PresupuestoFicha, { foreignKey: 'presupuestoId' })
-  declare fichas: HasMany<typeof PresupuestoFicha>
+  @hasMany(() => PresupuestoAsignacion, { foreignKey: 'presupuestoId' })
+  declare asignaciones: HasMany<typeof PresupuestoAsignacion>
+
+  @hasMany(() => PresupuestoPrograma, { foreignKey: 'presupuestoId' })
+  declare programas: HasMany<typeof PresupuestoPrograma>
 }

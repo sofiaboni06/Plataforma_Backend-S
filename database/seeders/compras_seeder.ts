@@ -1,23 +1,30 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import Modulo from '#models/modulo'
 import Perfil from '#models/perfil'
+import ProgramaFormacion from '#models/programa_formacion'
 import User from '#models/usuario'
 import RoleService from '#services/role_service'
+import UsuarioService from '#services/usuario_service'
 import PermissionSeeder from '#database/seeders/permission_seeder'
 
 export const COMPRAS_PROFILE_NAME = 'Compras'
 
+/**
+ * Arma y corrige la lista maestra y descarga lo ya aprobado en la vigencia.
+ * No pide materiales (`solicitud_programa.crear`) ni cambia precios
+ * (`precio_lista_maestra.editar`). Esos permisos se otorgan aparte, a este
+ * perfil o a cualquier otro.
+ */
 export const COMPRAS_PERMISSIONS = [
   'programa_formacion.ver',
+  'ficha.ver',
   'lista_maestra.ver',
   'lista_maestra.crear',
   'lista_maestra.editar',
   'lista_maestra.eliminar',
   'vigencia.ver',
-  'solicitud_programa.ver',
   'proceso_compra.ver',
   'proceso_compra.crear',
-  'proceso_compra.editar',
 ] as const
 
 const DEMO_USER = {
@@ -34,13 +41,18 @@ export default class extends BaseSeeder {
   async run() {
     await new PermissionSeeder(this.client).run()
 
+    const descripcion =
+      'Agrega materiales a la lista maestra y descarga el pedido aprobado de la vigencia. No pide ni cambia precios.'
     let perfil = await Perfil.query().where('nombre', COMPRAS_PROFILE_NAME).first()
     if (!perfil) {
       perfil = await Perfil.create({
         nombre: COMPRAS_PROFILE_NAME,
-        descripcion: 'Unifica solicitudes aprobadas y genera procesos de compra',
+        descripcion,
         estado: true,
       })
+    } else if (perfil.descripcion !== descripcion) {
+      perfil.descripcion = descripcion
+      await perfil.save()
     }
 
     const formacion = await Modulo.query().where('nombre', 'Materiales de Formación').firstOrFail()
@@ -48,14 +60,27 @@ export default class extends BaseSeeder {
     await roles.assignModules(perfil.id, [formacion.id])
     await roles.assignPermissions(perfil.id, [...COMPRAS_PERMISSIONS])
 
-    const user = await User.query().where('email', DEMO_USER.email).first()
+    let user = await User.query().where('email', DEMO_USER.email).first()
     if (!user) {
-      await User.create({ ...DEMO_USER, idPerfil: perfil.id, estado: true })
-      return
-    }
-    if (user.idPerfil !== perfil.id) {
+      user = await User.create({ ...DEMO_USER, idPerfil: perfil.id, estado: true })
+    } else if (user.idPerfil !== perfil.id) {
       user.idPerfil = perfil.id
       await user.save()
+    }
+
+    const programas = await ProgramaFormacion.query()
+      .where('estado_programa', true)
+      .whereHas('fichas', (fichas) => {
+        fichas.where('centroFormacionId', user.idCformacion).where('estado', true)
+      })
+      .orderBy('id_programa_formacion', 'asc')
+      .limit(3)
+
+    if (programas.length) {
+      await new UsuarioService().syncProgramas(
+        user.id,
+        programas.map((programa) => programa.id)
+      )
     }
   }
 }

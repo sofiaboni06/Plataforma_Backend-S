@@ -32,6 +32,7 @@ type DecisionPayload = {
   items: Array<{
     id: number
     accion: AccionDecision
+    cantidadSolicitada?: number
     cantidadAprobada?: number
     observacionCoordinador?: string | null
   }>
@@ -135,7 +136,7 @@ export default class SolicitudProgramaService {
     assertCan(scope, 'solicitud_programa.crear')
     const solicitud = await this.show(scope, id)
     if (solicitud.instructorId !== scope.idUsuario && !scope.isAdmin) {
-      throw new Exception('Solo el instructor dueño puede editar el borrador', {
+      throw new Exception('Solo quien creó la solicitud puede editar el borrador', {
         status: 403,
         code: 'E_FORBIDDEN',
       })
@@ -167,7 +168,7 @@ export default class SolicitudProgramaService {
     assertCan(scope, 'solicitud_programa.crear')
     const solicitud = await this.show(scope, id)
     if (solicitud.instructorId !== scope.idUsuario && !scope.isAdmin) {
-      throw new Exception('Solo el instructor dueño puede enviar la solicitud', {
+      throw new Exception('Solo quien creó la solicitud puede enviarla', {
         status: 403,
         code: 'E_FORBIDDEN',
       })
@@ -218,6 +219,10 @@ export default class SolicitudProgramaService {
   async decidir(scope: AccessScope, id: number, payload: DecisionPayload) {
     assertCan(scope, 'solicitud_programa.editar')
     const solicitud = await this.show(scope, id)
+    if (solicitud.estado === 'anulada') {
+      solicitud.estado = 'enviada'
+      await solicitud.save()
+    }
     if (solicitud.estado !== 'enviada' && solicitud.estado !== 'parcial') {
       throw new Exception('Solo se revisan solicitudes enviadas o parciales', {
         status: 409,
@@ -238,7 +243,6 @@ export default class SolicitudProgramaService {
     }> = []
     const rechazadosAhora: Array<{ producto: string; cantidad: number; motivo: string | null }> = []
     const tocados = new Set<number>()
-    let costoConsumo = 0
     const presupuesto = new PresupuestoFormacionService()
 
     try {
@@ -249,7 +253,14 @@ export default class SolicitudProgramaService {
 
       for (const detalle of solicitud.detalles ?? []) {
         const decision = byId.get(detalle.id)
-        if (!decision || decision.accion === 'pendiente') continue
+        if (!decision) continue
+        if (decision.cantidadSolicitada && decision.cantidadSolicitada > 0) {
+          detalle.useTransaction(trx)
+          detalle.cantidadSolicitada = decision.cantidadSolicitada
+          if (detalle.estado !== 'pendiente') detalle.estado = 'pendiente'
+          await detalle.save()
+        }
+        if (decision.accion === 'pendiente') continue
         if (detalle.estado !== 'pendiente') continue
 
         const ya = detalle.cantidadAprobada ?? 0
@@ -292,12 +303,11 @@ export default class SolicitudProgramaService {
               code: 'E_PRESUPUESTO',
             })
           }
-          costoConsumo += cantidad * Number(valor)
           await presupuesto.assertCabe({
-            idUsuario: scope.idUsuario,
+            idCformacion: scope.idCformacion,
             anio: solicitud.vigencia,
             fichaId: solicitud.fichaId,
-            costoNuevo: costoConsumo,
+            costoNuevo: cantidad * Number(valor),
             producto,
           })
         }
@@ -320,11 +330,16 @@ export default class SolicitudProgramaService {
         }
       }
 
-      if (!entregados.length && !ajustados.length && !rechazadosAhora.length) {
+      const soloCantidades = payload.items.some((item) => item.cantidadSolicitada && item.cantidadSolicitada > 0)
+      if (!entregados.length && !ajustados.length && !rechazadosAhora.length && !soloCantidades) {
         throw new Exception(
           'Selecciona qué autorizas ahora, qué dejas pendiente o qué no autorizas',
           { status: 422, code: 'E_VALIDATION_ERROR' }
         )
+      }
+      if (!entregados.length && !ajustados.length && !rechazadosAhora.length) {
+        await trx.commit()
+        return this.show(scope, id)
       }
 
       const lineas = solicitud.detalles ?? []

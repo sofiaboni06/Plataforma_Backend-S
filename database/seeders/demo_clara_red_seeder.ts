@@ -359,6 +359,35 @@ export default class extends BaseSeeder {
       })
     }
 
+    if (solicitud.estado === 'enviada') {
+      const coordinador = await User.query().where('email', COORDINADOR_EMAIL).first()
+      const cubre = coordinador
+        ? await db
+            .from('usuario_red_conocimiento')
+            .where('id_usuario', coordinador.id)
+            .where('id_red_conocimiento', input.programa.idRedConocimiento)
+            .where('estado', true)
+            .where((query) => {
+              query
+                .whereNull('id_linea_tematica')
+                .orWhere('id_linea_tematica', input.programa.idLineaTematica)
+            })
+            .first()
+        : null
+
+      if (cubre) {
+        solicitud.estado = 'aprobada'
+        solicitud.aprobadorId = coordinador!.id
+        await solicitud.save()
+        const detalles = await DetalleSolicitudPrograma.query().where('solicitudId', solicitud.id)
+        for (const detalle of detalles) {
+          detalle.estado = 'aprobado'
+          detalle.cantidadAprobada = detalle.cantidadSolicitada
+          await detalle.save()
+        }
+      }
+    }
+
     await this.avisar(solicitud.id, input)
   }
 
