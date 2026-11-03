@@ -53,4 +53,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   MAIL_PASSWORD: Env.schema.string.optional(),
   MAIL_FROM: Env.schema.string.optional(),
   MAIL_FROM_NAME: Env.schema.string.optional(),
+
+  CAPTCHA_ENABLED: Env.schema.boolean.optional(),
+  RECAPTCHA_SECRET_KEY: Env.schema.string.optional(),
 })

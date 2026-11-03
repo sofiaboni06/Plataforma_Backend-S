@@ -28,13 +28,12 @@ transmit.registerRoutes((route) => {
   route.use(middleware.auth())
   route.use(middleware.account())
 })
-
 router
   .group(() => {
     router
       .group(() => {
         router.post('signup', [controllers.NewAccount, 'store'])
-        router.post('login', [controllers.AccessTokens, 'store'])
+        router.post('login', [controllers.AccessTokens, 'store']).use(middleware.captcha())
         router.post('recover', [PasswordRecoveryController, 'request'])
         router.post('recover/verify', [PasswordRecoveryController, 'verify'])
         router.post('recover/google', [PasswordRecoveryController, 'verifyGoogle'])
