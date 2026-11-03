@@ -18,7 +18,7 @@ export const asignacionCoordinadorValidator = vine.compile(
 export const asignacionAreaValidator = vine.compile(
   vine.object({
     anio: vine.number().positive().withoutDecimals(),
-    programaId: vine.number().positive().withoutDecimals(),
+    redId: vine.number().positive().withoutDecimals(),
     monto: vine.number().min(0),
   })
 )

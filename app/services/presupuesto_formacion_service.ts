@@ -5,7 +5,8 @@ import PDFDocument from 'pdfkit'
 import Ficha from '#models/ficha'
 import LoteVigencia from '#models/lote_vigencia'
 import PresupuestoAsignacion from '#models/presupuesto_asignacion'
-import PresupuestoAsignacionArea from '#models/presupuesto_asignacion_area'
+import PresupuestoAsignacionRed from '#models/presupuesto_asignacion_red'
+import RedConocimiento from '#models/red_conocimiento'
 import PresupuestoAsignacionFicha from '#models/presupuesto_asignacion_ficha'
 import PresupuestoCoordinador from '#models/presupuesto_coordinador'
 import PresupuestoPrograma from '#models/presupuesto_programa'
@@ -166,7 +167,7 @@ export default class PresupuestoFormacionService {
     return this.vistaCoordinadores(scope.idCformacion, anio)
   }
 
-  async asignarArea(scope: AccessScope, anio: number, programaId: number, monto: number) {
+  async asignarArea(scope: AccessScope, anio: number, redId: number, monto: number) {
     assertCan(scope, 'solicitud_programa.editar')
     if (scope.asignaPresupuesto) {
       throw new Exception('El reparto por área lo hace el coordinador con su monto', {
@@ -182,11 +183,11 @@ export default class PresupuestoFormacionService {
         code: 'E_PRESUPUESTO',
       })
     }
-    await this.assertProgramaDelCoordinador(scope, programaId)
+    await this.assertRedDelCoordinador(scope, redId)
 
-    const actual = await PresupuestoAsignacionArea.query()
+    const actual = await PresupuestoAsignacionRed.query()
       .where('asignacionId', asignacion.id)
-      .where('programaId', programaId)
+      .where('redId', redId)
       .first()
     const otros = (await this.sumaAreas(asignacion.id)) - (actual ? Number(actual.monto) : 0)
     const queda = Number(asignacion.monto) - otros
@@ -196,7 +197,7 @@ export default class PresupuestoFormacionService {
         code: 'E_PRESUPUESTO',
       })
     }
-    const aprobado = await this.aprobadoPrograma(anio, programaId, scope.idCformacion)
+    const aprobado = await this.aprobadoRed(anio, redId, scope.idCformacion)
     if (monto < aprobado) {
       throw new Exception('No puedes dejar el área por debajo de lo ya aprobado', {
         status: 422,
@@ -211,9 +212,9 @@ export default class PresupuestoFormacionService {
         actual.monto = monto
         await actual.save()
       } else {
-        await PresupuestoAsignacionArea.create({
+        await PresupuestoAsignacionRed.create({
           asignacionId: asignacion.id,
-          programaId,
+          redId,
           monto,
         })
       }
@@ -429,19 +430,19 @@ export default class PresupuestoFormacionService {
   }
 
   private async filasAreas(scope: AccessScope, asignacionId: number | null) {
-    const ids = await this.idsAreasDelCoordinador(scope)
-    const programas = await ProgramaFormacion.query()
+    const ids = await this.idsRedesDelCoordinador(scope.idUsuario)
+    const redes = await RedConocimiento.query()
       .whereIn('id', ids.length ? ids : [0])
       .orderBy('nombre', 'asc')
     const montos = asignacionId
-      ? await PresupuestoAsignacionArea.query().where('asignacionId', asignacionId)
+      ? await PresupuestoAsignacionRed.query().where('asignacionId', asignacionId)
       : []
-    const porPrograma = new Map(montos.map((fila) => [fila.programaId, Number(fila.monto)]))
-    return programas.map((programa) => ({
-      id: programa.id,
-      nombre: programa.nombre,
-      codigo: programa.codigo,
-      monto: porPrograma.get(programa.id) ?? 0,
+    const porRed = new Map(montos.map((fila) => [fila.redId, Number(fila.monto)]))
+    return redes.map((red) => ({
+      id: red.id,
+      nombre: red.nombre,
+      codigo: null,
+      monto: porRed.get(red.id) ?? 0,
     }))
   }
 
@@ -549,7 +550,7 @@ export default class PresupuestoFormacionService {
   }
 
   private async sumaAreas(asignacionId: number) {
-    const filas = await PresupuestoAsignacionArea.query().where('asignacionId', asignacionId)
+    const filas = await PresupuestoAsignacionRed.query().where('asignacionId', asignacionId)
     return filas.reduce((suma, fila) => suma + Number(fila.monto), 0)
   }
 
@@ -565,22 +566,21 @@ export default class PresupuestoFormacionService {
 
   async alertas(scope: AccessScope, anio: number) {
     assertCan(scope, 'solicitud_programa.ver')
-    const ids = await this.idsAreasDelCoordinador(scope)
-    const programas = await ProgramaFormacion.query()
+    const ids = await this.idsRedesDelCoordinador(scope.idUsuario)
+    const redes = await RedConocimiento.query()
       .whereIn('id', ids.length ? ids : [0])
       .orderBy('nombre', 'asc')
     const filas = []
-    for (const programa of programas) {
-      const area = await this.areaAsignada(scope.idCformacion, anio, programa.id)
-      const asignado = area ? Number(area.monto) : 0
-      const pedido = await this.pedidoPrograma(anio, programa.id, scope.idCformacion)
+    for (const red of redes) {
+      const asignado = await this.montoRed(scope.idCformacion, anio, red.id)
+      const pedido = await this.pedidoRed(anio, red.id, scope.idCformacion)
       if (pedido <= 0) continue
       const tipo = pedido > asignado ? 'se_pasa' : pedido / (asignado || 1) >= 0.8 ? 'cerca' : null
       if (!tipo) continue
       filas.push({
-        programaId: programa.id,
-        nombre: programa.nombre,
-        codigo: programa.codigo,
+        programaId: red.id,
+        nombre: red.nombre,
+        codigo: null,
         anio,
         asignado,
         pedido,
@@ -737,7 +737,10 @@ export default class PresupuestoFormacionService {
       })
     }
 
-    const aprobado = await this.aprobadoPrograma(input.anio, ficha.programaId, input.idCformacion)
+    const redId = await this.redIdDe(ficha.programaId)
+    const aprobado = redId
+      ? await this.aprobadoRed(input.anio, redId, input.idCformacion)
+      : 0
     const queda = Number(fila.monto) - aprobado
     if (input.costoNuevo > queda) {
       throw new Exception(
@@ -770,12 +773,9 @@ export default class PresupuestoFormacionService {
         ? await this.areaAsignada(scope.idCformacion, anio, programaId)
         : null
       const asignado = area ? Number(area.monto) : 0
-      const pedido = programaId
-        ? await this.pedidoPrograma(anio, programaId, scope.idCformacion)
-        : 0
-      const aprobado = programaId
-        ? await this.aprobadoPrograma(anio, programaId, scope.idCformacion)
-        : 0
+      const redId = programaId ? await this.redIdDe(programaId) : null
+      const pedido = redId ? await this.pedidoRed(anio, redId, scope.idCformacion) : 0
+      const aprobado = redId ? await this.aprobadoRed(anio, redId, scope.idCformacion) : 0
       cortes.set(clave, {
         asignado,
         pedido,
@@ -818,10 +818,56 @@ export default class PresupuestoFormacionService {
   }
 
   private async areaAsignada(idCformacion: number, anio: number, programaId: number) {
+    const redId = await this.redIdDe(programaId)
+    if (!redId) return null
     const presupuesto = await this.presupuestoDe(idCformacion, anio)
     if (!presupuesto) return null
-    const filas = await PresupuestoAsignacionArea.query()
-      .where('programaId', programaId)
+    const filas = await PresupuestoAsignacionRed.query()
+      .where('redId', redId)
+      .whereIn(
+        'asignacionId',
+        PresupuestoAsignacion.query().where('presupuestoId', presupuesto.id).select('id')
+      )
+    if (!filas.length) return null
+    return {
+      monto: filas.reduce((suma, fila) => suma + Number(fila.monto), 0),
+    }
+  }
+
+  private async redIdDe(programaId: number) {
+    const programa = await ProgramaFormacion.find(programaId)
+    return programa?.idRedConocimiento ?? null
+  }
+
+  private async idsRedesDelCoordinador(idUsuario: number) {
+    const filas = await db
+      .from('usuario_red_conocimiento')
+      .where('id_usuario', idUsuario)
+      .where('estado', true)
+      .distinct('id_red_conocimiento')
+    return filas.map((fila) => Number(fila.id_red_conocimiento))
+  }
+
+  private async assertRedDelCoordinador(scope: AccessScope, redId: number) {
+    const ids = await this.idsRedesDelCoordinador(scope.idUsuario)
+    if (!ids.includes(redId)) {
+      throw new Exception('Esa área no está en tus redes', {
+        status: 422,
+        code: 'E_PRESUPUESTO',
+      })
+    }
+  }
+
+  private async montoRed(idCformacion: number, anio: number, redId: number) {
+    const fila = await this.areaPorRed(idCformacion, anio, redId)
+    return fila ? Number(fila.monto) : 0
+  }
+
+  private async areaPorRed(idCformacion: number, anio: number, redId: number) {
+    const presupuesto = await this.presupuestoDe(idCformacion, anio)
+    if (!presupuesto) return null
+    const filas = await PresupuestoAsignacionRed.query()
+      .where('redId', redId)
       .whereIn(
         'asignacionId',
         PresupuestoAsignacion.query().where('presupuestoId', presupuesto.id).select('id')
@@ -869,6 +915,41 @@ export default class PresupuestoFormacionService {
       .join('lista_maestra_material as l', 'l.id_lista_maestra', 'd.id_lista_maestra')
       .join('ficha as f', 'f.id_ficha', 's.id_ficha')
       .where('s.id_ficha', fichaId)
+      .where('s.vigencia', anio)
+      .where('f.centro_formacion_id', idCformacion)
+      .whereNot('s.estado', 'anulada')
+      .where('l.caracter', 'consumo')
+      .where('d.cantidad_aprobada', '>', 0)
+      .sum({ total: db.raw('d.cantidad_aprobada * l.valor_unitario') })
+      .first()
+    return Number(fila?.total ?? 0)
+  }
+
+  private async pedidoRed(anio: number, redId: number, idCformacion: number) {
+    const fila = await db
+      .from('detalle_solicitud_programa as d')
+      .join('solicitud_material_programa as s', 's.id_solicitud_programa', 'd.id_solicitud_programa')
+      .join('lista_maestra_material as l', 'l.id_lista_maestra', 'd.id_lista_maestra')
+      .join('ficha as f', 'f.id_ficha', 's.id_ficha')
+      .join('programa_formacion as p', 'p.id_programa_formacion', 's.id_programa_formacion')
+      .where('p.id_red_conocimiento', redId)
+      .where('s.vigencia', anio)
+      .where('f.centro_formacion_id', idCformacion)
+      .whereNot('s.estado', 'anulada')
+      .where('l.caracter', 'consumo')
+      .sum({ total: db.raw('d.cantidad_solicitada * COALESCE(l.valor_unitario, 0)') })
+      .first()
+    return Number(fila?.total ?? 0)
+  }
+
+  private async aprobadoRed(anio: number, redId: number, idCformacion: number) {
+    const fila = await db
+      .from('detalle_solicitud_programa as d')
+      .join('solicitud_material_programa as s', 's.id_solicitud_programa', 'd.id_solicitud_programa')
+      .join('lista_maestra_material as l', 'l.id_lista_maestra', 'd.id_lista_maestra')
+      .join('ficha as f', 'f.id_ficha', 's.id_ficha')
+      .join('programa_formacion as p', 'p.id_programa_formacion', 's.id_programa_formacion')
+      .where('p.id_red_conocimiento', redId)
       .where('s.vigencia', anio)
       .where('f.centro_formacion_id', idCformacion)
       .whereNot('s.estado', 'anulada')

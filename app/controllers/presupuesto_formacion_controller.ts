@@ -50,7 +50,7 @@ export default class PresupuestoFormacionController {
     const payload = await request.validateUsing(asignacionAreaValidator)
     const scope = await resolveScope(auth.getUserOrFail())
     return serialize(
-      await this.service.asignarArea(scope, payload.anio, payload.programaId, payload.monto)
+      await this.service.asignarArea(scope, payload.anio, payload.redId, payload.monto)
     )
   }
 
