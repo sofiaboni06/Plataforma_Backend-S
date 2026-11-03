@@ -49,4 +49,5 @@ export const middleware = router.named({
   account: () => import('#middleware/active_account_middleware'),
   admin: () => import('#middleware/admin_middleware'),
   permission: () => import('#middleware/permission_middleware'),
+  captcha: () => import('#middleware/captcha_middleware'),
 })
