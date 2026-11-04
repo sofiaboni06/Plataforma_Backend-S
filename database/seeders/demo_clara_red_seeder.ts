@@ -47,8 +47,8 @@ const MATERIALES = [
 
 /**
  * Deja el árbol que debe ver el product owner:
- * Red Informática → Línea Software → ADSO (solicitudes de Clara)
- * Red Deportes → Línea Recreación (existe, pero Clara no la cubre)
+ * Red Informática → Línea Software → ADSO
+ * Red Deportes → Línea Recreación → Entrenamiento deportivo
  */
 export default class extends BaseSeeder {
   async run() {
@@ -78,7 +78,10 @@ export default class extends BaseSeeder {
     })
 
     await this.asignarUsuario(instructor.id, [software.programa.id, deportes.programa.id])
-    await new UsuarioService().syncProgramas(coordinador.id, [software.programa.id])
+    await new UsuarioService().syncProgramas(coordinador.id, [
+      software.programa.id,
+      deportes.programa.id,
+    ])
 
     const fichaAdso1 = await this.ficha(software.programa.id, instructor.idCformacion, 'DEMO-ADSO-1')
     const fichaAdso2 = await this.ficha(software.programa.id, instructor.idCformacion, 'DEMO-ADSO-2')
@@ -134,7 +137,7 @@ export default class extends BaseSeeder {
     const adsoIds = await db
       .from('solicitud_material_programa as s')
       .join('programa_formacion as pf', 'pf.id_programa_formacion', 's.id_programa_formacion')
-      .where('pf.codigo_programa', 'DEMO-228118')
+      .whereIn('pf.codigo_programa', ['DEMO-228118', 'DEMO-626101'])
       .select('s.id_solicitud_programa')
 
     const ids = adsoIds.map((row) => Number(row.id_solicitud_programa))
