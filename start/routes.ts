@@ -507,6 +507,21 @@ router
           .use(middleware.permission('vigencia.ver'))
         router.post('/', [VigenciasController, 'store']).use(middleware.permission('vigencia.crear'))
         router
+          .get(':anio/especiales', [VigenciasController, 'especiales'])
+          .use(middleware.permission('vigencia.ver'))
+        router
+          .post(':anio/especiales', [VigenciasController, 'crearEspecial'])
+          .use(middleware.permission('vigencia.crear'))
+        router
+          .patch(':anio/especiales/:id', [VigenciasController, 'actualizarEspecial'])
+          .use(middleware.permission('vigencia.editar'))
+        router
+          .post(':anio/especiales/:id/programas', [VigenciasController, 'agregarPrograma'])
+          .use(middleware.permission('vigencia.editar'))
+        router
+          .delete(':anio/especiales/:id/programas/:programaId', [VigenciasController, 'quitarPrograma'])
+          .use(middleware.permission('vigencia.editar'))
+        router
           .put(':anio', [VigenciasController, 'update'])
           .use(middleware.permission('vigencia.editar'))
         router
@@ -554,22 +569,16 @@ router
           .use(middleware.permission('solicitud_programa.ver'))
         router
           .put('coordinadores', [PresupuestoFormacionController, 'asignarCoordinador'])
-          .use(middleware.permission('solicitud_programa.editar'))
+          .use(middleware.permission('presupuesto.editar'))
         router
           .put('areas', [PresupuestoFormacionController, 'asignarArea'])
-          .use(middleware.permission('solicitud_programa.editar'))
-        router
-          .put('fichas', [PresupuestoFormacionController, 'asignarFicha'])
           .use(middleware.permission('solicitud_programa.editar'))
         router
           .get('/', [PresupuestoFormacionController, 'resumen'])
           .use(middleware.permission('solicitud_programa.ver'))
         router
           .put('monto', [PresupuestoFormacionController, 'guardarMonto'])
-          .use(middleware.permission('solicitud_programa.editar'))
-        router
-          .put('programas', [PresupuestoFormacionController, 'repartir'])
-          .use(middleware.permission('solicitud_programa.editar'))
+          .use(middleware.permission('presupuesto.editar'))
         router
           .get('alertas', [PresupuestoFormacionController, 'alertas'])
           .use(middleware.permission('solicitud_programa.ver'))

@@ -1639,6 +1639,66 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'vigencias.vigencias.especiales': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/vigencias/:anio/especiales'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { anio: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.crear_especial': {
+    methods: ["POST"]
+    pattern: '/api/v1/vigencias/:anio/especiales'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { anio: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.actualizar_especial': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/vigencias/:anio/especiales/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { anio: ParamValue; id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.agregar_programa': {
+    methods: ["POST"]
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/programas'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { anio: ParamValue; id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.quitar_programa': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/programas/:programaId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { anio: ParamValue; id: ParamValue; programaId: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'vigencias.vigencias.update': {
     methods: ["PUT"]
     pattern: '/api/v1/vigencias/:anio'
@@ -1783,18 +1843,6 @@ export interface Registry {
       errorResponse: unknown
     }
   }
-  'presupuestoFormacion.presupuesto_formacion.asignar_ficha': {
-    methods: ["PUT"]
-    pattern: '/api/v1/presupuesto-formacion/fichas'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
   'presupuestoFormacion.presupuesto_formacion.resumen': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/presupuesto-formacion'
@@ -1810,18 +1858,6 @@ export interface Registry {
   'presupuestoFormacion.presupuesto_formacion.guardar_monto': {
     methods: ["PUT"]
     pattern: '/api/v1/presupuesto-formacion/monto'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'presupuestoFormacion.presupuesto_formacion.repartir': {
-    methods: ["PUT"]
-    pattern: '/api/v1/presupuesto-formacion/programas'
     types: {
       body: {}
       paramsTuple: []

@@ -37,6 +37,7 @@ import type UnidadMedidaTransformer from '#transformers/unidad_medida_transforme
 import type UserTransformer from '#transformers/user_transformer'
 import type UsoPresupuestalTransformer from '#transformers/uso_presupuestal_transformer'
 import type VigenciaTransformer from '#transformers/vigencia_transformer'
+import type VigenciaEspecialTransformer from '#transformers/vigencia_especial_transformer'
 
 export namespace Data {
   export type AdminUser = InferData<AdminUserTransformer>
@@ -166,5 +167,9 @@ export namespace Data {
   export type Vigencia = InferData<VigenciaTransformer>
   export namespace Vigencia {
     export type Variants = InferVariants<VigenciaTransformer>
+  }
+  export type VigenciaEspecial = InferData<VigenciaEspecialTransformer>
+  export namespace VigenciaEspecial {
+    export type Variants = InferVariants<VigenciaEspecialTransformer>
   }
 }

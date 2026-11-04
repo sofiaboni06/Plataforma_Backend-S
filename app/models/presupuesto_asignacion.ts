@@ -1,7 +1,6 @@
-import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
-import PresupuestoAsignacionFicha from '#models/presupuesto_asignacion_ficha'
 import PresupuestoCoordinador from '#models/presupuesto_coordinador'
 import User from '#models/usuario'
 
@@ -33,7 +32,4 @@ export default class PresupuestoAsignacion extends BaseModel {
 
   @belongsTo(() => User, { foreignKey: 'idUsuario' })
   declare usuario: BelongsTo<typeof User>
-
-  @hasMany(() => PresupuestoAsignacionFicha, { foreignKey: 'asignacionId' })
-  declare fichas: HasMany<typeof PresupuestoAsignacionFicha>
 }

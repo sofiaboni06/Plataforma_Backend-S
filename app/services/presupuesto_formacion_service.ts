@@ -7,22 +7,27 @@ import LoteVigencia from '#models/lote_vigencia'
 import PresupuestoAsignacion from '#models/presupuesto_asignacion'
 import PresupuestoAsignacionRed from '#models/presupuesto_asignacion_red'
 import RedConocimiento from '#models/red_conocimiento'
-import PresupuestoAsignacionFicha from '#models/presupuesto_asignacion_ficha'
 import PresupuestoCoordinador from '#models/presupuesto_coordinador'
-import PresupuestoPrograma from '#models/presupuesto_programa'
 import ProgramaFormacion from '#models/programa_formacion'
 import User from '#models/usuario'
 import Vigencia from '#models/vigencia'
 import { assertCan, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
-type Reparto = { programaId: number; monto: number }
+type FilaPrograma = {
+  nombre: string
+  monto: number
+  pedido: number
+  aprobado: number
+  disponible: number
+  sePasa: boolean
+}
 
 export default class PresupuestoFormacionService {
   async guardarMonto(scope: AccessScope, anio: number, monto: number) {
-    assertCan(scope, 'solicitud_programa.editar')
+    assertCan(scope, 'presupuesto.editar')
     if (!scope.asignaPresupuesto) {
-      throw new Exception('Solo la subdirectora asigna el presupuesto de la vigencia', {
+      throw new Exception('Solo quien tiene el permiso de presupuesto asigna el de la vigencia', {
         status: 403,
         code: 'E_FORBIDDEN',
       })
@@ -54,65 +59,10 @@ export default class PresupuestoFormacionService {
     }
   }
 
-  async repartir(scope: AccessScope, anio: number, programas: Reparto[]) {
-    assertCan(scope, 'solicitud_programa.editar')
-    const presupuesto = await this.presupuestoDe(scope.idCformacion, anio)
-    if (!presupuesto) {
-      throw new Exception('La subdirectora aún no asignó el monto del centro en esta vigencia', {
-        status: 422,
-        code: 'E_PRESUPUESTO',
-      })
-    }
-
-    const unicas = new Map<number, number>()
-    for (const fila of programas) unicas.set(fila.programaId, fila.monto)
-    const total = [...unicas.values()].reduce((suma, valor) => suma + valor, 0)
-    if (total > Number(presupuesto.monto)) {
-      throw new Exception('La suma de las áreas supera el monto de la vigencia', {
-        status: 422,
-        code: 'E_PRESUPUESTO',
-      })
-    }
-
-    for (const [programaId, monto] of unicas) {
-      await this.assertProgramaDelCoordinador(scope, programaId)
-      const aprobado = await this.aprobadoPrograma(anio, programaId, scope.idCformacion)
-      if (monto < aprobado) {
-        throw new Exception('No puedes dejar un área por debajo de lo ya aprobado', {
-          status: 422,
-          code: 'E_PRESUPUESTO',
-        })
-      }
-    }
-
-    const trx = await db.transaction()
-    try {
-      await PresupuestoPrograma.query({ client: trx })
-        .where('presupuestoId', presupuesto.id)
-        .delete()
-      if (unicas.size) {
-        await PresupuestoPrograma.createMany(
-          [...unicas.entries()].map(([programaId, monto]) => ({
-            presupuestoId: presupuesto.id,
-            programaId,
-            monto,
-          })),
-          { client: trx }
-        )
-      }
-      await trx.commit()
-    } catch (error) {
-      await trx.rollback()
-      rethrowDatabaseError(error, 'No se pudo repartir el presupuesto')
-    }
-
-    return this.resumen(scope, anio)
-  }
-
   async asignarCoordinador(scope: AccessScope, anio: number, idUsuario: number, monto: number) {
-    assertCan(scope, 'solicitud_programa.editar')
+    assertCan(scope, 'presupuesto.editar')
     if (!scope.asignaPresupuesto) {
-      throw new Exception('Solo la subdirectora reparte el presupuesto entre coordinadores', {
+      throw new Exception('Solo quien tiene el permiso de presupuesto reparte entre coordinadores', {
         status: 403,
         code: 'E_FORBIDDEN',
       })
@@ -225,57 +175,6 @@ export default class PresupuestoFormacionService {
     return this.vistaAreas(scope, anio)
   }
 
-  async asignarFicha(scope: AccessScope, anio: number, fichaId: number, monto: number) {
-    assertCan(scope, 'solicitud_programa.editar')
-    if (scope.asignaPresupuesto) {
-      throw new Exception('El reparto por ficha lo hace el coordinador con su monto', {
-        status: 403,
-        code: 'E_FORBIDDEN',
-      })
-    }
-    await this.assertVigencia(anio)
-    const asignacion = await this.asignacionDe(scope.idCformacion, scope.idUsuario, anio)
-    if (!asignacion) {
-      throw new Exception('La subdirectora aún no te asignó monto en esta vigencia', {
-        status: 422,
-        code: 'E_PRESUPUESTO',
-      })
-    }
-    await this.assertFichaDelCoordinador(scope, fichaId)
-
-    const actual = await PresupuestoAsignacionFicha.query()
-      .where('asignacionId', asignacion.id)
-      .where('fichaId', fichaId)
-      .first()
-    const otros = (await this.sumaFichas(asignacion.id)) - (actual ? Number(actual.monto) : 0)
-    const queda = Number(asignacion.monto) - otros
-    if (monto > queda) {
-      throw new Exception(`Supera lo que te queda. Quedan ${queda}.`, {
-        status: 422,
-        code: 'E_PRESUPUESTO',
-      })
-    }
-
-    try {
-      if (monto === 0) {
-        if (actual) await actual.delete()
-      } else if (actual) {
-        actual.monto = monto
-        await actual.save()
-      } else {
-        await PresupuestoAsignacionFicha.create({
-          asignacionId: asignacion.id,
-          fichaId,
-          monto,
-        })
-      }
-    } catch (error) {
-      rethrowDatabaseError(error, 'No se pudo asignar el presupuesto a la ficha')
-    }
-
-    return this.vistaFichas(scope, anio)
-  }
-
   async resumen(scope: AccessScope, anio: number) {
     assertCan(scope, 'solicitud_programa.ver')
     if (!scope.asignaPresupuesto) return this.resumenCoordinador(scope, anio)
@@ -285,34 +184,9 @@ export default class PresupuestoFormacionService {
 
   private async resumenDe(idCformacion: number, anio: number) {
     const presupuesto = await this.presupuestoDe(idCformacion, anio)
-    const asignaciones = presupuesto
-      ? await PresupuestoPrograma.query()
-          .where('presupuestoId', presupuesto.id)
-          .preload('programa')
-      : []
-
-    const programas = []
-    for (const fila of asignaciones) {
-      const pedido = await this.pedidoPrograma(anio, fila.programaId, idCformacion)
-      const aprobado = await this.aprobadoPrograma(anio, fila.programaId, idCformacion)
-      const monto = Number(fila.monto)
-      programas.push({
-        programaId: fila.programaId,
-        codigo: fila.programa?.codigo ?? null,
-        nombre: fila.programa?.nombre ?? String(fila.programaId),
-        monto,
-        pedido,
-        aprobado,
-        disponible: monto - pedido,
-        sePasa: pedido > monto,
-      })
-    }
-
     const monto = presupuesto ? Number(presupuesto.monto) : 0
     const coordinadores = await this.filasCoordinadores(idCformacion, presupuesto?.id ?? null)
     const repartido = coordinadores.reduce((suma, fila) => suma + fila.monto, 0)
-    const pedido = programas.reduce((suma, fila) => suma + fila.pedido, 0)
-    const aprobado = programas.reduce((suma, fila) => suma + fila.aprobado, 0)
     const porLote = await this.gastoPorLote(idCformacion, anio)
 
     return {
@@ -321,11 +195,11 @@ export default class PresupuestoFormacionService {
       monto,
       repartido,
       sinRepartir: monto - repartido,
-      pedido,
-      aprobado,
-      disponible: monto - pedido,
-      sePasa: pedido > monto,
-      programas,
+      pedido: 0,
+      aprobado: 0,
+      disponible: monto,
+      sePasa: false,
+      programas: [] as FilaPrograma[],
       coordinadores,
       areas: [],
       fichas: [],
@@ -407,7 +281,7 @@ export default class PresupuestoFormacionService {
       aprobado: 0,
       disponible: vista.sinRepartir,
       sePasa: vista.sinRepartir < 0,
-      programas: [],
+      programas: [] as FilaPrograma[],
       coordinadores: [],
       areas: vista.areas,
       fichas: [],
@@ -446,85 +320,6 @@ export default class PresupuestoFormacionService {
     }))
   }
 
-  private async vistaFichas(scope: AccessScope, anio: number) {
-    const asignacion = await this.asignacionDe(scope.idCformacion, scope.idUsuario, anio)
-    const monto = asignacion ? Number(asignacion.monto) : 0
-    const fichas = await this.filasFichas(scope, asignacion?.id ?? null)
-    const repartido = fichas.reduce((suma, fila) => suma + fila.monto, 0)
-    return {
-      anio,
-      monto,
-      repartido,
-      sinRepartir: monto - repartido,
-      fichas,
-    }
-  }
-
-  private async filasFichas(scope: AccessScope, asignacionId: number | null) {
-    const fichas = await Ficha.query()
-      .where('centroFormacionId', scope.idCformacion)
-      .where('estado', true)
-      .whereIn('programaId', this.programasDelCoordinador(scope.idUsuario))
-      .preload('programa')
-      .orderBy('numeroFicha', 'asc')
-    const montos = asignacionId
-      ? await PresupuestoAsignacionFicha.query().where('asignacionId', asignacionId)
-      : []
-    const porFicha = new Map(montos.map((fila) => [fila.fichaId, Number(fila.monto)]))
-    return fichas.map((ficha) => ({
-      id: ficha.id,
-      numeroFicha: ficha.numeroFicha,
-      programa: ficha.programa?.nombre ?? '',
-      monto: porFicha.get(ficha.id) ?? 0,
-    }))
-  }
-
-  private async idsAreasDelCoordinador(scope: AccessScope) {
-    const alcance = await db
-      .from('usuario_red_conocimiento')
-      .where('id_usuario', scope.idUsuario)
-      .where('estado', true)
-      .select('id_red_conocimiento', 'id_linea_tematica')
-
-    if (alcance.length) {
-      const query = ProgramaFormacion.query()
-        .where('estado', true)
-        .whereHas('fichas', (fichas) => {
-          fichas.where('centroFormacionId', scope.idCformacion).where('estado', true)
-        })
-      query.where((grupo) => {
-        for (const fila of alcance) {
-          grupo.orWhere((row) => {
-            row.where('id_red_conocimiento', Number(fila.id_red_conocimiento))
-            if (fila.id_linea_tematica !== null && fila.id_linea_tematica !== undefined) {
-              row.where('id_linea_tematica', Number(fila.id_linea_tematica))
-            }
-          })
-        }
-      })
-      const programas = await query
-      return programas.map((programa) => programa.id)
-    }
-
-    const rows = await db
-      .from('usuario_programa_formacion as upf')
-      .join('ficha as f', 'f.programa_id', 'upf.id_programa_formacion')
-      .where('upf.id_usuario', scope.idUsuario)
-      .where('upf.estado', true)
-      .where('f.centro_formacion_id', scope.idCformacion)
-      .where('f.estado', true)
-      .distinct('upf.id_programa_formacion')
-    return rows.map((row) => Number(row.id_programa_formacion))
-  }
-
-  private programasDelCoordinador(idUsuario: number) {
-    return db
-      .from('usuario_programa_formacion')
-      .select('id_programa_formacion')
-      .where('id_usuario', idUsuario)
-      .where('estado', true)
-  }
-
   private async asignacionDe(idCformacion: number, idUsuario: number, anio: number) {
     const presupuesto = await this.presupuestoDe(idCformacion, anio)
     if (!presupuesto) return null
@@ -534,28 +329,8 @@ export default class PresupuestoFormacionService {
       .first()
   }
 
-  private async assertFichaDelCoordinador(scope: AccessScope, fichaId: number) {
-    const ficha = await Ficha.query()
-      .where('id', fichaId)
-      .where('centroFormacionId', scope.idCformacion)
-      .where('estado', true)
-      .whereIn('programaId', this.programasDelCoordinador(scope.idUsuario))
-      .first()
-    if (!ficha) {
-      throw new Exception('Esa ficha no está en tus programas', {
-        status: 422,
-        code: 'E_PRESUPUESTO',
-      })
-    }
-  }
-
   private async sumaAreas(asignacionId: number) {
     const filas = await PresupuestoAsignacionRed.query().where('asignacionId', asignacionId)
-    return filas.reduce((suma, fila) => suma + Number(fila.monto), 0)
-  }
-
-  private async sumaFichas(asignacionId: number) {
-    const filas = await PresupuestoAsignacionFicha.query().where('asignacionId', asignacionId)
     return filas.reduce((suma, fila) => suma + Number(fila.monto), 0)
   }
 
@@ -729,6 +504,19 @@ export default class PresupuestoFormacionService {
       })
     }
 
+    const especial = await this.especialDePrograma(input.idCformacion, input.anio, ficha.programaId)
+    if (especial) {
+      const aprobado = await this.aprobadoEspecial(especial.id)
+      const queda = Number(especial.monto) - aprobado
+      if (input.costoNuevo > queda) {
+        throw new Exception(
+          `La vigencia especial se pasa del monto con ${input.producto}. Quedan ${queda}.`,
+          { status: 422, code: 'E_PRESUPUESTO' }
+        )
+      }
+      return
+    }
+
     const fila = await this.areaAsignada(input.idCformacion, input.anio, ficha.programaId)
     if (!fila) {
       throw new Exception('Asigna presupuesto a esta área antes de aprobar consumo', {
@@ -769,6 +557,21 @@ export default class PresupuestoFormacionService {
         .where('centroFormacionId', scope.idCformacion)
         .first()
       const programaId = ficha?.programaId
+      const especial = programaId
+        ? await this.especialDePrograma(scope.idCformacion, anio, programaId)
+        : null
+      if (especial) {
+        const aprobado = await this.aprobadoEspecial(especial.id)
+        const pedido = await this.pedidoEspecial(especial.id)
+        cortes.set(clave, {
+          asignado: Number(especial.monto),
+          pedido,
+          aprobado,
+          queda: Number(especial.monto) - pedido,
+          sePasa: pedido > Number(especial.monto),
+        })
+        continue
+      }
       const area = programaId
         ? await this.areaAsignada(scope.idCformacion, anio, programaId)
         : null
@@ -798,22 +601,6 @@ export default class PresupuestoFormacionService {
     const vigencia = await Vigencia.find(anio)
     if (!vigencia) {
       throw new Exception('La vigencia no existe', { status: 404, code: 'E_ROW_NOT_FOUND' })
-    }
-  }
-
-  private async assertProgramaDelCoordinador(scope: AccessScope, programaId: number) {
-    const programa = await ProgramaFormacion.query()
-      .where('id', programaId)
-      .where('estado_programa', true)
-      .whereHas('fichas', (fichas) => {
-        fichas.where('centroFormacionId', scope.idCformacion).where('estado', true)
-      })
-      .first()
-    if (!programa) {
-      throw new Exception('Esa área no tiene fichas activas en tu centro', {
-        status: 422,
-        code: 'E_PRESUPUESTO',
-      })
     }
   }
 
@@ -878,53 +665,6 @@ export default class PresupuestoFormacionService {
     }
   }
 
-  private async fichaAsignada(
-    idCformacion: number,
-    idUsuario: number,
-    anio: number,
-    fichaId: number
-  ) {
-    const asignacion = await this.asignacionDe(idCformacion, idUsuario, anio)
-    if (!asignacion) return null
-    return PresupuestoAsignacionFicha.query()
-      .where('asignacionId', asignacion.id)
-      .where('fichaId', fichaId)
-      .first()
-  }
-
-  private async pedidoFicha(anio: number, fichaId: number, idCformacion: number) {
-    const fila = await db
-      .from('detalle_solicitud_programa as d')
-      .join('solicitud_material_programa as s', 's.id_solicitud_programa', 'd.id_solicitud_programa')
-      .join('lista_maestra_material as l', 'l.id_lista_maestra', 'd.id_lista_maestra')
-      .join('ficha as f', 'f.id_ficha', 's.id_ficha')
-      .where('s.id_ficha', fichaId)
-      .where('s.vigencia', anio)
-      .where('f.centro_formacion_id', idCformacion)
-      .whereNot('s.estado', 'anulada')
-      .where('l.caracter', 'consumo')
-      .sum({ total: db.raw('d.cantidad_solicitada * COALESCE(l.valor_unitario, 0)') })
-      .first()
-    return Number(fila?.total ?? 0)
-  }
-
-  private async aprobadoFicha(anio: number, fichaId: number, idCformacion: number) {
-    const fila = await db
-      .from('detalle_solicitud_programa as d')
-      .join('solicitud_material_programa as s', 's.id_solicitud_programa', 'd.id_solicitud_programa')
-      .join('lista_maestra_material as l', 'l.id_lista_maestra', 'd.id_lista_maestra')
-      .join('ficha as f', 'f.id_ficha', 's.id_ficha')
-      .where('s.id_ficha', fichaId)
-      .where('s.vigencia', anio)
-      .where('f.centro_formacion_id', idCformacion)
-      .whereNot('s.estado', 'anulada')
-      .where('l.caracter', 'consumo')
-      .where('d.cantidad_aprobada', '>', 0)
-      .sum({ total: db.raw('d.cantidad_aprobada * l.valor_unitario') })
-      .first()
-    return Number(fila?.total ?? 0)
-  }
-
   private async pedidoRed(anio: number, redId: number, idCformacion: number) {
     const fila = await db
       .from('detalle_solicitud_programa as d')
@@ -937,6 +677,7 @@ export default class PresupuestoFormacionService {
       .where('f.centro_formacion_id', idCformacion)
       .whereNot('s.estado', 'anulada')
       .where('l.caracter', 'consumo')
+      .whereRaw(this.fueraDeVigenciaEspecial())
       .sum({ total: db.raw('d.cantidad_solicitada * COALESCE(l.valor_unitario, 0)') })
       .first()
     return Number(fila?.total ?? 0)
@@ -955,41 +696,69 @@ export default class PresupuestoFormacionService {
       .whereNot('s.estado', 'anulada')
       .where('l.caracter', 'consumo')
       .where('d.cantidad_aprobada', '>', 0)
+      .whereRaw(this.fueraDeVigenciaEspecial())
       .sum({ total: db.raw('d.cantidad_aprobada * l.valor_unitario') })
       .first()
     return Number(fila?.total ?? 0)
   }
 
-  private async pedidoPrograma(anio: number, programaId: number, idCformacion: number) {
-    const fila = await db
-      .from('detalle_solicitud_programa as d')
-      .join('solicitud_material_programa as s', 's.id_solicitud_programa', 'd.id_solicitud_programa')
-      .join('lista_maestra_material as l', 'l.id_lista_maestra', 'd.id_lista_maestra')
-      .join('ficha as f', 'f.id_ficha', 's.id_ficha')
-      .where('s.id_programa_formacion', programaId)
-      .where('s.vigencia', anio)
-      .where('f.centro_formacion_id', idCformacion)
-      .whereNot('s.estado', 'anulada')
-      .where('l.caracter', 'consumo')
-      .sum({ total: db.raw('d.cantidad_solicitada * COALESCE(l.valor_unitario, 0)') })
-      .first()
-    return Number(fila?.total ?? 0)
+  private fueraDeVigenciaEspecial() {
+    return `NOT EXISTS (
+      SELECT 1
+      FROM vigencia_especial_programa ep
+      JOIN vigencia_especial ve ON ve.id_vigencia_especial = ep.id_vigencia_especial
+      WHERE ep.id_programa_formacion = s.id_programa_formacion
+        AND ve.anio = s.vigencia
+        AND ve.id_cformacion = f.centro_formacion_id
+        AND ve.activa = TRUE
+    )`
   }
 
-  private async aprobadoPrograma(anio: number, programaId: number, idCformacion: number) {
+  private async especialDePrograma(idCformacion: number, anio: number, programaId: number) {
     const fila = await db
+      .from('vigencia_especial as ve')
+      .join(
+        'vigencia_especial_programa as ep',
+        'ep.id_vigencia_especial',
+        've.id_vigencia_especial'
+      )
+      .where('ve.anio', anio)
+      .where('ve.id_cformacion', idCformacion)
+      .where('ve.activa', true)
+      .where('ep.id_programa_formacion', programaId)
+      .select('ve.id_vigencia_especial as id', 've.monto')
+      .first()
+    if (!fila) return null
+    return { id: Number(fila.id), monto: Number(fila.monto) }
+  }
+
+  private async aprobadoEspecial(vigenciaEspecialId: number) {
+    return this.gastoEspecial(vigenciaEspecialId, 'd.cantidad_aprobada * l.valor_unitario', true)
+  }
+
+  private async pedidoEspecial(vigenciaEspecialId: number) {
+    return this.gastoEspecial(
+      vigenciaEspecialId,
+      'd.cantidad_solicitada * COALESCE(l.valor_unitario, 0)',
+      false
+    )
+  }
+
+  private async gastoEspecial(vigenciaEspecialId: number, expresion: string, soloAprobado: boolean) {
+    const consulta = db
       .from('detalle_solicitud_programa as d')
       .join('solicitud_material_programa as s', 's.id_solicitud_programa', 'd.id_solicitud_programa')
       .join('lista_maestra_material as l', 'l.id_lista_maestra', 'd.id_lista_maestra')
-      .join('ficha as f', 'f.id_ficha', 's.id_ficha')
-      .where('s.id_programa_formacion', programaId)
-      .where('s.vigencia', anio)
-      .where('f.centro_formacion_id', idCformacion)
+      .join(
+        'vigencia_especial_programa as ep',
+        'ep.id_programa_formacion',
+        's.id_programa_formacion'
+      )
+      .where('ep.id_vigencia_especial', vigenciaEspecialId)
       .whereNot('s.estado', 'anulada')
       .where('l.caracter', 'consumo')
-      .where('d.cantidad_aprobada', '>', 0)
-      .sum({ total: db.raw('d.cantidad_aprobada * l.valor_unitario') })
-      .first()
+    if (soloAprobado) consulta.where('d.cantidad_aprobada', '>', 0)
+    const fila = await consulta.sum({ total: db.raw(expresion) }).first()
     return Number(fila?.total ?? 0)
   }
 

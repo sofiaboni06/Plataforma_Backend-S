@@ -822,6 +822,36 @@ const routes = {
     tokens: [{"old":"/api/v1/vigencias","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias","type":0,"val":"vigencias","end":""}],
     types: placeholder as Registry['vigencias.vigencias.store']['types'],
   },
+  'vigencias.vigencias.especiales': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/vigencias/:anio/especiales',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales","type":0,"val":"especiales","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.especiales']['types'],
+  },
+  'vigencias.vigencias.crear_especial': {
+    methods: ["POST"],
+    pattern: '/api/v1/vigencias/:anio/especiales',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales","type":0,"val":"especiales","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.crear_especial']['types'],
+  },
+  'vigencias.vigencias.actualizar_especial': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/vigencias/:anio/especiales/:id',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales/:id","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id","type":0,"val":"especiales","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.actualizar_especial']['types'],
+  },
+  'vigencias.vigencias.agregar_programa': {
+    methods: ["POST"],
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/programas',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales/:id/programas","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas","type":0,"val":"especiales","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas","type":1,"val":"id","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas","type":0,"val":"programas","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.agregar_programa']['types'],
+  },
+  'vigencias.vigencias.quitar_programa': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/programas/:programaId',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales/:id/programas/:programaId","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas/:programaId","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas/:programaId","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas/:programaId","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas/:programaId","type":0,"val":"especiales","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas/:programaId","type":1,"val":"id","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas/:programaId","type":0,"val":"programas","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/programas/:programaId","type":1,"val":"programaId","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.quitar_programa']['types'],
+  },
   'vigencias.vigencias.update': {
     methods: ["PUT"],
     pattern: '/api/v1/vigencias/:anio',
@@ -894,12 +924,6 @@ const routes = {
     tokens: [{"old":"/api/v1/presupuesto-formacion/areas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/areas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/areas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/areas","type":0,"val":"areas","end":""}],
     types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.asignar_area']['types'],
   },
-  'presupuestoFormacion.presupuesto_formacion.asignar_ficha': {
-    methods: ["PUT"],
-    pattern: '/api/v1/presupuesto-formacion/fichas',
-    tokens: [{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/fichas","type":0,"val":"fichas","end":""}],
-    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.asignar_ficha']['types'],
-  },
   'presupuestoFormacion.presupuesto_formacion.resumen': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/presupuesto-formacion',
@@ -911,12 +935,6 @@ const routes = {
     pattern: '/api/v1/presupuesto-formacion/monto',
     tokens: [{"old":"/api/v1/presupuesto-formacion/monto","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/monto","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/monto","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/monto","type":0,"val":"monto","end":""}],
     types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.guardar_monto']['types'],
-  },
-  'presupuestoFormacion.presupuesto_formacion.repartir': {
-    methods: ["PUT"],
-    pattern: '/api/v1/presupuesto-formacion/programas',
-    tokens: [{"old":"/api/v1/presupuesto-formacion/programas","type":0,"val":"api","end":""},{"old":"/api/v1/presupuesto-formacion/programas","type":0,"val":"v1","end":""},{"old":"/api/v1/presupuesto-formacion/programas","type":0,"val":"presupuesto-formacion","end":""},{"old":"/api/v1/presupuesto-formacion/programas","type":0,"val":"programas","end":""}],
-    types: placeholder as Registry['presupuestoFormacion.presupuesto_formacion.repartir']['types'],
   },
   'presupuestoFormacion.presupuesto_formacion.alertas': {
     methods: ["GET","HEAD"],

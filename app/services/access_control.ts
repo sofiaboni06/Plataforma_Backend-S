@@ -62,7 +62,9 @@ async function loadScope(user: User): Promise<AccessScope> {
   return {
     idUsuario: account.id,
     isAdmin: perfil === ADMIN_PROFILE_NAME,
-    asignaPresupuesto: perfil === ADMIN_PROFILE_NAME || /^subdirector/i.test(perfil),
+    asignaPresupuesto:
+      perfil !== ADMIN_PROFILE_NAME &&
+      account.perfil?.permisos.some((permiso) => permiso.code === 'presupuesto.editar') === true,
     idCformacion: account.idCformacion,
     bodegaIds: account.bodegas.map((bodega) => bodega.id),
     permissions: new Set(account.perfil?.permisos.map((permiso) => permiso.code) ?? []),

@@ -23,26 +23,6 @@ export const asignacionAreaValidator = vine.compile(
   })
 )
 
-export const asignacionFichaValidator = vine.compile(
-  vine.object({
-    anio: vine.number().positive().withoutDecimals(),
-    fichaId: vine.number().positive().withoutDecimals(),
-    monto: vine.number().min(0),
-  })
-)
-
-export const repartoPresupuestoValidator = vine.compile(
-  vine.object({
-    anio: vine.number().positive().withoutDecimals(),
-    programas: vine.array(
-      vine.object({
-        programaId: vine.number().positive().withoutDecimals(),
-        monto: vine.number().min(0),
-      })
-    ),
-  })
-)
-
 export const lotePresupuestoValidator = vine.compile(
   vine.object({
     anio: vine.number().positive().withoutDecimals(),

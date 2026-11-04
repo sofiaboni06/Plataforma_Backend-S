@@ -151,6 +151,11 @@ export const PERMISSION_RESOURCES = {
     label: 'Procesos de compra',
     actions: ['ver', 'crear', 'editar', 'eliminar'],
   },
+  presupuesto: {
+    module: 'Materiales de Formación',
+    label: 'Presupuesto del centro',
+    actions: ['ver', 'editar'],
+  },
 } as const
 
 type PermissionResources = typeof PERMISSION_RESOURCES

@@ -5,10 +5,8 @@ import { parseOptionalPositiveInt } from '#services/query_params'
 import {
   asignacionCoordinadorValidator,
   asignacionAreaValidator,
-  asignacionFichaValidator,
   lotePresupuestoValidator,
   montoPresupuestoValidator,
-  repartoPresupuestoValidator,
 } from '#validators/presupuesto_formacion'
 
 export default class PresupuestoFormacionController {
@@ -24,12 +22,6 @@ export default class PresupuestoFormacionController {
     const payload = await request.validateUsing(montoPresupuestoValidator)
     const scope = await resolveScope(auth.getUserOrFail())
     return serialize(await this.service.guardarMonto(scope, payload.anio, payload.monto))
-  }
-
-  async repartir({ auth, request, serialize }: HttpContext) {
-    const payload = await request.validateUsing(repartoPresupuestoValidator)
-    const scope = await resolveScope(auth.getUserOrFail())
-    return serialize(await this.service.repartir(scope, payload.anio, payload.programas))
   }
 
   async coordinadores({ auth, request, serialize }: HttpContext) {
@@ -51,14 +43,6 @@ export default class PresupuestoFormacionController {
     const scope = await resolveScope(auth.getUserOrFail())
     return serialize(
       await this.service.asignarArea(scope, payload.anio, payload.redId, payload.monto)
-    )
-  }
-
-  async asignarFicha({ auth, request, serialize }: HttpContext) {
-    const payload = await request.validateUsing(asignacionFichaValidator)
-    const scope = await resolveScope(auth.getUserOrFail())
-    return serialize(
-      await this.service.asignarFicha(scope, payload.anio, payload.fichaId, payload.monto)
     )
   }
 

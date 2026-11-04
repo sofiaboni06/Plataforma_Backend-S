@@ -140,6 +140,11 @@ export type ScannedRoutes = {
     'vigencias.vigencias.index': { paramsTuple?: []; params?: {} }
     'vigencias.vigencias.activa': { paramsTuple?: []; params?: {} }
     'vigencias.vigencias.store': { paramsTuple?: []; params?: {} }
+    'vigencias.vigencias.especiales': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
+    'vigencias.vigencias.crear_especial': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
+    'vigencias.vigencias.actualizar_especial': { paramsTuple: [ParamValue,ParamValue]; params: {'anio': ParamValue,'id': ParamValue} }
+    'vigencias.vigencias.agregar_programa': { paramsTuple: [ParamValue,ParamValue]; params: {'anio': ParamValue,'id': ParamValue} }
+    'vigencias.vigencias.quitar_programa': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'anio': ParamValue,'id': ParamValue,'programaId': ParamValue} }
     'vigencias.vigencias.update': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
     'vigencias.vigencias.destroy': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
     'solicitudesPrograma.solicitudes_programa.index': { paramsTuple?: []; params?: {} }
@@ -152,10 +157,8 @@ export type ScannedRoutes = {
     'presupuestoFormacion.presupuesto_formacion.coordinadores': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.asignar_coordinador': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.asignar_area': { paramsTuple?: []; params?: {} }
-    'presupuestoFormacion.presupuesto_formacion.asignar_ficha': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.resumen': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.guardar_monto': { paramsTuple?: []; params?: {} }
-    'presupuestoFormacion.presupuesto_formacion.repartir': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.alertas': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.lotes': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.crear_lote': { paramsTuple?: []; params?: {} }
@@ -254,6 +257,7 @@ export type ScannedRoutes = {
     'listasMaestrasMaterial.listas_maestras_material.plantilla': { paramsTuple?: []; params?: {} }
     'vigencias.vigencias.index': { paramsTuple?: []; params?: {} }
     'vigencias.vigencias.activa': { paramsTuple?: []; params?: {} }
+    'vigencias.vigencias.especiales': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
     'solicitudesPrograma.solicitudes_programa.index': { paramsTuple?: []; params?: {} }
     'solicitudesPrograma.solicitudes_programa.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presupuestoFormacion.presupuesto_formacion.coordinadores': { paramsTuple?: []; params?: {} }
@@ -339,6 +343,7 @@ export type ScannedRoutes = {
     'listasMaestrasMaterial.listas_maestras_material.plantilla': { paramsTuple?: []; params?: {} }
     'vigencias.vigencias.index': { paramsTuple?: []; params?: {} }
     'vigencias.vigencias.activa': { paramsTuple?: []; params?: {} }
+    'vigencias.vigencias.especiales': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
     'solicitudesPrograma.solicitudes_programa.index': { paramsTuple?: []; params?: {} }
     'solicitudesPrograma.solicitudes_programa.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presupuestoFormacion.presupuesto_formacion.coordinadores': { paramsTuple?: []; params?: {} }
@@ -402,6 +407,8 @@ export type ScannedRoutes = {
     'listasMaestrasMaterial.listas_maestras_material.crear': { paramsTuple?: []; params?: {} }
     'listasMaestrasMaterial.listas_maestras_material.importar': { paramsTuple?: []; params?: {} }
     'vigencias.vigencias.store': { paramsTuple?: []; params?: {} }
+    'vigencias.vigencias.crear_especial': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
+    'vigencias.vigencias.agregar_programa': { paramsTuple: [ParamValue,ParamValue]; params: {'anio': ParamValue,'id': ParamValue} }
     'solicitudesPrograma.solicitudes_programa.store': { paramsTuple?: []; params?: {} }
     'solicitudesPrograma.solicitudes_programa.enviar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesPrograma.solicitudes_programa.decidir': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -432,6 +439,7 @@ export type ScannedRoutes = {
     'lineasTematicas.lineas_tematicas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'listasMaestrasMaterial.listas_maestras_material.eliminar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'vigencias.vigencias.quitar_programa': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'anio': ParamValue,'id': ParamValue,'programaId': ParamValue} }
     'vigencias.vigencias.destroy': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
     'solicitudesPrograma.solicitudes_programa.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -460,6 +468,7 @@ export type ScannedRoutes = {
     'lineasTematicas.lineas_tematicas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'programasFormacion.programas_formacion.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'listasMaestrasMaterial.listas_maestras_material.actualizar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'vigencias.vigencias.actualizar_especial': { paramsTuple: [ParamValue,ParamValue]; params: {'anio': ParamValue,'id': ParamValue} }
     'solicitudesPrograma.solicitudes_programa.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'fichas.fichas.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'obras.obras.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -478,9 +487,7 @@ export type ScannedRoutes = {
     'vigencias.vigencias.update': { paramsTuple: [ParamValue]; params: {'anio': ParamValue} }
     'presupuestoFormacion.presupuesto_formacion.asignar_coordinador': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.asignar_area': { paramsTuple?: []; params?: {} }
-    'presupuestoFormacion.presupuesto_formacion.asignar_ficha': { paramsTuple?: []; params?: {} }
     'presupuestoFormacion.presupuesto_formacion.guardar_monto': { paramsTuple?: []; params?: {} }
-    'presupuestoFormacion.presupuesto_formacion.repartir': { paramsTuple?: []; params?: {} }
   }
 }
 declare module '@adonisjs/core/types/http' {

@@ -2,7 +2,6 @@ import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import PresupuestoAsignacion from '#models/presupuesto_asignacion'
-import PresupuestoPrograma from '#models/presupuesto_programa'
 
 export default class PresupuestoCoordinador extends BaseModel {
   static table = 'presupuesto_coordinador'
@@ -29,7 +28,4 @@ export default class PresupuestoCoordinador extends BaseModel {
 
   @hasMany(() => PresupuestoAsignacion, { foreignKey: 'presupuestoId' })
   declare asignaciones: HasMany<typeof PresupuestoAsignacion>
-
-  @hasMany(() => PresupuestoPrograma, { foreignKey: 'presupuestoId' })
-  declare programas: HasMany<typeof PresupuestoPrograma>
 }
