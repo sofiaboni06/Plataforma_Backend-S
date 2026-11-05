@@ -311,6 +311,8 @@ export default class UsuarioService {
     const vistos = new Set<string>()
 
     for (const programa of programas) {
+      if (programa.idRedConocimiento == null || programa.idLineaTematica == null) continue
+
       const clave = `${programa.idRedConocimiento}:${programa.idLineaTematica}`
       if (vistos.has(clave)) continue
       vistos.add(clave)

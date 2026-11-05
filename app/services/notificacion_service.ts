@@ -1066,10 +1066,13 @@ export default class NotificacionService {
     const programa = await ProgramaFormacion.query({ client: trx })
       .where('id', input.programaId)
       .first()
-    if (!programa) return []
+    if (!programa || programa.idRedConocimiento == null) return []
 
     const instructor = await User.query({ client: trx }).where('id', input.instructorId).first()
     if (!instructor) return []
+
+    const redId = programa.idRedConocimiento
+    const lineaId = programa.idLineaTematica
 
     const query = db
       .from('usuario as u')
@@ -1092,12 +1095,11 @@ export default class NotificacionService {
         red
           .from('usuario_red_conocimiento as ur')
           .whereRaw('ur.id_usuario = u.id_usuario')
-          .where('ur.id_red_conocimiento', programa.idRedConocimiento)
+          .where('ur.id_red_conocimiento', redId)
           .where('ur.estado', true)
           .where((linea) => {
-            linea
-              .whereNull('ur.id_linea_tematica')
-              .orWhere('ur.id_linea_tematica', programa.idLineaTematica)
+            linea.whereNull('ur.id_linea_tematica')
+            if (lineaId != null) linea.orWhere('ur.id_linea_tematica', lineaId)
           })
       })
       .distinct('u.id_usuario')

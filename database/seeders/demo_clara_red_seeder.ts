@@ -368,19 +368,21 @@ export default class extends BaseSeeder {
 
     if (solicitud.estado === 'enviada') {
       const coordinador = await User.query().where('email', COORDINADOR_EMAIL).first()
-      const cubre = coordinador
-        ? await db
-            .from('usuario_red_conocimiento')
-            .where('id_usuario', coordinador.id)
-            .where('id_red_conocimiento', input.programa.idRedConocimiento)
-            .where('estado', true)
-            .where((query) => {
-              query
-                .whereNull('id_linea_tematica')
-                .orWhere('id_linea_tematica', input.programa.idLineaTematica)
-            })
-            .first()
-        : null
+      const redId = input.programa.idRedConocimiento
+      const lineaId = input.programa.idLineaTematica
+      const cubre =
+        coordinador && redId != null
+          ? await db
+              .from('usuario_red_conocimiento')
+              .where('id_usuario', coordinador.id)
+              .where('id_red_conocimiento', redId)
+              .where('estado', true)
+              .where((query) => {
+                query.whereNull('id_linea_tematica')
+                if (lineaId != null) query.orWhere('id_linea_tematica', lineaId)
+              })
+              .first()
+          : null
 
       if (cubre) {
         solicitud.estado = 'aprobada'

@@ -180,7 +180,7 @@ export default class ProcesoCompraService {
     libro.creator = 'Plataforma de formación'
     const hoja = libro.addWorksheet('Pedido aprobado', {
       views: [{ state: 'frozen', ySplit: 5 }],
-      pageSetup: { orientation: 'landscape', fitToPage: true, fitToWidth: 1, paperSize: 1 },
+      pageSetup: { orientation: 'landscape', fitToPage: true, fitToWidth: 1 },
     })
 
     const columnas = [

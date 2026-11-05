@@ -10,7 +10,8 @@ async function login(client: ApiClient, email: string) {
 async function anioActivo(client: ApiClient, token: string) {
   const respuesta = await client.get('/api/v1/vigencias/activa').bearerToken(token)
   respuesta.assertStatus(200)
-  const anio = respuesta.body().data?.anio as number | undefined
+  const cuerpo = respuesta.body() as { data?: { anio?: number } | null }
+  const anio = cuerpo.data?.anio
   if (!anio) {
     throw new Error('No hay vigencia activa para el test de vigencia especial')
   }

@@ -39,7 +39,8 @@ test.group('Fotografía de perfil', () => {
       .file('fotografia', png, { filename: 'foto.png', contentType: 'image/png' })
 
     subida.assertStatus(200)
-    assert.equal(subida.body().data.avatarUrl, '/api/v1/account/profile/foto')
+    const subidaBody = subida.body() as { data: { avatarUrl: string } }
+    assert.equal(subidaBody.data.avatarUrl, '/api/v1/account/profile/foto')
     await accessFile(join(fotosDir, 'perfiles', String(id), 'foto.webp'), constants.R_OK)
 
     const imagen = await client.get('/api/v1/account/profile/foto').bearerToken(token)
@@ -57,7 +58,8 @@ test.group('Fotografía de perfil', () => {
 
     const quitada = await client.delete('/api/v1/account/profile/foto').bearerToken(token)
     quitada.assertStatus(200)
-    assert.equal(quitada.body().data.avatarUrl, '')
+    const quitadaBody = quitada.body() as { data: { avatarUrl: string } }
+    assert.equal(quitadaBody.data.avatarUrl, '')
 
     const otraVez = await client.get('/api/v1/account/profile/foto').bearerToken(token)
     otraVez.assertStatus(404)

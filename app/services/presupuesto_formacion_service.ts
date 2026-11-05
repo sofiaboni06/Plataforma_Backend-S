@@ -11,7 +11,7 @@ import PresupuestoCoordinador from '#models/presupuesto_coordinador'
 import ProgramaFormacion from '#models/programa_formacion'
 import User from '#models/usuario'
 import Vigencia from '#models/vigencia'
-import { assertCan, can, type AccessScope } from '#services/access_control'
+import { assertCan, assertCanAny, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type FilaPrograma = {
