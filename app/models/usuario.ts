@@ -52,7 +52,7 @@ export default class User extends AuthFinder(BaseModel) {
   @column({ columnName: 'correo' })
   declare email: string
 
-  @column({ columnName: 'url_fotografia' })
+  @column({ columnName: 'fotografia' })
   declare urlFotografia: string | null
 
   @column({ serializeAs: null })
@@ -60,9 +60,6 @@ export default class User extends AuthFinder(BaseModel) {
 
   @column()
   declare estado: boolean
-  
-  @column()
-  declare fotografia: string | null
 
   @column({ columnName: 'google_authenticator_enabled' })
   declare googleAuthenticatorEnabled: boolean
