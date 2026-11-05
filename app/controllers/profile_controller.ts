@@ -31,15 +31,46 @@ export default class ProfileController {
     const account = auth.getUserOrFail()
     const payload = await request.validateUsing(changePasswordValidator)
     await new ProfileService().changePassword(account, payload.currentPassword, payload.password)
+    return { message: 'Contraseña actualizada' }
+  }
 
-    return {
-      message: 'Contraseña actualizada',
-    }
+  async storeFoto({ auth, request, serialize }: HttpContext) {
+    const account = auth.getUserOrFail()
+    const { fotografia } = await request.validateUsing(fotoPerfilValidator)
+    
+    const photoService = new FotoPerfilService()
+    // Usamos 'guardar' y le pasamos el ID
+    const rutaGuardada = await photoService.guardar(account.id, fotografia) 
+    
+    // IMPORTANTE: Guardamos la ruta en la base de datos usando el modelo Usuario
+    account.urlFotografia = rutaGuardada
+    await account.save()
+    
+    const user = await new ProfileService().load(account)
+    return serialize(await this.present(account, user))
+  }
+
+  async destroyFoto({ auth, serialize }: HttpContext) {
+    const account = auth.getUserOrFail()
+    
+    const photoService = new FotoPerfilService()
+    // Usamos 'eliminar' y le pasamos el ID
+    await photoService.eliminar(account.id)
+    
+    // Borramos la ruta en la base de datos
+    account.urlFotografia = null
+    await account.save()
+    
+    const user = await new ProfileService().load(account)
+    return serialize(await this.present(account, user))
   }
 
   async showFoto({ auth, response }: HttpContext) {
-    const account = await new ProfileService().load(auth.getUserOrFail())
-    const archivo = await new FotoPerfilService().rutaEnDisco(account.id, account.urlFotografia)
+    const account = auth.getUserOrFail()
+    const photoService = new FotoPerfilService()
+    
+    // Usamos 'rutaEnDisco' pasándole el ID y la ruta que hay en la BD
+    const archivo = await photoService.rutaEnDisco(account.id, account.urlFotografia)
 
     if (!archivo) {
       throw new Exception('El perfil no tiene fotografía', {
@@ -50,28 +81,6 @@ export default class ProfileController {
 
     response.header('Cache-Control', 'private, max-age=86400')
     response.attachment(archivo, 'foto.webp', 'inline', true)
-  }
-
-  async storeFoto({ auth, request, serialize }: HttpContext) {
-    const account = auth.getUserOrFail()
-    const { fotografia } = await request.validateUsing(fotoPerfilValidator)
-    const ruta = await new FotoPerfilService().guardar(account.id, fotografia)
-    const user = await new ProfileService().asignarFotografia(account, ruta)
-
-    return serialize(await this.present(account, user))
-  }
-
-  async destroyFoto({ auth, serialize }: HttpContext) {
-    const account = auth.getUserOrFail()
-    const fotos = new FotoPerfilService()
-    const actual = await new ProfileService().load(account)
-    const user = await new ProfileService().asignarFotografia(account, null)
-
-    if (actual.urlFotografia === fotos.rutaDe(account.id)) {
-      await fotos.eliminar(account.id)
-    }
-
-    return serialize(await this.present(account, user))
   }
 
   async programas({ auth, serialize }: HttpContext) {
