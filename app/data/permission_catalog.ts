@@ -141,6 +141,11 @@ export const PERMISSION_RESOURCES = {
     label: 'Vigencias',
     actions: ['ver', 'crear', 'editar', 'eliminar'],
   },
+  vigencia_especial: {
+    module: 'Materiales de Formación',
+    label: 'Vigencia especial de programas nuevos',
+    actions: ['ver', 'editar'],
+  },
   solicitud_programa: {
     module: 'Materiales de Formación',
     label: 'Solicitudes de materiales de formación',
@@ -155,6 +160,16 @@ export const PERMISSION_RESOURCES = {
     module: 'Materiales de Formación',
     label: 'Presupuesto del centro',
     actions: ['ver', 'editar'],
+  },
+  lote: {
+    module: 'Materiales de Formación',
+    label: 'Lotes de la vigencia',
+    actions: ['ver', 'crear'],
+  },
+  alerta_formacion: {
+    module: 'Materiales de Formación',
+    label: 'Alertas de materiales de formación',
+    actions: ['ver'],
   },
 } as const
 
@@ -171,6 +186,7 @@ export const CENTER_ONLY_RESOURCES: ReadonlySet<PermissionResource> = new Set([
   'solicitud_material',
   'solicitud_equipo',
   'alerta',
+  'vigencia_especial',
 ])
 
 export function isCenterOnlyCode(code: string) {

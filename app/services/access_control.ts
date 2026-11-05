@@ -101,6 +101,15 @@ export function assertCan(scope: AccessScope, code: PermissionCode) {
   }
 }
 
+export function assertCanAny(scope: AccessScope, codes: PermissionCode[]) {
+  if (!codes.some((code) => can(scope, code))) {
+    throw new Exception('No tienes permiso para realizar esta acción', {
+      status: 403,
+      code: 'E_FORBIDDEN',
+    })
+  }
+}
+
 export function forbidden(message: string) {
   return new Exception(message, { status: 403, code: 'E_FORBIDDEN' })
 }

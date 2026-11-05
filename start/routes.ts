@@ -507,20 +507,32 @@ router
           .use(middleware.permission('vigencia.ver'))
         router.post('/', [VigenciasController, 'store']).use(middleware.permission('vigencia.crear'))
         router
+          .get(':anio/especiales/para-repartir', [VigenciasController, 'paraRepartir'])
+          .use(middleware.permission('solicitud_programa.ver'))
+        router
+          .get(':anio/especiales/:id/reparto', [VigenciasController, 'reparto'])
+          .use(middleware.permission('vigencia_especial.ver'))
+        router
+          .put(':anio/especiales/:id/coordinadores', [VigenciasController, 'asignarCoordinadorEspecial'])
+          .use(middleware.permission('vigencia_especial.editar'))
+        router
+          .put(':anio/especiales/:id/areas', [VigenciasController, 'asignarAreaEspecial'])
+          .use(middleware.permission('solicitud_programa.editar'))
+        router
           .get(':anio/especiales', [VigenciasController, 'especiales'])
-          .use(middleware.permission('vigencia.ver'))
+          .use(middleware.permission('vigencia_especial.ver'))
         router
           .post(':anio/especiales', [VigenciasController, 'crearEspecial'])
-          .use(middleware.permission('vigencia.crear'))
+          .use(middleware.permission('vigencia_especial.editar'))
         router
           .patch(':anio/especiales/:id', [VigenciasController, 'actualizarEspecial'])
-          .use(middleware.permission('vigencia.editar'))
+          .use(middleware.permission('vigencia_especial.editar'))
         router
           .post(':anio/especiales/:id/programas', [VigenciasController, 'agregarPrograma'])
-          .use(middleware.permission('vigencia.editar'))
+          .use(middleware.permission('vigencia_especial.editar'))
         router
           .delete(':anio/especiales/:id/programas/:programaId', [VigenciasController, 'quitarPrograma'])
-          .use(middleware.permission('vigencia.editar'))
+          .use(middleware.permission('vigencia_especial.editar'))
         router
           .put(':anio', [VigenciasController, 'update'])
           .use(middleware.permission('vigencia.editar'))
@@ -575,19 +587,23 @@ router
           .use(middleware.permission('solicitud_programa.editar'))
         router
           .get('/', [PresupuestoFormacionController, 'resumen'])
-          .use(middleware.permission('solicitud_programa.ver'))
+          .use(
+            middleware.permission(['solicitud_programa.ver', 'presupuesto.ver', 'lote.ver'])
+          )
         router
           .put('monto', [PresupuestoFormacionController, 'guardarMonto'])
           .use(middleware.permission('presupuesto.editar'))
         router
           .get('alertas', [PresupuestoFormacionController, 'alertas'])
-          .use(middleware.permission('solicitud_programa.ver'))
+          .use(middleware.permission('alerta_formacion.ver'))
         router
           .get('lotes', [PresupuestoFormacionController, 'lotes'])
-          .use(middleware.permission('solicitud_programa.ver'))
+          .use(
+            middleware.permission(['lote.ver', 'lista_maestra.ver', 'solicitud_programa.ver'])
+          )
         router
           .post('lotes', [PresupuestoFormacionController, 'crearLote'])
-          .use(middleware.permission('solicitud_programa.editar'))
+          .use(middleware.permission('lote.crear'))
         router
           .get('descargar', [PresupuestoFormacionController, 'descargar'])
           .use(middleware.permission('solicitud_programa.ver'))

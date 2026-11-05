@@ -13,6 +13,7 @@ export type TipoNotificacion =
   | 'devolucion_equipo'
   | 'solicitud_programa'
   | 'decision_solicitud_programa'
+  | 'vigencia_especial'
 
 export type RecursoNotificacion =
   | 'alerta'

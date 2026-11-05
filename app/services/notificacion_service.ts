@@ -812,6 +812,49 @@ export default class NotificacionService {
     void this.enviarPorCorreo(filas)
   }
 
+  async avisarVigenciaEspecial(input: {
+    idCformacion: number
+    idVigenciaEspecial: number
+    nombre: string
+    monto: number
+    idUsuario?: number
+  }) {
+    const consulta = User.query()
+      .where('estado', true)
+      .where('idCformacion', input.idCformacion)
+      .whereHas('perfil', (perfil) => {
+        perfil.where('estado', true).whereILike('nombre', 'coordinador%')
+      })
+    if (input.idUsuario) consulta.where('id', input.idUsuario)
+    const coordinadores = await consulta
+
+    if (!coordinadores.length) return []
+
+    const monto = input.monto.toLocaleString('es-CO')
+    const trx = await db.transaction()
+    try {
+      const filas = await this.crear(
+        trx,
+        coordinadores.map((usuario) => ({
+          idUsuario: usuario.id,
+          tipo: 'vigencia_especial' as const,
+          titulo: 'Vigencia especial para repartir',
+          mensaje: input.idUsuario
+            ? `Te asignaron ${monto} en la vigencia especial «${input.nombre}». Distribúyelo en tus áreas.`
+            : `Hay una vigencia especial «${input.nombre}» con monto ${monto}. La subdirectora reparte y ustedes lo distribuyen en las áreas.`,
+          recurso: null,
+          idReferencia: input.idVigenciaEspecial,
+        }))
+      )
+      await trx.commit()
+      this.emitir(filas)
+      return filas
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+  }
+
   private async enviarPorCorreo(filas: Notificacion[]) {
     if (!filas.length || !correoConfigurado()) return
 

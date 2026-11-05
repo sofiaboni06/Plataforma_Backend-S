@@ -108,7 +108,11 @@ export default class ProgramaFormacionService {
     const idRedConocimiento = payload.idRedConocimiento ?? programa.idRedConocimiento
     const idLineaTematica = payload.idLineaTematica ?? programa.idLineaTematica
 
-    if (payload.idRedConocimiento !== undefined || payload.idLineaTematica !== undefined) {
+    if (
+      (payload.idRedConocimiento !== undefined || payload.idLineaTematica !== undefined) &&
+      idRedConocimiento != null &&
+      idLineaTematica != null
+    ) {
       await this.assertRedLinea(idRedConocimiento, idLineaTematica)
     }
 

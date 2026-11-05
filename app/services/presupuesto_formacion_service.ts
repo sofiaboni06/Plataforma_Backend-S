@@ -11,7 +11,7 @@ import PresupuestoCoordinador from '#models/presupuesto_coordinador'
 import ProgramaFormacion from '#models/programa_formacion'
 import User from '#models/usuario'
 import Vigencia from '#models/vigencia'
-import { assertCan, type AccessScope } from '#services/access_control'
+import { assertCan, can, type AccessScope } from '#services/access_control'
 import { rethrowDatabaseError } from '#services/database_error'
 
 type FilaPrograma = {
@@ -176,7 +176,7 @@ export default class PresupuestoFormacionService {
   }
 
   async resumen(scope: AccessScope, anio: number) {
-    assertCan(scope, 'solicitud_programa.ver')
+    assertCanAny(scope, ['solicitud_programa.ver', 'presupuesto.ver', 'lote.ver'])
     if (!scope.asignaPresupuesto) return this.resumenCoordinador(scope, anio)
     const corte = await this.resumenDe(scope.idCformacion, anio)
     return { ...corte, areas: corte.areas ?? [], fichas: [] }
@@ -340,8 +340,10 @@ export default class PresupuestoFormacionService {
   }
 
   async alertas(scope: AccessScope, anio: number) {
-    assertCan(scope, 'solicitud_programa.ver')
-    const ids = await this.idsRedesDelCoordinador(scope.idUsuario)
+    assertCan(scope, 'alerta_formacion.ver')
+    const ids = scope.asignaPresupuesto
+      ? await this.idsRedesConPedido(scope.idCformacion, anio)
+      : await this.idsRedesDelCoordinador(scope.idUsuario)
     const redes = await RedConocimiento.query()
       .whereIn('id', ids.length ? ids : [0])
       .orderBy('nombre', 'asc')
@@ -366,7 +368,7 @@ export default class PresupuestoFormacionService {
   }
 
   async lotes(scope: AccessScope, anio: number) {
-    assertCan(scope, 'solicitud_programa.ver')
+    assertCanAny(scope, ['lote.ver', 'lista_maestra.ver', 'solicitud_programa.ver'])
     return LoteVigencia.query()
       .where('anio', anio)
       .where('idCformacion', scope.idCformacion)
@@ -375,7 +377,7 @@ export default class PresupuestoFormacionService {
   }
 
   async crearLote(scope: AccessScope, anio: number, nombre: string) {
-    assertCan(scope, 'solicitud_programa.editar')
+    assertCan(scope, 'lote.crear')
     await this.assertVigencia(anio)
     try {
       return await LoteVigencia.create({
@@ -506,8 +508,16 @@ export default class PresupuestoFormacionService {
 
     const especial = await this.especialDePrograma(input.idCformacion, input.anio, ficha.programaId)
     if (especial) {
-      const aprobado = await this.aprobadoEspecial(especial.id)
-      const queda = Number(especial.monto) - aprobado
+      const redId = await this.redIdDe(ficha.programaId)
+      const asignado = redId ? await this.montoRedEspecial(especial.id, redId) : 0
+      if (!asignado) {
+        throw new Exception('El coordinador todavía no distribuye esta área en la vigencia especial', {
+          status: 422,
+          code: 'E_PRESUPUESTO',
+        })
+      }
+      const aprobado = redId ? await this.aprobadoEspecialRed(especial.id, redId) : 0
+      const queda = asignado - aprobado
       if (input.costoNuevo > queda) {
         throw new Exception(
           `La vigencia especial se pasa del monto con ${input.producto}. Quedan ${queda}.`,
@@ -635,6 +645,18 @@ export default class PresupuestoFormacionService {
     return filas.map((fila) => Number(fila.id_red_conocimiento))
   }
 
+  private async idsRedesConPedido(idCformacion: number, anio: number) {
+    const filas = await db
+      .from('solicitud_material_programa as s')
+      .join('ficha as f', 'f.id_ficha', 's.id_ficha')
+      .join('programa_formacion as p', 'p.id_programa_formacion', 's.id_programa_formacion')
+      .where('s.vigencia', anio)
+      .where('f.centro_formacion_id', idCformacion)
+      .whereNot('s.estado', 'anulada')
+      .distinct('p.id_red_conocimiento')
+    return filas.map((fila) => Number(fila.id_red_conocimiento))
+  }
+
   private async assertRedDelCoordinador(scope: AccessScope, redId: number) {
     const ids = await this.idsRedesDelCoordinador(scope.idUsuario)
     if (!ids.includes(redId)) {
@@ -730,6 +752,42 @@ export default class PresupuestoFormacionService {
       .first()
     if (!fila) return null
     return { id: Number(fila.id), monto: Number(fila.monto) }
+  }
+
+  private async montoRedEspecial(vigenciaEspecialId: number, redId: number) {
+    const fila = await db
+      .from('vigencia_especial_asignacion as a')
+      .join(
+        'vigencia_especial_asignacion_red as ar',
+        'ar.id_asignacion_especial',
+        'a.id_asignacion_especial'
+      )
+      .where('a.id_vigencia_especial', vigenciaEspecialId)
+      .where('ar.id_red_conocimiento', redId)
+      .sum({ total: 'ar.monto' })
+      .first()
+    return Number(fila?.total ?? 0)
+  }
+
+  private async aprobadoEspecialRed(vigenciaEspecialId: number, redId: number) {
+    const fila = await db
+      .from('detalle_solicitud_programa as d')
+      .join('solicitud_material_programa as s', 's.id_solicitud_programa', 'd.id_solicitud_programa')
+      .join('lista_maestra_material as l', 'l.id_lista_maestra', 'd.id_lista_maestra')
+      .join('programa_formacion as p', 'p.id_programa_formacion', 's.id_programa_formacion')
+      .join(
+        'vigencia_especial_programa as ep',
+        'ep.id_programa_formacion',
+        's.id_programa_formacion'
+      )
+      .where('ep.id_vigencia_especial', vigenciaEspecialId)
+      .where('p.id_red_conocimiento', redId)
+      .whereNot('s.estado', 'anulada')
+      .where('l.caracter', 'consumo')
+      .where('d.cantidad_aprobada', '>', 0)
+      .sum({ total: db.raw('d.cantidad_aprobada * l.valor_unitario') })
+      .first()
+    return Number(fila?.total ?? 0)
   }
 
   private async aprobadoEspecial(vigenciaEspecialId: number) {

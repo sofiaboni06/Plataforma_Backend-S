@@ -26,6 +26,7 @@ const MATERIALES = [
     unidadMedida: 'Unidad',
     cantidadBase: 2,
     caracter: 'devolutivo' as const,
+    valorUnitario: 180000,
   },
   {
     codigoUnspsc: '44121701',
@@ -34,6 +35,7 @@ const MATERIALES = [
     unidadMedida: 'Caja',
     cantidadBase: 4,
     caracter: 'consumo' as const,
+    valorUnitario: 25000,
   },
   {
     codigoUnspsc: '14111514',
@@ -42,6 +44,7 @@ const MATERIALES = [
     unidadMedida: 'Resma',
     cantidadBase: 10,
     caracter: 'consumo' as const,
+    valorUnitario: 18000,
   },
 ]
 
@@ -299,6 +302,7 @@ export default class extends BaseSeeder {
           unidadMedida: material.unidadMedida,
           cantidadBase: material.cantidadBase,
           caracter: material.caracter,
+          valorUnitario: material.valorUnitario,
           estado: true,
         })
         await existing.save()

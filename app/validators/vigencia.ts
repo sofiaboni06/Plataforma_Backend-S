@@ -36,6 +36,14 @@ export const programaVigenciaEspecialValidator = vine.compile(
   })
 )
 
+export const repartoVigenciaEspecialValidator = vine.compile(
+  vine.object({
+    idUsuario: vine.number().withoutDecimals().positive().optional(),
+    redId: vine.number().withoutDecimals().positive().optional(),
+    monto: vine.number().min(0),
+  })
+)
+
 export const updateVigenciaValidator = vine.compile(
   vine.object({
     activa: vine.boolean().optional(),

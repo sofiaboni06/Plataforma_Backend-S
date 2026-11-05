@@ -1,4 +1,5 @@
-import { assertCan, resolveScope } from '#services/access_control'
+import { can, resolveScope } from '#services/access_control'
+import { Exception } from '@adonisjs/core/exceptions'
 import type { PermissionCode } from '#data/permission_catalog'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
@@ -11,15 +12,20 @@ import type { NextFn } from '@adonisjs/core/types/http'
  * inventory permissions that are not center-only.
  */
 export default class PermissionMiddleware {
-  async handle(ctx: HttpContext, next: NextFn, code: PermissionCode) {
+  async handle(ctx: HttpContext, next: NextFn, code: PermissionCode | PermissionCode[]) {
     const scope = await resolveScope(ctx.auth.getUserOrFail())
-    
-    // Los administradores pueden generar reportes automáticamente
-    if (scope.isAdmin && code === 'reporte.generar') {
+    const codes = Array.isArray(code) ? code : [code]
+
+    if (scope.isAdmin && codes.includes('reporte.generar')) {
       return next()
     }
-    
-    assertCan(scope, code)
+
+    if (!codes.some((item) => can(scope, item))) {
+      throw new Exception('No tienes permiso para realizar esta acción', {
+        status: 403,
+        code: 'E_FORBIDDEN',
+      })
+    }
 
     return next()
   }

@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { Exception } from '@adonisjs/core/exceptions'
 import type { DateTime } from 'luxon'
 import { resolveScope } from '#services/access_control'
 import VigenciaService from '#services/vigencia_service'
@@ -8,6 +9,7 @@ import {
   createVigenciaEspecialValidator,
   createVigenciaValidator,
   programaVigenciaEspecialValidator,
+  repartoVigenciaEspecialValidator,
   updateVigenciaEspecialValidator,
   updateVigenciaValidator,
 } from '#validators/vigencia'
@@ -109,6 +111,50 @@ export default class VigenciasController {
         Number(params.anio),
         Number(params.id),
         Number(params.programaId)
+      )
+    )
+  }
+
+  async paraRepartir({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(await this.service.paraRepartir(scope, Number(params.anio)))
+  }
+
+  async reparto({ auth, params, serialize }: HttpContext) {
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(await this.service.reparto(scope, Number(params.anio), Number(params.id)))
+  }
+
+  async asignarCoordinadorEspecial({ auth, params, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(repartoVigenciaEspecialValidator)
+    if (!payload.idUsuario) {
+      throw new Exception('idUsuario es requerido', { status: 422, code: 'E_VALIDATION_ERROR' })
+    }
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(
+      await this.service.asignarCoordinadorEspecial(
+        scope,
+        Number(params.anio),
+        Number(params.id),
+        payload.idUsuario,
+        payload.monto
+      )
+    )
+  }
+
+  async asignarAreaEspecial({ auth, params, request, serialize }: HttpContext) {
+    const payload = await request.validateUsing(repartoVigenciaEspecialValidator)
+    if (!payload.redId) {
+      throw new Exception('redId es requerido', { status: 422, code: 'E_VALIDATION_ERROR' })
+    }
+    const scope = await resolveScope(auth.getUserOrFail())
+    return serialize(
+      await this.service.asignarAreaEspecial(
+        scope,
+        Number(params.anio),
+        Number(params.id),
+        payload.redId,
+        payload.monto
       )
     )
   }

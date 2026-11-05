@@ -15,6 +15,11 @@ const PERMISOS = [
   'solicitud_programa.editar',
   'presupuesto.ver',
   'presupuesto.editar',
+  'vigencia_especial.ver',
+  'vigencia_especial.editar',
+  'lote.ver',
+  'lote.crear',
+  'alerta_formacion.ver',
 ] as const
 
 export default class extends BaseSeeder {

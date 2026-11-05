@@ -23,6 +23,9 @@ export const COORDINADOR_PERMISSIONS = [
   'vigencia.editar',
   'solicitud_programa.ver',
   'solicitud_programa.editar',
+  'lote.ver',
+  'lote.crear',
+  'alerta_formacion.ver',
 ] as const
 
 const DEMO_USER = {

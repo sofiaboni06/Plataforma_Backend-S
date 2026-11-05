@@ -1639,6 +1639,54 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'vigencias.vigencias.para_repartir': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/vigencias/:anio/especiales/para-repartir'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { anio: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.reparto': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/reparto'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { anio: ParamValue; id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.asignar_coordinador_especial': {
+    methods: ["PUT"]
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/coordinadores'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { anio: ParamValue; id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'vigencias.vigencias.asignar_area_especial': {
+    methods: ["PUT"]
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/areas'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { anio: ParamValue; id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'vigencias.vigencias.especiales': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/vigencias/:anio/especiales'

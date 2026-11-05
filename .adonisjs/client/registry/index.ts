@@ -822,6 +822,30 @@ const routes = {
     tokens: [{"old":"/api/v1/vigencias","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias","type":0,"val":"vigencias","end":""}],
     types: placeholder as Registry['vigencias.vigencias.store']['types'],
   },
+  'vigencias.vigencias.para_repartir': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/vigencias/:anio/especiales/para-repartir',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales/para-repartir","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales/para-repartir","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales/para-repartir","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales/para-repartir","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales/para-repartir","type":0,"val":"especiales","end":""},{"old":"/api/v1/vigencias/:anio/especiales/para-repartir","type":0,"val":"para-repartir","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.para_repartir']['types'],
+  },
+  'vigencias.vigencias.reparto': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/reparto',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales/:id/reparto","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/reparto","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/reparto","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/reparto","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/reparto","type":0,"val":"especiales","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/reparto","type":1,"val":"id","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/reparto","type":0,"val":"reparto","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.reparto']['types'],
+  },
+  'vigencias.vigencias.asignar_coordinador_especial': {
+    methods: ["PUT"],
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/coordinadores',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales/:id/coordinadores","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/coordinadores","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/coordinadores","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/coordinadores","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/coordinadores","type":0,"val":"especiales","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/coordinadores","type":1,"val":"id","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/coordinadores","type":0,"val":"coordinadores","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.asignar_coordinador_especial']['types'],
+  },
+  'vigencias.vigencias.asignar_area_especial': {
+    methods: ["PUT"],
+    pattern: '/api/v1/vigencias/:anio/especiales/:id/areas',
+    tokens: [{"old":"/api/v1/vigencias/:anio/especiales/:id/areas","type":0,"val":"api","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/areas","type":0,"val":"v1","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/areas","type":0,"val":"vigencias","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/areas","type":1,"val":"anio","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/areas","type":0,"val":"especiales","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/areas","type":1,"val":"id","end":""},{"old":"/api/v1/vigencias/:anio/especiales/:id/areas","type":0,"val":"areas","end":""}],
+    types: placeholder as Registry['vigencias.vigencias.asignar_area_especial']['types'],
+  },
   'vigencias.vigencias.especiales': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/vigencias/:anio/especiales',

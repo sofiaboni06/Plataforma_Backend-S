@@ -47,7 +47,7 @@ export default class SolicitudProgramaService {
 
     if (!scope.isAdmin) {
       this.restringirAlCentro(query, scope)
-      if (!can(scope, 'proceso_compra.ver')) {
+      if (!can(scope, 'proceso_compra.ver') && !scope.asignaPresupuesto) {
         if (can(scope, 'solicitud_programa.editar') && !can(scope, 'solicitud_programa.crear')) {
           const programaIds = await this.programaIdsDelCoordinador(scope)
           query.whereIn('programaId', programaIds.length ? programaIds : [0])
@@ -547,7 +547,7 @@ export default class SolicitudProgramaService {
         'Esta solicitud no pertenece a tu centro de formación'
       )
     }
-    if (scope.isAdmin || can(scope, 'proceso_compra.ver')) return
+    if (scope.isAdmin || can(scope, 'proceso_compra.ver') || scope.asignaPresupuesto) return
     if (solicitud.instructorId === scope.idUsuario) return
     if (can(scope, 'solicitud_programa.editar')) {
       const cubiertos = await this.programaIdsDelCoordinador(scope)

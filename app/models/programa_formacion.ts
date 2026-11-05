@@ -13,13 +13,13 @@ export default class ProgramaFormacion extends BaseModel {
   declare id: number
 
   @column({ columnName: 'id_red_conocimiento' })
-  declare idRedConocimiento: number
+  declare idRedConocimiento: number | null
 
   @column({ columnName: 'id_linea_tematica' })
-  declare idLineaTematica: number
+  declare idLineaTematica: number | null
 
   @column({ columnName: 'id_nivel_programa' })
-  declare idNivelPrograma: number
+  declare idNivelPrograma: number | null
 
   @column({ columnName: 'codigo_programa' })
   declare codigo: string
