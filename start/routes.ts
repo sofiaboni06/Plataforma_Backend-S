@@ -14,6 +14,7 @@ import VigenciasController from '#controllers/vigencias_controller'
 import PresupuestoFormacionController from '#controllers/presupuesto_formacion_controller'
 import SolicitudesProgramaController from '#controllers/solicitudes_programa_controller'
 import ProcesosCompraController from '#controllers/procesos_compra_controller'
+import AssistantSourcesController from '#controllers/assistant_sources_controller'
 import transmit from '@adonisjs/transmit/services/main'
 
 router.get('/', () => {
@@ -759,6 +760,27 @@ router
       })
       .prefix('reportes')
       .as('reportes')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.get('/', [AssistantSourcesController, 'index'])
+        router.post('buscar', [AssistantSourcesController, 'buscar'])
+        router.post('/', [AssistantSourcesController, 'store']).use(middleware.admin())
+        router.patch(':id', [AssistantSourcesController, 'update']).use(middleware.admin())
+      })
+      .prefix('assistant/sources')
+      .as('assistantSources')
+      .use(middleware.auth())
+      .use(middleware.account())
+
+    router
+      .group(() => {
+        router.post('preguntar', [AssistantSourcesController, 'preguntar'])
+      })
+      .prefix('assistant')
+      .as('assistant')
       .use(middleware.auth())
       .use(middleware.account())
   })

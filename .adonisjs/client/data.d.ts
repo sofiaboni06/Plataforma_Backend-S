@@ -7,6 +7,7 @@
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type AdminUserTransformer from '#transformers/admin_user_transformer'
 import type AlertaTransformer from '#transformers/alerta_transformer'
+import type AssistantSourceTransformer from '#transformers/assistant_source_transformer'
 import type BodegaTransformer from '#transformers/bodega_transformer'
 import type CategoriaTransformer from '#transformers/categoria_transformer'
 import type ClasificacionElementoTransformer from '#transformers/clasificacion_elemento_transformer'
@@ -47,6 +48,10 @@ export namespace Data {
   export type Alerta = InferData<AlertaTransformer>
   export namespace Alerta {
     export type Variants = InferVariants<AlertaTransformer>
+  }
+  export type AssistantSource = InferData<AssistantSourceTransformer>
+  export namespace AssistantSource {
+    export type Variants = InferVariants<AssistantSourceTransformer>
   }
   export type Bodega = InferData<BodegaTransformer>
   export namespace Bodega {

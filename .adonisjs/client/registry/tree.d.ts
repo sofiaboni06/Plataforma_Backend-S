@@ -348,4 +348,17 @@ export interface ApiDefinition {
       bodega: typeof routes['reportes.reportes.bodega']
     }
   }
+  assistantSources: {
+    assistantSources: {
+      index: typeof routes['assistantSources.assistant_sources.index']
+      buscar: typeof routes['assistantSources.assistant_sources.buscar']
+      store: typeof routes['assistantSources.assistant_sources.store']
+      update: typeof routes['assistantSources.assistant_sources.update']
+    }
+  }
+  assistant: {
+    assistantSources: {
+      preguntar: typeof routes['assistant.assistant_sources.preguntar']
+    }
+  }
 }

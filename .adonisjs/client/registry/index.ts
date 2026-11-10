@@ -1194,6 +1194,36 @@ const routes = {
     tokens: [{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"api","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"v1","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"reportes","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":0,"val":"bodega","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"id","end":""},{"old":"/api/v1/reportes/bodega/:id/:formato","type":1,"val":"formato","end":""}],
     types: placeholder as Registry['reportes.reportes.bodega']['types'],
   },
+  'assistantSources.assistant_sources.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/assistant/sources',
+    tokens: [{"old":"/api/v1/assistant/sources","type":0,"val":"api","end":""},{"old":"/api/v1/assistant/sources","type":0,"val":"v1","end":""},{"old":"/api/v1/assistant/sources","type":0,"val":"assistant","end":""},{"old":"/api/v1/assistant/sources","type":0,"val":"sources","end":""}],
+    types: placeholder as Registry['assistantSources.assistant_sources.index']['types'],
+  },
+  'assistantSources.assistant_sources.buscar': {
+    methods: ["POST"],
+    pattern: '/api/v1/assistant/sources/buscar',
+    tokens: [{"old":"/api/v1/assistant/sources/buscar","type":0,"val":"api","end":""},{"old":"/api/v1/assistant/sources/buscar","type":0,"val":"v1","end":""},{"old":"/api/v1/assistant/sources/buscar","type":0,"val":"assistant","end":""},{"old":"/api/v1/assistant/sources/buscar","type":0,"val":"sources","end":""},{"old":"/api/v1/assistant/sources/buscar","type":0,"val":"buscar","end":""}],
+    types: placeholder as Registry['assistantSources.assistant_sources.buscar']['types'],
+  },
+  'assistantSources.assistant_sources.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/assistant/sources',
+    tokens: [{"old":"/api/v1/assistant/sources","type":0,"val":"api","end":""},{"old":"/api/v1/assistant/sources","type":0,"val":"v1","end":""},{"old":"/api/v1/assistant/sources","type":0,"val":"assistant","end":""},{"old":"/api/v1/assistant/sources","type":0,"val":"sources","end":""}],
+    types: placeholder as Registry['assistantSources.assistant_sources.store']['types'],
+  },
+  'assistantSources.assistant_sources.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/assistant/sources/:id',
+    tokens: [{"old":"/api/v1/assistant/sources/:id","type":0,"val":"api","end":""},{"old":"/api/v1/assistant/sources/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/assistant/sources/:id","type":0,"val":"assistant","end":""},{"old":"/api/v1/assistant/sources/:id","type":0,"val":"sources","end":""},{"old":"/api/v1/assistant/sources/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['assistantSources.assistant_sources.update']['types'],
+  },
+  'assistant.assistant_sources.preguntar': {
+    methods: ["POST"],
+    pattern: '/api/v1/assistant/preguntar',
+    tokens: [{"old":"/api/v1/assistant/preguntar","type":0,"val":"api","end":""},{"old":"/api/v1/assistant/preguntar","type":0,"val":"v1","end":""},{"old":"/api/v1/assistant/preguntar","type":0,"val":"assistant","end":""},{"old":"/api/v1/assistant/preguntar","type":0,"val":"preguntar","end":""}],
+    types: placeholder as Registry['assistant.assistant_sources.preguntar']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

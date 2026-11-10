@@ -202,6 +202,11 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'assistantSources.assistant_sources.index': { paramsTuple?: []; params?: {} }
+    'assistantSources.assistant_sources.buscar': { paramsTuple?: []; params?: {} }
+    'assistantSources.assistant_sources.store': { paramsTuple?: []; params?: {} }
+    'assistantSources.assistant_sources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'assistant.assistant_sources.preguntar': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -290,6 +295,7 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'assistantSources.assistant_sources.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -378,6 +384,7 @@ export type ScannedRoutes = {
     'solicitudesMaterial.solicitud_material.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reportes.reportes.elementos': { paramsTuple?: []; params?: {} }
     'reportes.reportes.bodega': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'formato': ParamValue} }
+    'assistantSources.assistant_sources.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -428,6 +435,9 @@ export type ScannedRoutes = {
     'solicitudes.solicitudes.registrar_en_bodega': { paramsTuple?: []; params?: {} }
     'solicitudesEquipo.solicitud_equipo.store': { paramsTuple?: []; params?: {} }
     'solicitudesMaterial.solicitud_material.store': { paramsTuple?: []; params?: {} }
+    'assistantSources.assistant_sources.buscar': { paramsTuple?: []; params?: {} }
+    'assistantSources.assistant_sources.store': { paramsTuple?: []; params?: {} }
+    'assistant.assistant_sources.preguntar': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'authTwoFactor.password_recovery.disable_google': { paramsTuple?: []; params?: {} }
@@ -485,6 +495,7 @@ export type ScannedRoutes = {
     'solicitudesEquipo.solicitud_equipo.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesEquipo.solicitud_equipo.devolver': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'solicitudesMaterial.solicitud_material.entregar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'assistantSources.assistant_sources.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'roles.roles.sync_modules': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

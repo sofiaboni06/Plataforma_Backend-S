@@ -2383,4 +2383,64 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'assistantSources.assistant_sources.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/assistant/sources'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'assistantSources.assistant_sources.buscar': {
+    methods: ["POST"]
+    pattern: '/api/v1/assistant/sources/buscar'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'assistantSources.assistant_sources.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/assistant/sources'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'assistantSources.assistant_sources.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/assistant/sources/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'assistant.assistant_sources.preguntar': {
+    methods: ["POST"]
+    pattern: '/api/v1/assistant/preguntar'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
 }
